@@ -44,6 +44,7 @@ namespace MovieRecommender.App_Start
 
             // TODO: Register your types here
             container.RegisterType<ApplicationUserManager>();
+            container.RegisterType<ApplicationRoleManager>();
             container.RegisterType<SignInHelper>();
 
             var mongoPool = new MongoDbConnectionPool();

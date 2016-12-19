@@ -56,7 +56,6 @@ namespace MovieRecommender.App_Start.IdentityConfiguration
                 this.UserTokenProvider = new DataProtectorTokenProvider<ApplicationUser>(dataProtectionProvider.Create("ASP.NET Identity"));
             }
         }
-
         #endregion
 
         #region Public Methods

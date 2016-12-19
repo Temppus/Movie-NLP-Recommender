@@ -1,22 +1,30 @@
-﻿using MongoMigrations;
+﻿using AspNet.Identity.MongoDB;
+using MongoMigrations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using MongoDB.Bson;
+using MongoDB.Driver;
 
 namespace MovieRecommender.App_Start.MongoMigrations
 {
     public class Migration1 : CollectionMigration
     {
-        public Migration1()
-            : base("0.0.1", "users")
+        private static IEnumerable<IdentityRole> _roles = new List<IdentityRole>()
         {
-            Description = "Dummy migration.";
+            new IdentityRole() {  Name = "admin" },
+            new IdentityRole() { Name = "user" }
+        };
+
+        public Migration1() : base("0.0.1", "roles")
+        {
+            Description = "Initial roles for users.";
         }
 
-        public override void ValidateMigrationDocuments()
+        public override void AfterMigration(IMongoCollection<BsonDocument> collection)
         {
-            // no validation needed
+            collection.InsertMany(_roles.Select(r => r.ToBsonDocument()));
         }
     }
 }

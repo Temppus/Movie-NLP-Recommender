@@ -210,6 +210,7 @@
     <Compile Include="App_Start\IdentityConfiguration\EmailService.cs" />
     <Compile Include="App_Start\IdentityConfiguration\SignInHelper.cs" />
     <Compile Include="App_Start\IdentityConfiguration\SmsService.cs" />
+    <Compile Include="App_Start\MongoMigrations\Migration2.cs" />
     <Compile Include="App_Start\MongoMigrations\Migration1.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
