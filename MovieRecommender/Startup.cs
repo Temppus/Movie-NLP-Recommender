@@ -1,4 +1,5 @@
 ﻿using Microsoft.Owin;
+using Microsoft.Owin.Security.DataProtection;
 using Owin;
 
 [assembly: OwinStartupAttribute(typeof(MovieRecommender.Startup))]

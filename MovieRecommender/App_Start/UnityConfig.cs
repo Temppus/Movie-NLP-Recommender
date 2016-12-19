@@ -1,6 +1,13 @@
 using System;
 using Microsoft.Practices.Unity;
 using Microsoft.Practices.Unity.Configuration;
+using Microsoft.AspNet.Identity;
+using MovieRecommender.Models;
+using AspNet.Identity.MongoDB;
+using System.Web;
+using Microsoft.Owin.Security;
+using MovieRecommender.Database;
+using MovieRecommender.App_Start.IdentityConfiguration;
 
 namespace MovieRecommender.App_Start
 {
@@ -36,7 +43,28 @@ namespace MovieRecommender.App_Start
             // container.LoadConfiguration();
 
             // TODO: Register your types here
-            // container.RegisterType<IProductRepository, ProductRepository>();
+            container.RegisterType<ApplicationUserManager>();
+            container.RegisterType<SignInHelper>();
+
+            var mongoPool = new MongoDbConnectionPool();
+
+            container.RegisterInstance(mongoPool); // Rgister "singleton" like object dependency
+
+            container.RegisterType<ApplicationIdentityContext>(new InjectionConstructor(container.Resolve<MongoDbConnectionPool>()));
+            container.RegisterType<IRepositoryManager, RepositoryManager>(new InjectionConstructor(container.Resolve<MongoDbConnectionPool>()));
+
+            container.RegisterType<IAuthenticationManager>(
+                new InjectionFactory(c => HttpContext.Current.GetOwinContext().Authentication));
+
+            container.RegisterType<IUserStore<ApplicationUser>, UserStore<ApplicationUser>>(new InjectionFactory((c) =>
+            {
+                return new UserStore<ApplicationUser>(container.Resolve<ApplicationIdentityContext>().Users);
+            }));
+
+            container.RegisterType<IRoleStore<IdentityRole, string>, RoleStore<IdentityRole>>(new InjectionFactory((c) =>
+            {
+                return new RoleStore<IdentityRole>(container.Resolve<ApplicationIdentityContext>().Roles);
+            }));
         }
     }
 }
