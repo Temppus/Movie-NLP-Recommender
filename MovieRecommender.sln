@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MovieRecommender", "MovieRe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MovieRecommender.Tests", "MovieRecommender.Tests\MovieRecommender.Tests.csproj", "{33DF39C2-8DD0-41E8-8F50-D8ACE3BDA225}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MongoMigrations", "..\..\..\..\..\..\GitRepos\C#\DevACTs\AdministrationPortal\MongoMigrations\MongoMigrations.csproj", "{21FAA69E-8C95-46A9-85F4-5020E3939973}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{33DF39C2-8DD0-41E8-8F50-D8ACE3BDA225}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33DF39C2-8DD0-41E8-8F50-D8ACE3BDA225}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{33DF39C2-8DD0-41E8-8F50-D8ACE3BDA225}.Release|Any CPU.Build.0 = Release|Any CPU
-		{21FAA69E-8C95-46A9-85F4-5020E3939973}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{21FAA69E-8C95-46A9-85F4-5020E3939973}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{21FAA69E-8C95-46A9-85F4-5020E3939973}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{21FAA69E-8C95-46A9-85F4-5020E3939973}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
