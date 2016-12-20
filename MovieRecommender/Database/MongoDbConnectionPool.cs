@@ -23,7 +23,7 @@ namespace MovieRecommender.Database
                 throw new InvalidOperationException("Connection pool was instantiated more than once. Use IoC container only.");
 
             MongoClient client = new MongoClient(ConfigurationManager.ConnectionStrings["Mongo"].ConnectionString);
-            database = client.GetDatabase("MovieRecommenderDb");
+            database = client.GetDatabase(ConfigurationManager.AppSettings["DatabaseName"]);
             _instantiated = true;
         }
 
