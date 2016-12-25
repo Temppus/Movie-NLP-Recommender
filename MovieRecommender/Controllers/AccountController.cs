@@ -11,6 +11,7 @@ using Microsoft.Owin.Security;
 using MovieRecommender.Models;
 using MovieRecommender.Database;
 using MovieRecommender.App_Start.IdentityConfiguration;
+using System.Web.UI.WebControls;
 
 namespace MovieRecommender.Controllers
 {

@@ -4,7 +4,11 @@
     ViewBag.Title = "Registration successful";
 }
 
-<h2>RegistrationSuccessful</h2>
+<h2 class="ui teal header">
+    <span class="content">
+        Registration Successful
+    </span>
+</h2>
 <strong>
     Account for user : @Html.DisplayFor(m => m.UserName) was created.
     You can @Html.ActionLink("login", "Login", "Account") now.
