@@ -41,7 +41,7 @@
                 <i class="film icon"></i>
                 Movie Recommender
             </a>
-            <a href="#" class="item">Home</a>
+            @Html.ActionLink("Home", "Index", "Home", null, htmlAttributes: new { @class = "item" })
             @Html.Partial("_LoginPartial")
         </div>
     </div>
