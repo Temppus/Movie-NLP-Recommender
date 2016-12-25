@@ -1,5 +1,6 @@
 ﻿using AspNet.Identity.MongoDB;
 using MongoDB.Driver;
+using MovieRecommender.Database.Models;
 using MovieRecommender.Models;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,8 @@ namespace MovieRecommender.Database
 
         private IMongoCollection<ApplicationUser> _users;
         private IMongoCollection<IdentityRole> _roles;
+        private IMongoCollection<Movie> _movies;
+        private IMongoCollection<MovieReview> _reviews;
 
         /// <summary>
         /// Main repository constructor
@@ -45,6 +48,30 @@ namespace MovieRecommender.Database
                     _roles = _database.GetCollection<IdentityRole>("roles");
                 }
                 return _roles;
+            }
+        }
+
+        public IMongoCollection<Movie> Movies
+        {
+            get
+            {
+                if (_movies == null)
+                {
+                    _movies = _database.GetCollection<Movie>("movies");
+                }
+                return _movies;
+            }
+        }
+
+        public IMongoCollection<MovieReview> Reviews
+        {
+            get
+            {
+                if (_reviews == null)
+                {
+                    _reviews = _database.GetCollection<MovieReview>("reviews");
+                }
+                return _reviews;
             }
         }
     }

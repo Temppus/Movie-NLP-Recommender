@@ -228,6 +228,8 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Database\IRepositoryManager.cs" />
+    <Compile Include="Database\Models\Movie.cs" />
+    <Compile Include="Database\Models\MovieReview.cs" />
     <Compile Include="Database\MongoDbConnectionPool.cs" />
     <Compile Include="Database\RepositoryManager.cs" />
     <Compile Include="Global.asax.cs">

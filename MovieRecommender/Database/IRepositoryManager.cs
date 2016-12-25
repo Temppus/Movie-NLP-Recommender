@@ -1,5 +1,6 @@
 ﻿using AspNet.Identity.MongoDB;
 using MongoDB.Driver;
+using MovieRecommender.Database.Models;
 using MovieRecommender.Models;
 using System;
 using System.Collections.Generic;
@@ -12,5 +13,7 @@ namespace MovieRecommender.Database
     {
         IMongoCollection<ApplicationUser> Users { get; }
         IMongoCollection<IdentityRole> Roles { get; }
+        IMongoCollection<Movie> Movies { get; }
+        IMongoCollection<MovieReview> Reviews { get; }
     }
 }
