@@ -48,6 +48,10 @@
       <HintPath>..\packages\AspNet.Identity.MongoDB.2.0.8\lib\net45\AspNet.Identity.MongoDB.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="AutoMapper, Version=5.2.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.5.2.0\lib\net45\AutoMapper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
       <Private>True</Private>
@@ -96,6 +100,7 @@
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.InteropServices.RuntimeInformation, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Runtime.InteropServices.RuntimeInformation.4.0.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
       <Private>True</Private>
@@ -220,6 +225,7 @@
     <Compile Include="App_Start\IdentityConfiguration\SmsService.cs" />
     <Compile Include="App_Start\MongoMigrations\Migration2.cs" />
     <Compile Include="App_Start\MongoMigrations\Migration1.cs" />
+    <Compile Include="App_Start\MongoMigrations\Migration3.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="App_Start\UnityConfig.cs" />
@@ -227,6 +233,9 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Controllers\MovieController.cs" />
+    <Compile Include="Database\CollectionAPI\IMovieRepository.cs" />
+    <Compile Include="Database\CollectionAPI\MongoMovieRepository.cs" />
     <Compile Include="Database\IRepositoryManager.cs" />
     <Compile Include="Database\Models\Movie.cs" />
     <Compile Include="Database\Models\MovieReview.cs" />
@@ -238,6 +247,7 @@
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\MoviePreviewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -387,6 +397,9 @@
     <Content Include="Content\Themes\basic\assets\fonts\icons.svg" />
     <Content Include="Content\Themes\default\assets\fonts\icons.svg" />
     <Content Include="Content\Themes\default\assets\images\flags.png" />
+    <Content Include="css\themes\basic\assets\fonts\icons.svg" />
+    <Content Include="css\themes\default\assets\fonts\icons.svg" />
+    <Content Include="css\themes\default\assets\images\flags.png" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Scripts\bootstrap.js" />
@@ -399,6 +412,14 @@
     <Content Include="Content\Themes\basic\assets\fonts\icons.woff" />
     <Content Include="Content\Themes\basic\assets\fonts\icons.ttf" />
     <Content Include="Content\Themes\basic\assets\fonts\icons.eot" />
+    <Content Include="css\themes\basic\assets\fonts\icons.eot" />
+    <Content Include="css\themes\basic\assets\fonts\icons.ttf" />
+    <Content Include="css\themes\basic\assets\fonts\icons.woff" />
+    <Content Include="css\themes\default\assets\fonts\icons.eot" />
+    <Content Include="css\themes\default\assets\fonts\icons.otf" />
+    <Content Include="css\themes\default\assets\fonts\icons.ttf" />
+    <Content Include="css\themes\default\assets\fonts\icons.woff" />
+    <Content Include="css\themes\default\assets\fonts\icons.woff2" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -446,6 +467,8 @@
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Account\RegistrationSuccessful.cshtml" />
+    <Content Include="Views\Movie\Index.cshtml" />
+    <Content Include="Views\Movie\SearchMoviePartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

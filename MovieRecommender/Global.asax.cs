@@ -9,6 +9,9 @@ using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using Microsoft.Practices.Unity;
+using AutoMapper;
+using MovieRecommender.Database.Models;
+using MovieRecommender.Models;
 
 namespace MovieRecommender
 {
@@ -40,6 +43,10 @@ namespace MovieRecommender
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+
+            Mapper.Initialize(cfg => {
+                cfg.CreateMap<Movie, MoviePreview>();
+            });
 
             onStartHooks.ForEach(x => x.Start());
         }

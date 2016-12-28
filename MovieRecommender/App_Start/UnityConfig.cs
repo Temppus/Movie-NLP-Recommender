@@ -8,6 +8,7 @@ using System.Web;
 using Microsoft.Owin.Security;
 using MovieRecommender.Database;
 using MovieRecommender.App_Start.IdentityConfiguration;
+using MovieRecommender.Database.CollectionAPI;
 
 namespace MovieRecommender.App_Start
 {
@@ -50,6 +51,8 @@ namespace MovieRecommender.App_Start
             var mongoPool = new MongoDbConnectionPool();
 
             container.RegisterInstance(mongoPool); // Rgister "singleton" like object dependency
+
+            container.RegisterType<IMovieRepository, MongoMovieRepository>(new InjectionConstructor(container.Resolve<MongoDbConnectionPool>()));
 
             container.RegisterType<ApplicationIdentityContext>(new InjectionConstructor(container.Resolve<MongoDbConnectionPool>()));
             container.RegisterType<IRepositoryManager, RepositoryManager>(new InjectionConstructor(container.Resolve<MongoDbConnectionPool>()));

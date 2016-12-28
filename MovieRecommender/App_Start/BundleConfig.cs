@@ -20,6 +20,7 @@ namespace MovieRecommender
             bundles.Add(new ScriptBundle("~/scripts/semantic").Include(
                       "~/Scripts/semantic.js"));
 
+            BundleTable.EnableOptimizations = true;
         }
     }
 }
