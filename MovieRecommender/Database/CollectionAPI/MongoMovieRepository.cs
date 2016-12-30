@@ -6,6 +6,7 @@ using System.Web;
 using MongoDB.Driver;
 using MovieRecommender.Database.Models;
 using System.Runtime.Caching;
+using MongoDB.Bson;
 
 namespace MovieRecommender.Database.CollectionAPI
 {
@@ -75,6 +76,19 @@ namespace MovieRecommender.Database.CollectionAPI
             });
 
             return yearsDesc;
+        }
+
+        public IEnumerable<Movie> FindMoviesLikeTitleAsync(string likeTitle, int limit, bool sortDescByYear)
+        {
+            if (limit <= 0)
+                throw new ArgumentException(nameof(limit) + " must be > 0");
+
+            var filter = Builders<Movie>.Filter.Regex("Title", new BsonRegularExpression(likeTitle, "i"));
+
+            if (sortDescByYear)
+                return _collection.Find(filter).SortByDescending(m => m.PublicationYear).Limit(limit).ToList();
+            else
+                return _collection.Find(filter).Limit(limit).ToList();
         }
     }
 }

@@ -4,8 +4,10 @@ using MovieRecommender.Database;
 using MovieRecommender.Database.CollectionAPI;
 using MovieRecommender.Database.Models;
 using MovieRecommender.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -62,8 +64,8 @@ namespace MovieRecommender.Controllers
 
             model.SelectedGenres = model.SelectedGenres ?? new List<string>(); // model binder is binding empty collections as nulls
 
-            var movies = _movieStore.FilterMovies(  model.SelectedFromYear,
-                                                    model.SelectedToYear, 
+            var movies = _movieStore.FilterMovies(model.SelectedFromYear,
+                                                    model.SelectedToYear,
                                                     model.SelectedGenres,
                                                     model.SelectedRating == "desc",
                                                     _movieLimit,
@@ -74,13 +76,21 @@ namespace MovieRecommender.Controllers
             return Json(moviePreviews);
         }
 
+        [HttpGet]
+        public string SearchMoviesLike(string title)
+        {
+            var movies = _movieStore.FindMoviesLikeTitleAsync(title, 10, true);
+            var json = JsonConvert.SerializeObject(new QuickSearchResponse(movies));
+            return json;
+        }
+
         private IEnumerable<Movie> GetMoviesByModelSearchQuery(MoviePreviewModel model, int limit)
         {
             return _movieStore.FilterMovies(model.SelectedFromYear, model.SelectedToYear, model.SelectedGenres, model.SelectedRating == "desc", limit);
         }
 
         // GET: Movie/Details/5
-        public ActionResult Details(int id)
+        public ActionResult Details(string imdbId)
         {
             return View();
         }

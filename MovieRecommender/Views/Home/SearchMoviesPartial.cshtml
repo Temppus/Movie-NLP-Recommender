@@ -1,0 +1,28 @@
+﻿
+<div class="ui left aligned search">
+    <div class="ui icon input">
+        <input class="prompt" type="text" placeholder="Common passwords...">
+        <i class="search icon"></i>
+    </div>
+    <div class="results"></div>
+</div>
+
+<script>
+    $('.ui.search')
+      .search({
+          searchDelay: 500,
+          maxResults: 8,
+          apiSettings: {
+              url: '/Movie/SearchMoviesLike?title={query}'
+          },
+          minCharacters: 3,
+          onResultsAdd: function (html) {
+
+              /*$(html).find('.description').each(function () {
+                  $(this).html("todo");
+              });*/
+
+              return true;
+          }
+      });
+</script>
