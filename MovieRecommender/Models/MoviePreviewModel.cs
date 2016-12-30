@@ -29,7 +29,11 @@ namespace MovieRecommender.Models
             SelectedRating = "desc";
 
             FromYear = yearListDesc.First() - 2;
+
             SelectedFromYear = FromYear;
+            SelectedToYear = yearListDesc.First();
+
+            SelectedGenres = new List<string>();
         }
 
         [Display(Name = "From Year")]

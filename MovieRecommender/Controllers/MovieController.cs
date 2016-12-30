@@ -19,6 +19,8 @@ namespace MovieRecommender.Controllers
         private readonly ApplicationUserManager _userManager;
         private readonly IMovieRepository _movieStore;
 
+        private const int _movieLimit = 10;
+
         /// <summary>
         /// Parameters injected via unity IoC container
         /// </summary>
@@ -33,7 +35,7 @@ namespace MovieRecommender.Controllers
         public ActionResult Index()
         {
             var model = new MoviePreviewModel(_movieStore.DistinctGenres(), _movieStore.DistinctYearsDesc());
-            var movies = GetMoviesByModelSearchQuery(model, 20);
+            var movies = GetMoviesByModelSearchQuery(model, _movieLimit);
             model.MoviePreviews = movies.Select(m => new MoviePreview(m));
             return View(model);
         }
@@ -42,10 +44,34 @@ namespace MovieRecommender.Controllers
         [HttpPost]
         public ActionResult Search(MoviePreviewModel model)
         {
-            var movies = GetMoviesByModelSearchQuery(model, 20);
+            model.SelectedGenres = model.SelectedGenres ?? new List<string>(); // model binder is binding empty collections as nulls
+
+            var movies = GetMoviesByModelSearchQuery(model, _movieLimit);
             model.MoviePreviews = movies.Select(m => new MoviePreview(m));
 
             return View("Index", model);
+        }
+
+        [HttpPost]
+        public JsonResult PaginationSearch(SearchModel model)
+        {
+            model.SelectedGenres = model.SelectedGenres ?? new List<string>(); // model binder is binding empty collections as nulls
+
+            if (model.SelectedGenres == null || model.SelectedFromYear < 0 || model.SelectedToYear < 0 || model.PaginationIndex < 0)
+                return Json(null);
+
+            model.SelectedGenres = model.SelectedGenres ?? new List<string>(); // model binder is binding empty collections as nulls
+
+            var movies = _movieStore.FilterMovies(  model.SelectedFromYear,
+                                                    model.SelectedToYear, 
+                                                    model.SelectedGenres,
+                                                    model.SelectedRating == "desc",
+                                                    _movieLimit,
+                                                    model.PaginationIndex);
+
+            var moviePreviews = movies.Select(m => new MoviePreview(m));
+
+            return Json(moviePreviews);
         }
 
         private IEnumerable<Movie> GetMoviesByModelSearchQuery(MoviePreviewModel model, int limit)

@@ -3,34 +3,39 @@
     ViewBag.Title = "Movies";
 }
 
+<div class="ui text container">
+    @Html.Partial("SearchMoviePartial")
+</div>
 
-@Html.Partial("SearchMoviePartial")
-
-<div class="ui celled grid">
+<div class="ui celled grid" id="resultGrid">
 
     @foreach (var moviePreview in Model.MoviePreviews)
     {
         <div class="row">
             <!-- Image column -->
-            <div class="five wide column">
-                <img alt="Film poster" src="@Url.Content(moviePreview.ImageURI)" />
-                <a href="http://www.imdb.com/title/@moviePreview.IMDBId" target="_blank">IMDb link</a>
+            <div class="four wide column">
+                <div class="row">
+                    <img alt="Film poster" src="@Url.Content(moviePreview.ImageURI)" id="posterImgId" />
+                </div>
+                <div class="row">
+                    <a href="http://www.imdb.com/title/@moviePreview.IMDBId" target="_blank" id="imdbLinkId">IMDb link</a>
+                </div>
             </div>
 
             <!-- Film info column -->
-            <div class="ten wide column">
+            <div class="twelve wide column">
                 <div class="ui grid">
 
-                    <!-- Overview -->
+                    <!-- Title -->
                     <div class="row">
                         <div class="wide row">
-                            <div class="ui medium header">@moviePreview.Title</div>
+                            <div class="ui medium header" id="titleId">@moviePreview.Title</div>
                             <div class="ui grid">
                                 <div class="twelve wide column">
-                                    <div class="ui star rating" data-rating=@Math.Floor(moviePreview.Rating).ToString()>
+                                    <div class="ui star rating" data-rating=@Math.Floor(moviePreview.Rating).ToString() id="ratingId">
                                     </div>
                                 </div>
-                                <div class="four wide column">
+                                <div class="four wide column" id="ratingNumberId">
                                     @moviePreview.Rating
                                 </div>
                             </div>
@@ -39,11 +44,11 @@
 
                     <!-- Genres -->
                     <div class="row">
-                        <div class="ui small header">
+                        <div class="ui small header" id="genresDivId">
                             Genres
                             @foreach (string genre in moviePreview.Genres)
                             {
-                                <button class="tiny ui button">@genre</button>
+                                <button class="tiny ui button" id="genreId">@genre</button>
                             }
                         </div>
 
@@ -53,27 +58,124 @@
                     <div class="row">
                         <div class="wide row">
                             <div class="ui small header">Overview</div>
-                            <p>@moviePreview.Overview</p>
+                            <p id="overviewId">@moviePreview.Overview</p>
                         </div>
                     </div>
+
                 </div>
             </div>
 
         </div>
     }
-
 </div>
 
+<div class="ui active centered inline loader" id="loaderId"></div>
+
 <script>
+
+    $(document).ready(function () {
+        $('#loaderId').hide();
+    });
+
+    var currentPaginationIndex = 1;
+
     $('.rating')
       .rating({
-
           initialRating: 5,
           maxRating: 10,
           interactive: false
-      })
-    ;
+      });
+
+
+    $(window).scroll(function () {
+        if ($(window).scrollTop() + $(window).height() == $(document).height()) {
+
+            var resultGrid = $('#resultGrid');
+
+            if (resultGrid.children().length > 0) {
+
+                $('#loaderId').show();
+
+                var fromYear = $("#SelectedFromYear :selected").text();
+                var toYear = $("#SelectedToYear :selected").text();
+
+                var selectedGenres = [];
+                $("#SelectedGenres :selected").each(function () {
+                    selectedGenres.push($(this).val());
+                });
+
+                var selectedRating = $("#SelectedRating :selected").text();
+
+                var searchModelObject = {
+                    'SelectedFromYear': fromYear,
+                    'SelectedToYear': toYear,
+                    'SelectedRating': selectedRating,
+                    'SelectedGenres': selectedGenres,
+                    'PaginationIndex': currentPaginationIndex++
+                };
+
+                searchModelObject = JSON.stringify({ model: searchModelObject });
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/Movie/PaginationSearch',
+                    data: searchModelObject,
+                    contentType: 'application/json',
+                    error: function (err) {
+                        alert("Pagination error.");
+                    },
+                    success: function (previewMovieArray) {
+
+                        $('#loaderId').hide();
+
+                        var filmDivsArray = [];
+
+                        for (var i = 0; i < previewMovieArray.length; i++) {
+
+                            var templateDiv = resultGrid.find(">:first-child").clone();
+                            var moviePreview = previewMovieArray[i];
+                            templateDiv.find("#titleId").html(moviePreview.Title);
+                            templateDiv.find("#posterImgId").attr("src", moviePreview.ImageURI);
+                            templateDiv.find("#imdbLinkId").attr("href", "http://www.imdb.com/title/" + moviePreview.IMDBId);
+                            templateDiv.find("#ratingId").attr("data-rating", Math.floor(moviePreview.Rating));
+                            templateDiv.find("#ratingNumberId").html(moviePreview.Rating);
+
+                            // remove genres
+                            templateDiv.find("#genreId").each(function () {
+                                $(this).remove();
+                            });
+
+                            var genreDiv = templateDiv.find("#genresDivId");
+
+                            // create new ones
+                            for (var j = 0; j < moviePreview.Genres.length; j++) {
+
+                                var button = $(document.createElement('button'))
+                                            .addClass('tiny ui button')
+                                            .text(moviePreview.Genres[j]);
+
+                                genreDiv.append(button);
+                            }
+
+                            // at last thing change overview
+                            templateDiv.find("#overviewId").html(moviePreview.Overview);
+
+                            filmDivsArray.push(templateDiv);
+                        }
+
+                        // append pagination movies
+                        resultGrid.append(filmDivsArray);
+
+                        // run sematic rating again to set appropriate stars
+                        $(".rating").rating();
+                    }
+                });
+            }
+        }
+    });
 </script>
+
+
 
 
 
