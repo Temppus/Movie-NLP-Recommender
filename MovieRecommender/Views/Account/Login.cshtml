@@ -4,43 +4,59 @@
     ViewBag.Title = "Log in";
 }
 
-<div class="ui middle aligned center aligned grid">
-    <div class="column">
-        <h2 class="ui teal image header">
-            <span class="content">
-                Log-in to your account
-            </span>
-        </h2>
+<div class="ui text container">
+    <div class="ui middle aligned center aligned grid">
+        <div class="column">
+            <h2 class="ui teal image header">
+                <span class="content">
+                    Log-in to your account
+                </span>
+            </h2>
 
-        @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "ui large form" }))
-        {
-            @Html.AntiForgeryToken()
+            @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "ui large form" }))
+            {
+                @Html.AntiForgeryToken()
 
-            <div class="ui stacked segment">
-                <div class="field">
-                    <div class="ui left icon input">
-                        <i class="user icon"></i>
-                        <input type="text" name="UserName" placeholder="Username">
+                <div class="ui stacked segment">
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <i class="user icon"></i>
+                            <input type="text" name="UserName" placeholder="Username">
+                        </div>
                     </div>
-                </div>
 
-                <div class="field">
-                    <div class="ui left icon input">
-                        <i class="lock icon"></i>
-                        <input type="password" name="Password" placeholder="Password">
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <i class="lock icon"></i>
+                            <input type="password" name="Password" placeholder="Password">
+                        </div>
                     </div>
-                </div>
 
-                <input type="submit" value="Log in" class="ui fluid large teal submit button" />
+                    <input type="submit" value="Log in" class="ui fluid large teal submit button" />
+                </div>
+            }
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="ui negative message">
+                    <div class="header">
+                        Login attempt
+                    </div>
+                    <p>
+                        Incorrect username or password entered. Please try again.
+                    </p>
+                </div>
+            }
+
+            <div class="ui message">
+                New to us ? @Html.ActionLink("Register", "Register")
             </div>
-        }
 
-
-        <div class="ui message">
-            New to us ? @Html.ActionLink("Register", "Register")
         </div>
     </div>
 </div>
+
+
 
 @*<div class="row">
         <div class="col-md-4">

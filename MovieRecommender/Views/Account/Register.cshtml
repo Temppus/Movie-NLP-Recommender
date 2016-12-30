@@ -3,47 +3,62 @@
     ViewBag.Title = "Register";
 }
 
-<div class="ui middle aligned center aligned grid">
-    <div class="column">
-        <h2 class="ui teal header">
-            <span class="content">
-                Create a new account
-            </span>
-        </h2>
+<div class="ui text container">
+    <div class="ui middle aligned center aligned grid">
+        <div class="column">
+            <h2 class="ui teal header">
+                <span class="content">
+                    Create a new account
+                </span>
+            </h2>
 
-        @using (Html.BeginForm("Register", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "ui large form" }))
-        {
-            @Html.AntiForgeryToken()
+            @using (Html.BeginForm("Register", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "ui large form" }))
+            {
+                @Html.AntiForgeryToken()
 
-            <div class="ui stacked segment">
-                <div class="field">
-                    <div class="ui left icon input">
-                        <i class="user icon"></i>
-                        <input type="text" name="UserName" placeholder="Username">
+                <div class="ui stacked segment">
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <i class="user icon"></i>
+                            <input type="text" name="UserName" placeholder="Username">
+                        </div>
                     </div>
-                </div>
 
-                <div class="field">
-                    <div class="ui left icon input">
-                        <i class="lock icon"></i>
-                        <input type="password" name="Password" placeholder="Password">
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <i class="lock icon"></i>
+                            <input type="password" name="Password" placeholder="Password">
+                        </div>
                     </div>
-                </div>
 
-                <div class="field">
-                    <div class="ui left icon input">
-                        <i class="lock icon"></i>
-                        <input type="password" name="ConfirmPassword" placeholder="Confirmed password">
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <i class="lock icon"></i>
+                            <input type="password" name="ConfirmPassword" placeholder="Confirmed password">
+                        </div>
                     </div>
+
+                    <input type="submit" value="Register" class="ui fluid large teal submit button" />
                 </div>
+            }
 
-                <input type="submit" value="Register" class="ui fluid large teal submit button" />
-            </div>
-            @Html.ValidationSummary("", new { @class = "text-danger" })
-        }
-
-        <div class="ui message">
-            New to us ? @Html.ActionLink("Register", "Register")
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="ui error message">
+                    <div class="header">
+                        Registration failed
+                    </div>
+                    <ul class="list">
+                        @foreach (ModelState modelState in ViewData.ModelState.Values)
+                        {
+                            foreach (ModelError error in modelState.Errors)
+                            {
+                                <li>@error.ErrorMessage</li>
+                            }
+                        }
+                    </ul>
+                </div>
+            }
         </div>
     </div>
 </div>

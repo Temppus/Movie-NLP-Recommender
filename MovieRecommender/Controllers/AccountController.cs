@@ -62,6 +62,7 @@ namespace MovieRecommender.Controllers
                 case SignInStatus.RequiresVerification:
                     return RedirectToAction("SendCode", new { ReturnUrl = returnUrl });
                 case SignInStatus.Failure:
+                    ModelState.AddModelError("", "Login failed");
                     return View(model);
                 default:
                     ModelState.AddModelError("", "Invalid login attempt.");
