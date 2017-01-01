@@ -1,0 +1,106 @@
+﻿@model MovieRecommender.Models.MovieDetailModel
+
+@{
+    ViewBag.Title = "Movie Detail";
+}
+
+<h2>View</h2>
+
+<div>
+    <h4>MovieDetailModel</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.TMDBId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TMDBId)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.IMDBId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.IMDBId)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Title)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Title)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Director)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Director)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.PublicationYear)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.PublicationYear)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Rating)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Rating)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.RatingCount)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.RatingCount)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Overview)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Overview)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ImageURI)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ImageURI)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.TrailerImageURI)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TrailerImageURI)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.TrailerVideoURI)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TrailerVideoURI)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

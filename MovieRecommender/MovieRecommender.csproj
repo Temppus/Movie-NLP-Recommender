@@ -235,7 +235,9 @@
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\MovieController.cs" />
     <Compile Include="Database\CollectionAPI\IMovieRepository.cs" />
+    <Compile Include="Database\CollectionAPI\IReviewRepository.cs" />
     <Compile Include="Database\CollectionAPI\MongoMovieRepository.cs" />
+    <Compile Include="Database\CollectionAPI\MongoReviewRepository.cs" />
     <Compile Include="Database\IRepositoryManager.cs" />
     <Compile Include="Database\Models\Movie.cs" />
     <Compile Include="Database\Models\MovieReview.cs" />
@@ -247,6 +249,7 @@
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\MovieDetailModel.cs" />
     <Compile Include="Models\MoviePreviewModel.cs" />
     <Compile Include="Models\QuickSearchResponse.cs" />
     <Compile Include="Models\SearchModel.cs" />
@@ -472,6 +475,7 @@
     <Content Include="Views\Movie\Index.cshtml" />
     <Content Include="Views\Movie\SearchMoviePartial.cshtml" />
     <Content Include="Views\Home\SearchMoviesPartial.cshtml" />
+    <Content Include="Views\Movie\Detail.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

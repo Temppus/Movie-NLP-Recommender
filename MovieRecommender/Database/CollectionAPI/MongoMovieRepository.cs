@@ -104,5 +104,10 @@ namespace MovieRecommender.Database.CollectionAPI
             else
                 return _collection.Find(filter).Limit(limit).SortByDescending(m => m.PublicationYear).ToList();
         }
+
+        public Movie FindMovieByImdbId(string imdbId)
+        {
+            return _collection.Find(m => m.IMDBId == imdbId).FirstOrDefault();
+        }
     }
 }

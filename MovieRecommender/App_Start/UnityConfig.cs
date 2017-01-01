@@ -53,6 +53,7 @@ namespace MovieRecommender.App_Start
             container.RegisterInstance(mongoPool); // Rgister "singleton" like object dependency
 
             container.RegisterType<IMovieRepository, MongoMovieRepository>(new InjectionConstructor(container.Resolve<MongoDbConnectionPool>()));
+            container.RegisterType<IReviewRepository, MongoReviewRepository>(new InjectionConstructor(container.Resolve<MongoDbConnectionPool>()));
 
             container.RegisterType<ApplicationIdentityContext>(new InjectionConstructor(container.Resolve<MongoDbConnectionPool>()));
             container.RegisterType<IRepositoryManager, RepositoryManager>(new InjectionConstructor(container.Resolve<MongoDbConnectionPool>()));

@@ -46,6 +46,8 @@ namespace MovieRecommender
 
             Mapper.Initialize(cfg => {
                 cfg.CreateMap<Movie, MoviePreview>();
+                cfg.CreateMap<Movie, MovieDetailModel>();
+                cfg.CreateMap<ActorsInfo, ActorModel>();
             });
 
             onStartHooks.ForEach(x => x.Start());

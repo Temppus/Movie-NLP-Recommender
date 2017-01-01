@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿using AutoMapper;
+using MongoDB.Driver;
 using MovieRecommender.App_Start.IdentityConfiguration;
 using MovieRecommender.Database;
 using MovieRecommender.Database.CollectionAPI;
@@ -20,17 +21,19 @@ namespace MovieRecommender.Controllers
         private readonly IRepositoryManager _repoManager;
         private readonly ApplicationUserManager _userManager;
         private readonly IMovieRepository _movieStore;
+        private readonly IReviewRepository _reviewStore;
 
         private const int _movieLimit = 10;
 
         /// <summary>
         /// Parameters injected via unity IoC container
         /// </summary>
-        public MovieController(ApplicationUserManager userManager, IRepositoryManager repoManager, IMovieRepository movieStore)
+        public MovieController(ApplicationUserManager userManager, IRepositoryManager repoManager, IMovieRepository movieStore, IReviewRepository reviewStore)
         {
             _repoManager = repoManager;
             _userManager = userManager;
             _movieStore = movieStore;
+            _reviewStore = reviewStore;
         }
 
         // GET: Movie
@@ -92,13 +95,17 @@ namespace MovieRecommender.Controllers
         // GET: Movie/Details/5
         public ActionResult Details(string imdbId)
         {
-            return View();
-        }
+            Movie movie = _movieStore.FindMovieByImdbId(imdbId);
 
-        // GET: Movie/Details/5
-        public ActionResult Filter(int id)
-        {
-            return View();
+            if (movie == null)
+                return View();
+
+            MovieDetailModel model = new MovieDetailModel();
+            Mapper.Map(movie, model);
+
+            model.Reviews = _reviewStore.FindReviewsByReviewId(movie.ReviewId);
+
+            return View("Detail", model);
         }
     }
 }
