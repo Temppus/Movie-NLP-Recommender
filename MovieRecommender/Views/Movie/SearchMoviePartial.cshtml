@@ -1,10 +1,9 @@
 ﻿@model MovieRecommender.Models.MoviePreviewModel
 
-
 @using (Html.BeginForm("Search", "Movie", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "ui form" }))
 {
     <div class="five fields">
-        <div class="field">
+        <div class="two wide field">
             @Html.LabelFor(x => x.FromYearList)
             @Html.DropDownListFor(x => x.SelectedFromYear, new SelectList(Model.FromYearList), Model.FromYear.ToString(),
                             new Dictionary<string, object> { { "class", "ui fluid dropdown" }})
@@ -14,7 +13,7 @@
                 @Html.Hidden("FromYearList[" + i + "]", Model.FromYearList.ElementAt(i))
             }
         </div>
-        <div class="field">
+        <div class="two wide field">
             @Html.LabelFor(x => x.ToYearList)
             @Html.DropDownListFor(x => x.SelectedToYear, new SelectList(Model.ToYearList),
                             new Dictionary<string, object> { { "class", "ui fluid dropdown" } })
@@ -25,7 +24,7 @@
                 @Html.Hidden("ToYearList[" + i + "]", Model.ToYearList.ElementAt(i))
             }
         </div>
-        <div class="nine wide field">
+        <div class="six wide field">
             @Html.LabelFor(x => x.Genres)
             @Html.ListBoxFor(x => x.SelectedGenres, new SelectList(Model.Genres),
                             new Dictionary<string, object> { { "class", "ui fluid dropdown selection multiple" }, { "multiple", "" } })
@@ -35,12 +34,12 @@
                 @Html.Hidden("Genres[" + i + "]", Model.Genres.ElementAt(i))
             }
         </div>
-        <div class="field">
-            @Html.LabelFor(x => x.OrderByRating)
-            @Html.DropDownListFor(x => Model.SelectedRating, new SelectList(Model.OrderByRating),
+        <div class="four wide field">
+            @Html.LabelFor(x => x.OrderByRatingCount)
+            @Html.DropDownListFor(x => Model.SelectedRating, new SelectList(Model.OrderByRatingCount),
                                     new Dictionary<string, object> { { "class", "ui fluid dropdown" } })
         </div>
-        <div class="field">
+        <div class="two wide field">
             <label>Search</label>
             <input type="submit" value="Search" class="ui primary button" />
         </div>

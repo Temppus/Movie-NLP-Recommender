@@ -18,6 +18,7 @@ namespace MovieRecommender.Database.Models
         public string Director { get; set; }
         public int PublicationYear { get; set; }
         public double Rating { get; set; }
+        public int RatingCount { get; set; }
         public string Overview { get; set; }
         public string ImageURI { get; set; }
         public string TrailerImageURI { get; set; }

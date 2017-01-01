@@ -19,7 +19,7 @@ namespace MovieRecommender.Database.CollectionAPI
             _collection = dbPool.Database.GetCollection<Movie>("movies");
         }
 
-        public IEnumerable<Movie> FilterMovies(int fromYear, int toYear, IEnumerable<string> genres, bool orderDescByRating, int limit, int paginationIndex)
+        public IEnumerable<Movie> FilterMovies(int fromYear, int toYear, IEnumerable<string> genres, bool orderDescByRatingCount, int limit, int paginationIndex)
         {
             if (fromYear <= 0)
                 throw new ArgumentException(nameof(fromYear) + " must be > 0");
@@ -41,13 +41,19 @@ namespace MovieRecommender.Database.CollectionAPI
                 filter = Builders<Movie>.Filter.And(filter, genreFilter);
             }
 
-            var sortedQuery = orderDescByRating
-                                            ? _collection.Find(filter).Skip(paginationIndex * limit).Limit(limit).SortByDescending(m => m.Rating)
-                                            : _collection.Find(filter).Skip(paginationIndex * limit).Limit(limit).SortBy(m => m.Rating);
+            var sortDefinitionBuilder = Builders<Movie>.Sort;
+            SortDefinition<Movie> sortDefinition;
 
-            return sortedQuery.ToList();
+            if (orderDescByRatingCount)
+                sortDefinition = sortDefinitionBuilder.Descending(m => m.RatingCount);
+            else
+                sortDefinition = sortDefinitionBuilder.Ascending(m => m.RatingCount);
+
+            return _collection.Find(filter).Sort(sortDefinition).Skip(paginationIndex * limit).Limit(limit).ToList();
+
         }
 
+        #region DistinctAPI
         public IEnumerable<string> DistinctGenres()
         {
             if (MemoryCache.Default.Contains("Genres")) // Cache this
@@ -78,15 +84,17 @@ namespace MovieRecommender.Database.CollectionAPI
             return yearsDesc;
         }
 
-        public IEnumerable<Movie> FindMoviesLikeTitleAsync(string likeTitle, int limit, bool sortDescByYear)
+        #endregion
+
+        public IEnumerable<Movie> FindMoviesLikeTitleAsync(string likeTitle, int limit, bool sortByRatingCountDesc)
         {
             if (limit <= 0)
                 throw new ArgumentException(nameof(limit) + " must be > 0");
 
             var filter = Builders<Movie>.Filter.Regex("Title", new BsonRegularExpression(likeTitle, "i"));
 
-            if (sortDescByYear)
-                return _collection.Find(filter).SortByDescending(m => m.PublicationYear).Limit(limit).ToList();
+            if (sortByRatingCountDesc)
+                return _collection.Find(filter).SortByDescending(m => m.RatingCount).Limit(limit).ToList();
             else
                 return _collection.Find(filter).Limit(limit).ToList();
         }

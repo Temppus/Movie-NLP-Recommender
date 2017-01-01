@@ -47,8 +47,8 @@ namespace MovieRecommender.Models
         public int SelectedFromYear { get; set; }
         public int SelectedToYear { get; set; }
 
-        [Display(Name = "Order by rating")]
-        public IEnumerable<string> OrderByRating { get; set; } = new List<string>() { "desc", "asc" };
+        [Display(Name = "Order by number of ratings")]
+        public IEnumerable<string> OrderByRatingCount { get; set; } = new List<string>() { "desc", "asc" };
         public string SelectedRating { get; set; }
 
         [Display(Name = "Genres")]
