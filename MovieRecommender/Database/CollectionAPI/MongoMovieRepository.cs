@@ -41,13 +41,12 @@ namespace MovieRecommender.Database.CollectionAPI
                 filter = Builders<Movie>.Filter.And(filter, genreFilter);
             }
 
-            var sortDefinitionBuilder = Builders<Movie>.Sort;
             SortDefinition<Movie> sortDefinition;
 
             if (orderDescByRatingCount)
-                sortDefinition = sortDefinitionBuilder.Descending(m => m.RatingCount);
+                sortDefinition = Builders<Movie>.Sort.Descending(m => m.RatingCount);
             else
-                sortDefinition = sortDefinitionBuilder.Ascending(m => m.RatingCount);
+                sortDefinition = Builders<Movie>.Sort.Ascending(m => m.RatingCount);
 
             return _collection.Find(filter).Sort(sortDefinition).Skip(paginationIndex * limit).Limit(limit).ToList();
 
@@ -93,10 +92,17 @@ namespace MovieRecommender.Database.CollectionAPI
 
             var filter = Builders<Movie>.Filter.Regex("Title", new BsonRegularExpression(likeTitle, "i"));
 
+            SortDefinition<Movie> sortDefinition;
+
             if (sortByRatingCountDesc)
-                return _collection.Find(filter).SortByDescending(m => m.RatingCount).Limit(limit).ToList();
+                sortDefinition = Builders<Movie>.Sort.Descending(m => m.RatingCount).Descending(m => m.PublicationYear);
             else
-                return _collection.Find(filter).Limit(limit).ToList();
+                sortDefinition = Builders<Movie>.Sort.Ascending(m => m.RatingCount);
+
+            if (sortByRatingCountDesc)
+                return _collection.Find(filter).Sort(sortDefinition).Limit(limit).ToList();
+            else
+                return _collection.Find(filter).Limit(limit).SortByDescending(m => m.PublicationYear).ToList();
         }
     }
 }

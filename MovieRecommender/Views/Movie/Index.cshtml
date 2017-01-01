@@ -15,7 +15,7 @@
             <!-- Image column -->
             <div class="four wide column">
                 <div class="row">
-                    <img alt="Film poster" src="@Url.Content(moviePreview.ImageURI)" id="posterImgId" />
+                    <img alt="Film poster" src="@Url.Content(moviePreview.ImageURI)" id="posterImgId" class="ui centered medium image" />
                 </div>
                 <div class="row">
                     <a href="http://www.imdb.com/title/@moviePreview.IMDBId" target="_blank" id="imdbLinkId">IMDb link</a>
@@ -35,7 +35,7 @@
                                     <div class="ui star rating" data-rating=@Math.Floor(moviePreview.Rating).ToString() id="ratingId">
                                     </div>
                                 </div>
-                                <div class="four wide column" id="ratingNumberId">
+                                <div class="two wide column" id="ratingNumberId">
                                     @moviePreview.Rating
                                 </div>
                             </div>
