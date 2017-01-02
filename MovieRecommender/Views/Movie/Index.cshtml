@@ -15,7 +15,10 @@
             <!-- Image column -->
             <div class="four wide column">
                 <div class="row">
-                    <img alt="Film poster" src="@Url.Content(moviePreview.ImageURI)" id="posterImgId" class="ui centered medium image" />
+
+                    <a href="@Url.Action("Details","Movie", new { imdbId = @moviePreview.IMDBId })">
+                        <img alt="Film poster" src="@Url.Content(moviePreview.ImageURI)" id="posterImgId" class="ui centered medium image" />
+                    </a>
                 </div>
                 <div class="row">
                     <a href="http://www.imdb.com/title/@moviePreview.IMDBId" target="_blank" id="imdbLinkId">IMDb link</a>
