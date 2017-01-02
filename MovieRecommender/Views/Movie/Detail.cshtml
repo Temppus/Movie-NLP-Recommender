@@ -1,106 +1,112 @@
 ﻿@model MovieRecommender.Models.MovieDetailModel
 
 @{
-    ViewBag.Title = "Movie Detail";
+    ViewBag.Title = Model.Title;
 }
 
-<h2>View</h2>
+<div class="ui grid" id="resultGrid">
+    <div class="row">
+        <!-- Image column -->
+        <div class="four wide column">
+            <div class="row">
+                <img alt="Film poster" src="@Url.Content(Model.ImageURI)" id="posterImgId" class="ui centered medium image" />
+            </div>
+            <div class="row">
+                <a href="http://www.imdb.com/title/@Model.IMDBId" target="_blank" id="imdbLinkId">IMDb link</a>
+            </div>
+        </div>
 
-<div>
-    <h4>MovieDetailModel</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.TMDBId)
-        </dt>
+        <!-- Film info column -->
+        <div class="twelve wide column">
+            <div class="ui grid">
 
-        <dd>
-            @Html.DisplayFor(model => model.TMDBId)
-        </dd>
+                <!-- Title -->
+                <div class="row">
+                    <div class="wide row">
+                        <div class="ui medium header" id="titleId">@Model.Title</div>
+                        <div class="ui grid">
+                            <div class="twelve wide column">
+                                <div class="ui star rating" data-rating=@Math.Floor(Model.Rating).ToString() id="ratingId">
+                                </div>
+                            </div>
+                            <div class="two wide column" id="ratingNumberId">
+                                @Model.Rating
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.IMDBId)
-        </dt>
+                <!-- Director -->
+                <div class="row">
+                    <div class="ui small header" id="directorDivId">
+                        Director
+                        <button class="tiny ui button">@Model.Director</button>
+                    </div>
+                </div>
 
-        <dd>
-            @Html.DisplayFor(model => model.IMDBId)
-        </dd>
+                <!-- Genres -->
+                <div class="row">
+                    <div class="ui small header" id="genresDivId">
+                        Genres
+                        @foreach (string genre in Model.Genres)
+                        {
+                            <button class="tiny ui button" id="genreId">@genre</button>
+                        }
+                    </div>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
+                </div>
 
-        <dd>
-            @Html.DisplayFor(model => model.Title)
-        </dd>
+                <!-- Overview -->
+                <div class="row">
+                    <div class="wide row">
+                        <div class="ui small header">Overview</div>
+                        <p id="overviewId">@Model.Overview</p>
+                    </div>
+                </div>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Director)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Director)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.PublicationYear)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.PublicationYear)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.Rating)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Rating)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.RatingCount)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.RatingCount)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.Overview)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Overview)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.ImageURI)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.ImageURI)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.TrailerImageURI)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.TrailerImageURI)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.TrailerVideoURI)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.TrailerVideoURI)
-        </dd>
-
-    </dl>
+            </div>
+        </div>
+    </div>
 </div>
-<p>
-    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
-    @Html.ActionLink("Back to List", "Index")
-</p>
+
+@if (!string.IsNullOrEmpty(Model.TrailerImageURI))
+{
+    <h4 class="ui horizontal divider header">
+        <i class="tag icon"></i>
+        Trailer
+    </h4>
+
+    <div class="ui grid centered">
+            <a href="http://www.imdb.com/@Model.TrailerVideoURI" target="_blank">
+                <img alt="Trailer" title="Trailer" src="@Url.Content(Model.TrailerImageURI)" itemprop="image">
+            </a>
+    </div>
+
+}
+
+<h4 class="ui horizontal divider header">
+    <i class="tag icon"></i>
+    Actors
+</h4>
+
+<div class="ui horizontal segments">
+
+    @foreach (var actor in Model.ActorsInfo)
+    {
+        <div class="ui center aligned segment">
+            <img class="ui avatar small image centered" src=@actor.ImageURI>
+            <div class="content">
+                <div class="header"><strong>@actor.ActorName</strong></div>
+                <strong>As</strong> @actor.As
+            </div>
+        </div>
+    }
+</div>
+
+<script>
+    $('.rating').rating({
+        initialRating: 5,
+        maxRating: 10,
+        interactive: false
+    });
+</script>
