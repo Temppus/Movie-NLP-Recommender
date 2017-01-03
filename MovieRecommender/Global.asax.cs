@@ -12,6 +12,7 @@ using Microsoft.Practices.Unity;
 using AutoMapper;
 using MovieRecommender.Database.Models;
 using MovieRecommender.Models;
+using MovieRecommender.StartupHooks;
 
 namespace MovieRecommender
 {
@@ -22,7 +23,8 @@ namespace MovieRecommender
         // Register all possible on start application hooks
         private static List<IRunOnApplicationStart> onStartHooks = new List<IRunOnApplicationStart>
         {
-                new CheckDbVersionOnStartup()
+                new CheckDbVersionOnStartup(),
+                new IntegrityManager()
         };
 
         public MvcApplication() : this(UnityConfig.GetConfiguredContainer().Resolve<RepositoryManager>())
@@ -34,8 +36,6 @@ namespace MovieRecommender
         {
             _db = repoManager;
         }
-
-
 
         protected void Application_Start()
         {
@@ -52,18 +52,5 @@ namespace MovieRecommender
 
             onStartHooks.ForEach(x => x.Start());
         }
-    }
-
-    public class CheckDbVersionOnStartup : IRunOnApplicationStart
-    {
-        public void Start()
-        {
-            DataBaseConfiguration.ApplyMigrations();
-        }
-    }
-
-    public interface IRunOnApplicationStart
-    {
-        void Start();
     }
 }

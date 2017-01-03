@@ -7,7 +7,7 @@
             @Html.AntiForgeryToken()
 
             <div class="item">
-                <a href="@Url.Action("Index","Manage")" class="ui teal label"> Hello @User.Identity.GetUserName() </a>
+                <a href="@Url.Action("Index","Manage")" class="ui grey button"> Hello @User.Identity.GetUserName() </a>
             </div>
 
             <div class="item">
