@@ -58,7 +58,7 @@ namespace MovieRecommender.App_Start.IdentityConfiguration
         }
         #endregion
 
-        #region Public Methods
+        #region Role Methods
 
         /// <summary>
         /// Method to add user to multiple roles

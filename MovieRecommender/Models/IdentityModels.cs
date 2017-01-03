@@ -2,12 +2,16 @@
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using AspNet.Identity.MongoDB;
+using System.Collections.Generic;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace MovieRecommender.Models
 {
     // You can add profile data for the user by adding more properties to your ApplicationUser class, please visit http://go.microsoft.com/fwlink/?LinkID=317594 to learn more.
     public class ApplicationUser : IdentityUser
     {
+        public IEnumerable<string> LikedMovies { get; set; } = new List<string>();
+
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {
             // Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType

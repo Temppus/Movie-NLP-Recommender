@@ -21,8 +21,8 @@
             <div class="ui grid">
 
                 <!-- Title -->
-                <div class="row">
-                    <div class="wide row">
+                <div class="eight wide column">
+                    <div class="row">
                         <div class="ui medium header" id="titleId">@Model.Title</div>
                         <div class="ui grid">
                             <div class="twelve wide column">
@@ -36,31 +36,57 @@
                     </div>
                 </div>
 
+                <!-- Like segment -->
+                <div class="eight wide right aligned column" id="likeDiv">
+
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        if (Model.IsLikedMovie)
+                        {
+                            <div class="ui red button" id="unlikeButton" movieId="@Model.IMDBId">
+                                <i class="heart icon"></i> You liked this movie
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="ui green button" id="likeButton" movieId="@Model.IMDBId">
+                                <i class="thumbs outline up icon"></i> Like this movie
+                            </div>
+                        }
+                    }
+                </div>
+
                 <!-- Director -->
-                <div class="row">
-                    <div class="ui small header" id="directorDivId">
-                        Director
-                        <button class="tiny ui button">@Model.Director</button>
+                <div class="sixteen wide column">
+                    <div class="row">
+                        <div class="ui small header" id="directorDivId">
+                            Director
+                            <button class="tiny ui button">@Model.Director</button>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Genres -->
-                <div class="row">
-                    <div class="ui small header" id="genresDivId">
-                        Genres
-                        @foreach (string genre in Model.Genres)
-                        {
-                            <button class="tiny ui button" id="genreId">@genre</button>
-                        }
-                    </div>
+                <div class="sixteen wide column">
+                    <div class="row">
+                        <div class="ui small header" id="genresDivId">
+                            Genres
+                            @foreach (string genre in Model.Genres)
+                            {
+                                <button class="tiny ui button" id="genreId">@genre</button>
+                            }
+                        </div>
 
+                    </div>
                 </div>
 
                 <!-- Overview -->
-                <div class="row">
-                    <div class="wide row">
-                        <div class="ui small header">Overview</div>
-                        <p id="overviewId">@Model.Overview</p>
+                <div class="sixteen wide column">
+                    <div class="row">
+                        <div class="wide row">
+                            <div class="ui small header">Overview</div>
+                            <p id="overviewId">@Model.Overview</p>
+                        </div>
                     </div>
                 </div>
 
@@ -81,7 +107,6 @@
             <img alt="Trailer" title="Trailer" src="@Url.Content(Model.TrailerImageURI)" itemprop="image">
         </a>
     </div>
-
 }
 
 <h4 class="ui horizontal divider header">
@@ -102,7 +127,6 @@
         </div>
     }
 </div>
-
 
 <h4 class="ui horizontal divider header">
     <i class="tag icon"></i>
@@ -128,8 +152,82 @@
 
 <script>
 
+    var debounceDelay = 200;
+
     $(document).ready(function () {
-        $('#loaderId').hide();
+
+        var likeFunction = function () {
+
+            var movieId = $("#likeButton").attr("movieId");
+
+            if (movieId == null)
+                return;
+
+            var likeObject = {
+                'IsLike': true,
+                'IMDbId': movieId
+            };
+
+            likeObject = JSON.stringify({ model: likeObject });
+
+            $.ajax({
+                type: 'POST',
+                url: '/Movie/LikeHandler',
+                data: likeObject,
+                contentType: 'application/json',
+                error: function (err) {
+                    alert("Error, cannot like movie.");
+                },
+                success: function (previewMovieArray) {
+
+                    var movieId = $("#likeButton").attr("movieId");
+                    var likedButtonStr = "<div class='ui red button' id='unlikeButton' movieId='" + movieId + "'> <i class='heart icon'></i> You liked this movie </div>";
+                    var likedButton = $($.parseHTML(likedButtonStr)).click($.debounce(debounceDelay, unlikeFunction));
+
+                    $("#likeButton").detach();
+                    $("#likeDiv").append(likedButton);
+                }
+            });
+        };
+
+        $('#likeButton').bind("click", $.debounce(debounceDelay, likeFunction));
+
+        var unlikeFunction = function () {
+
+            var movieId = $("#unlikeButton").attr("movieId");
+
+            if (movieId == null)
+                return;
+
+            var unlikeObject = {
+                'IsLike': false,
+                'IMDbId': movieId
+            };
+
+            likeObject = JSON.stringify({ model: unlikeObject });
+
+            $.ajax({
+                type: 'POST',
+                url: '/Movie/LikeHandler',
+                data: likeObject,
+                contentType: 'application/json',
+                error: function (err) {
+                    alert("Error, cannot unlike movie.");
+                },
+                success: function (previewMovieArray) {
+
+                    var movieId = $("#unlikeButton").attr("movieId");
+                    var likeButtonStr = "<div class='ui green button' id='likeButton' movieId='" + movieId + "'> <i class='thumbs outline up icon'></i> Like this movie</div>";
+                    var likeButton = $($.parseHTML(likeButtonStr)).click($.debounce(debounceDelay, likeFunction));
+
+                    $("#unlikeButton").detach();
+                    $("#likeDiv").append(likeButton);
+                }
+            });
+        };
+
+        $('#unlikeButton').bind("click", $.debounce(debounceDelay, unlikeFunction));
+
     });
 
     $('.rating').rating({
@@ -137,4 +235,6 @@
         maxRating: 10,
         interactive: false
     });
+
+
 </script>

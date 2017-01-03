@@ -18,19 +18,22 @@ namespace MovieRecommender.Controllers
 {
     public class MovieController : Controller
     {
-        private readonly IRepositoryManager _repoManager;
+        // Identity
         private readonly ApplicationUserManager _userManager;
+
+        // Our repository API
         private readonly IMovieRepository _movieStore;
         private readonly IReviewRepository _reviewStore;
+        private readonly IUserRepository _userStore;
 
         private const int _movieLimit = 10;
 
         /// <summary>
         /// Parameters injected via unity IoC container
         /// </summary>
-        public MovieController(ApplicationUserManager userManager, IRepositoryManager repoManager, IMovieRepository movieStore, IReviewRepository reviewStore)
+        public MovieController(ApplicationUserManager userManager, IUserRepository userStore, IMovieRepository movieStore, IReviewRepository reviewStore)
         {
-            _repoManager = repoManager;
+            _userStore = userStore;
             _userManager = userManager;
             _movieStore = movieStore;
             _reviewStore = reviewStore;
@@ -104,8 +107,44 @@ namespace MovieRecommender.Controllers
             Mapper.Map(movie, model);
 
             model.Reviews = _reviewStore.FindReviewsByReviewId(movie.ReviewId);
+            model.IsLikedMovie = false;
+
+            if (User.Identity.IsAuthenticated)
+            {
+                model.IsLikedMovie = _userStore.CheckIfLikedMovie(User.Identity.Name, imdbId);
+            }
 
             return View("Detail", model);
+        }
+
+        [HttpPost]
+        public JsonResult LikeHandler(LikeModel model)
+        {
+            if (!User.Identity.IsAuthenticated)
+                return Json(null);
+
+            var userName = User.Identity.Name;
+            var user = _userManager.FindByNameAsync(userName).Result;
+
+            if (user == null)
+                return Json(null);
+
+            if (model.IsLike)
+            {
+                if (!_userStore.CheckIfLikedMovie(user.UserName, model.IMDbId))
+                    _userStore.UserLikedMovie(user.UserName, model.IMDbId);
+                else
+                    return Json(null);
+            }
+            else
+            {
+                if (_userStore.CheckIfLikedMovie(user.UserName, model.IMDbId))
+                    _userStore.UserUnlikedMovie(user.UserName, model.IMDbId);
+                else
+                    return Json(null);
+            }
+
+            return Json(true);
         }
     }
 }

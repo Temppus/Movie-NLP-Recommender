@@ -8,6 +8,7 @@ namespace MovieRecommender.Models
 {
     public class MovieDetailModel
     {
+        public bool IsLikedMovie { get; set; }
         public int TMDBId { get; set; }
         public string IMDBId { get; set; }
         public string Title { get; set; }
