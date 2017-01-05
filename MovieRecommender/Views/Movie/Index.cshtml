@@ -7,6 +7,7 @@
     @Html.Partial("SearchMoviePartial")
 </div>
 
+
 <div class="ui celled grid" id="resultGrid">
 
     @foreach (var moviePreview in Model.MoviePreviews)
@@ -15,13 +16,12 @@
             <!-- Image column -->
             <div class="four wide column">
                 <div class="row">
-
-                    <a href="@Url.Action("Details","Movie", new { imdbId = @moviePreview.IMDBId })">
-                        <img alt="Film poster" src="@Url.Content(moviePreview.ImageURI)" id="posterImgId" class="ui centered medium image" />
+                    <a href="@Url.Action("Details","Movie", new { imdbId = @moviePreview.IMDBId })" name="movieDetailLink">
+                        <img alt="Film poster" src="@Url.Content(moviePreview.ImageURI)" name="posterURI" class="ui centered medium image" />
                     </a>
                 </div>
                 <div class="row">
-                    <a href="http://www.imdb.com/title/@moviePreview.IMDBId" target="_blank" id="imdbLinkId">IMDb link</a>
+                    <a href="http://www.imdb.com/title/@moviePreview.IMDBId" target="_blank" name="imdbLink">IMDb link</a>
                 </div>
             </div>
 
@@ -30,54 +30,76 @@
                 <div class="ui grid">
 
                     <!-- Title -->
-                    <div class="row">
-                        <div class="wide row">
-                            <div class="ui medium header" id="titleId">@moviePreview.Title</div>
+                    <div class="eight wide column">
+                        <div class="row">
+                            <div class="ui medium header" name="movieTitle">@moviePreview.Title</div>
                             <div class="ui grid">
                                 <div class="twelve wide column">
-                                    <div class="ui star rating" data-rating=@Math.Floor(moviePreview.Rating).ToString() id="ratingId">
+                                    <div class="ui star rating" data-rating=@Math.Floor(moviePreview.Rating).ToString() name="ratingDecimal">
                                     </div>
                                 </div>
-                                <div class="two wide column" id="ratingNumberId">
+                                <div class="two wide column" name="ratingHolder">
                                     @moviePreview.Rating
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Genres -->
-                    <div class="row">
-                        <div class="ui small header" id="genresDivId">
-                            Genres
-                            @foreach (string genre in moviePreview.Genres)
-                            {
-                                <button class="tiny ui button" id="genreId">@genre</button>
-                            }
-                        </div>
+                    <!-- Like segment -->
+                    <div class="eight wide right aligned column" name="likeContainer">
 
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            if (@moviePreview.IsLikedByUser)
+                            {
+                                <div name="unlikeButton" movieId="@moviePreview.IMDBId"></div>
+                            }
+                            else
+                            {
+                                <div name="likeButton" movieId="@moviePreview.IMDBId"></div>
+                            }
+                        }
                     </div>
 
-                    <!-- Overview -->
-                    <div class="row">
-                        <div class="wide row">
-                            <div class="ui small header">Overview</div>
-                            <p id="overviewId">@moviePreview.Overview</p>
+                    <!-- Genres -->
+                    <div class="sixteen wide column">
+                        <div class="row">
+                            <div class="ui small header" name="genresHolder">
+                                Genres
+                                @foreach (string genre in moviePreview.Genres)
+                                {
+                                    <button class="tiny ui button" name="movieGenre">@genre</button>
+                                }
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="twelve wide column">
+                        <!-- Overview -->
+                        <div class="row">
+                            <div class="wide row">
+                                <div class="ui small header">Overview</div>
+                                <p name="movieOverview">@moviePreview.Overview</p>
+                            </div>
                         </div>
                     </div>
 
                 </div>
             </div>
-
         </div>
     }
 </div>
 
 <div class="ui active centered inline loader" id="loaderId"></div>
 
+@Scripts.Render("~/bundles/movielike")
+
 <script>
 
     $(document).ready(function () {
         $('#loaderId').hide();
+        likeDecorator();
     });
 
     var currentPaginationIndex = 1;
@@ -91,7 +113,7 @@
 
 
     $(window).scroll(function () {
-        if ($(window).scrollTop() + $(window).height() == $(document).height()) {
+        if ($(window).scrollTop() + $(window).height() > $(document).height() - 100) { // Check if we are near bottom
 
             var resultGrid = $('#resultGrid');
 
@@ -135,20 +157,22 @@
 
                         for (var i = 0; i < previewMovieArray.length; i++) {
 
-                            var templateDiv = resultGrid.find(">:first-child").clone();
-                            var moviePreview = previewMovieArray[i];
-                            templateDiv.find("#titleId").html(moviePreview.Title);
-                            templateDiv.find("#posterImgId").attr("src", moviePreview.ImageURI);
-                            templateDiv.find("#imdbLinkId").attr("href", "http://www.imdb.com/title/" + moviePreview.IMDBId);
-                            templateDiv.find("#ratingId").attr("data-rating", Math.floor(moviePreview.Rating));
-                            templateDiv.find("#ratingNumberId").html(moviePreview.Rating);
+                            var movieRowClone = resultGrid.find(">:first-child").clone();
 
-                            // remove genres
-                            templateDiv.find("#genreId").each(function () {
+                            var moviePreview = previewMovieArray[i];
+                            movieRowClone.find("[name='movieTitle']").html(moviePreview.Title);
+                            movieRowClone.find("[name='posterURI']").attr("src", moviePreview.ImageURI);
+                            movieRowClone.find("[name='movieDetailLink']").attr("href", "/Movie/Details?imdbId=" + moviePreview.IMDBId);
+                            movieRowClone.find("[name='imdbLink']").attr("href", "http://www.imdb.com/title/" + moviePreview.IMDBId);
+                            movieRowClone.find("[name='ratingDecimal']").attr("data-rating", Math.floor(moviePreview.Rating));
+                            movieRowClone.find("[name='ratingHolder']").html(moviePreview.Rating);
+
+                            // remove cloned genres
+                            movieRowClone.find("[name='movieGenre']").each(function () {
                                 $(this).remove();
                             });
 
-                            var genreDiv = templateDiv.find("#genresDivId");
+                            var genreDiv = movieRowClone.find("[name='genresHolder']");
 
                             // create new ones
                             for (var j = 0; j < moviePreview.Genres.length; j++) {
@@ -160,10 +184,28 @@
                                 genreDiv.append(button);
                             }
 
-                            // at last thing change overview
-                            templateDiv.find("#overviewId").html(moviePreview.Overview);
+                            // remove like container elements
+                            var likeContainer = movieRowClone.find("[name='likeContainer']");
+                            likeContainer.empty();
 
-                            filmDivsArray.push(templateDiv);
+                            if ("@User.Identity.IsAuthenticated" == "True")
+                            {
+                                if (moviePreview.IsLikedByUser)
+                                {
+                                    var unlikeDiv = $("<div name='unlikeButton' movieId='" + moviePreview.IMDBId + "'></div>");
+                                    likeContainer.append(unlikeDiv);
+                                }
+                                else
+                                {
+                                    var likeDiv = $("<div name='likeButton' movieId='" + moviePreview.IMDBId + "'></div>");
+                                    likeContainer.append(likeDiv);
+                                }
+                            }
+
+                            // at last thing change overview
+                            movieRowClone.find("[name='movieOverview']").html(moviePreview.Overview);
+
+                            filmDivsArray.push(movieRowClone);
                         }
 
                         // append pagination movies
@@ -171,6 +213,9 @@
 
                         // run sematic rating again to set appropriate stars
                         $(".rating").rating();
+
+                        // run like decorations
+                        likeDecorator();
                     }
                 });
             }

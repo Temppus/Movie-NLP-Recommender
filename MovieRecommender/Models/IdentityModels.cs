@@ -4,13 +4,15 @@ using Microsoft.AspNet.Identity;
 using AspNet.Identity.MongoDB;
 using System.Collections.Generic;
 using MongoDB.Bson.Serialization.Attributes;
+using System;
+using MongoDB.Bson;
 
 namespace MovieRecommender.Models
 {
     // You can add profile data for the user by adding more properties to your ApplicationUser class, please visit http://go.microsoft.com/fwlink/?LinkID=317594 to learn more.
     public class ApplicationUser : IdentityUser
     {
-        public IEnumerable<string> LikedMovies { get; set; } = new List<string>();
+        public IEnumerable<MovieLikeInfo> LikedMovies { get; set; } = new List<MovieLikeInfo>();
 
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {
@@ -19,5 +21,12 @@ namespace MovieRecommender.Models
             // Add custom user claims here
             return userIdentity;
         }
+    }
+
+    public class MovieLikeInfo
+    {
+        [BsonId]
+        public ObjectId Id { get; set; } = ObjectId.GenerateNewId();
+        public string IMDBId { get; set; }
     }
 }

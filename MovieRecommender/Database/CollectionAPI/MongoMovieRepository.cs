@@ -109,5 +109,16 @@ namespace MovieRecommender.Database.CollectionAPI
         {
             return _collection.Find(m => m.IMDBId == imdbId).FirstOrDefault();
         }
+
+        public IEnumerable<Movie> FindMoviesByIMDbIds(IEnumerable<string> imdbIds)
+        {
+            if (imdbIds == null)
+                throw new ArgumentNullException(nameof(imdbIds));
+
+            var filter = Builders<Movie>.Filter.In(m => m.IMDBId, imdbIds);
+
+            var movies = _collection.Find(filter).ToList();
+            return movies;
+        }
     }
 }

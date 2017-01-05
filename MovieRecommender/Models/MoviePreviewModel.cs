@@ -10,7 +10,7 @@ namespace MovieRecommender.Models
 {
     public class MoviePreviewModel
     {
-        public IEnumerable<MoviePreview> MoviePreviews = new List<MoviePreview>();
+        public List<MoviePreview> MoviePreviews = new List<MoviePreview>();
 
         public MoviePreviewModel()
         {
@@ -63,6 +63,7 @@ namespace MovieRecommender.Models
             Mapper.Map(movie, this);
         }
 
+        public bool IsLikedByUser { get; set; }
         public int TMDBId { get; set; }
         public string IMDBId { get; set; }
         public string Title { get; set; }

@@ -9,34 +9,30 @@ using Microsoft.Owin.Security;
 using MovieRecommender.Models;
 using MovieRecommender.Database;
 using MovieRecommender.App_Start.IdentityConfiguration;
+using MovieRecommender.Database.CollectionAPI;
 
 namespace MovieRecommender.Controllers
 {
     [Authorize]
     public class ManageController : Controller
     {
-        #region Private Fields
-
         private readonly ApplicationUserManager _userManager;
-        private readonly IRepositoryManager _db;
-
-        #endregion
-
-        #region Constructor
+        private readonly IMovieRepository _movieStore;
+        private readonly IUserRepository _userRepository;
 
         /// <summary>
         /// Parameters injected via unity IoC container
         /// </summary>
-        public ManageController(ApplicationUserManager userManager, IRepositoryManager repoManager)
+        public ManageController(ApplicationUserManager userManager, IMovieRepository movieStore, IUserRepository userRepository)
         {
             _userManager = userManager;
-            _db = repoManager;
+            _movieStore = movieStore;
+            _userRepository = userRepository;
         }
-        #endregion
-            
+
         public ApplicationUserManager UserManager
         {
-            get { return _userManager;}
+            get { return _userManager; }
         }
 
         //
@@ -53,6 +49,7 @@ namespace MovieRecommender.Controllers
                 : "";
 
             var userId = User.Identity.GetUserId();
+
             var model = new IndexViewModel
             {
                 HasPassword = HasPassword(),
@@ -61,6 +58,19 @@ namespace MovieRecommender.Controllers
                 Logins = await UserManager.GetLoginsAsync(userId),
                 BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId)
             };
+
+            var userLikedMovieInfos = _userRepository.FindLikedMovies(User.Identity.Name);
+            var userLikedMovies = _movieStore.FindMoviesByIMDbIds(userLikedMovieInfos.Select(m => m.IMDBId));
+
+            var likedMovies = userLikedMovies.Select(m => new LikedMovie()
+            {
+                IMDbId = m.IMDBId,
+                Title = m.Title,
+                LikedDateTime = userLikedMovieInfos.First(i => i.IMDBId == m.IMDBId).Id.CreationTime
+            });
+
+            model.LikedMovies = likedMovies.OrderByDescending(m => m.LikedDateTime);
+
             return View(model);
         }
 
@@ -378,6 +388,6 @@ namespace MovieRecommender.Controllers
             Error
         }
 
-#endregion
+        #endregion
     }
 }

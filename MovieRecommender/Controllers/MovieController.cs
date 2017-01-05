@@ -44,7 +44,9 @@ namespace MovieRecommender.Controllers
         {
             var model = new MoviePreviewModel(_movieStore.DistinctGenres(), _movieStore.DistinctYearsDesc());
             var movies = GetMoviesByModelSearchQuery(model, _movieLimit);
-            model.MoviePreviews = movies.Select(m => new MoviePreview(m));
+            model.MoviePreviews = movies.Select(m => new MoviePreview(m)).ToList();
+            MapMovieLikes(model);
+
             return View(model);
         }
 
@@ -55,7 +57,8 @@ namespace MovieRecommender.Controllers
             model.SelectedGenres = model.SelectedGenres ?? new List<string>(); // model binder is binding empty collections as nulls
 
             var movies = GetMoviesByModelSearchQuery(model, _movieLimit);
-            model.MoviePreviews = movies.Select(m => new MoviePreview(m));
+            model.MoviePreviews = movies.Select(m => new MoviePreview(m)).ToList();
+            MapMovieLikes(model);
 
             return View("Index", model);
         }
@@ -79,6 +82,16 @@ namespace MovieRecommender.Controllers
 
             var moviePreviews = movies.Select(m => new MoviePreview(m));
 
+            if (User.Identity.IsAuthenticated)
+            {
+                var likeMappings = _userStore.GetUserLikedMovieMappings(User.Identity.Name, moviePreviews.Select(p => p.IMDBId));
+
+                foreach (var preview in moviePreviews)
+                {
+                    preview.IsLikedByUser = likeMappings[preview.IMDBId];
+                }
+            }
+
             return Json(moviePreviews);
         }
 
@@ -90,10 +103,25 @@ namespace MovieRecommender.Controllers
             return json;
         }
 
+        #region #Helpers
         private IEnumerable<Movie> GetMoviesByModelSearchQuery(MoviePreviewModel model, int limit)
         {
             return _movieStore.FilterMovies(model.SelectedFromYear, model.SelectedToYear, model.SelectedGenres, model.SelectedRating == "desc", limit);
         }
+
+        private void MapMovieLikes(MoviePreviewModel model)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var likeMappings = _userStore.GetUserLikedMovieMappings(User.Identity.Name, model.MoviePreviews.Select(p => p.IMDBId));
+
+                foreach (var preview in model.MoviePreviews)
+                {
+                    preview.IsLikedByUser = likeMappings[preview.IMDBId];
+                }
+            }
+        }
+        #endregion
 
         // GET: Movie/Details/5
         public ActionResult Details(string imdbId)

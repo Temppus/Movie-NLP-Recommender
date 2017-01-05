@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
+using System;
 
 namespace MovieRecommender.Models
 {
@@ -12,6 +13,14 @@ namespace MovieRecommender.Models
         public string PhoneNumber { get; set; }
         public bool TwoFactor { get; set; }
         public bool BrowserRemembered { get; set; }
+        public IEnumerable<LikedMovie> LikedMovies { get; set; }
+    }
+
+    public class LikedMovie
+    {
+        public string Title { get; set; }
+        public string IMDbId { get; set; }
+        public DateTime LikedDateTime { get; set; }
     }
 
     public class ManageLoginsViewModel

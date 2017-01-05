@@ -15,6 +15,9 @@ namespace MovieRecommender
             bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
                         "~/Scripts/jquery.validate*"));
 
+            bundles.Add(new ScriptBundle("~/bundles/movielike").Include(
+            "~/Scripts/movie.like.js"));
+
             bundles.Add(new StyleBundle("~/css/semantic").Include(
                       "~/Content/semantic.css"));
 

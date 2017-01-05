@@ -37,21 +37,17 @@
                 </div>
 
                 <!-- Like segment -->
-                <div class="eight wide right aligned column" id="likeDiv">
+                <div class="eight wide right aligned column" name="likeContainer">
 
                     @if (User.Identity.IsAuthenticated)
                     {
                         if (Model.IsLikedMovie)
                         {
-                            <div class="ui red button" id="unlikeButton" movieId="@Model.IMDBId">
-                                <i class="heart icon"></i> You liked this movie
-                            </div>
+                            <div name="unlikeButton" movieId="@Model.IMDBId"></div>
                         }
                         else
                         {
-                            <div class="ui green button" id="likeButton" movieId="@Model.IMDBId">
-                                <i class="thumbs outline up icon"></i> Like this movie
-                            </div>
+                            <div name="likeButton" movieId="@Model.IMDBId"></div>
                         }
                     }
                 </div>
@@ -150,85 +146,9 @@
     </div>
 }
 
+@Scripts.Render("~/bundles/movielike")
+
 <script>
-
-    var debounceDelay = 200;
-
-    $(document).ready(function () {
-
-        var likeFunction = function () {
-
-            var movieId = $("#likeButton").attr("movieId");
-
-            if (movieId == null)
-                return;
-
-            var likeObject = {
-                'IsLike': true,
-                'IMDbId': movieId
-            };
-
-            likeObject = JSON.stringify({ model: likeObject });
-
-            $.ajax({
-                type: 'POST',
-                url: '/Movie/LikeHandler',
-                data: likeObject,
-                contentType: 'application/json',
-                error: function (err) {
-                    alert("Error, cannot like movie.");
-                },
-                success: function (previewMovieArray) {
-
-                    var movieId = $("#likeButton").attr("movieId");
-                    var likedButtonStr = "<div class='ui red button' id='unlikeButton' movieId='" + movieId + "'> <i class='heart icon'></i> You liked this movie </div>";
-                    var likedButton = $($.parseHTML(likedButtonStr)).click($.debounce(debounceDelay, unlikeFunction));
-
-                    $("#likeButton").detach();
-                    $("#likeDiv").append(likedButton);
-                }
-            });
-        };
-
-        $('#likeButton').bind("click", $.debounce(debounceDelay, likeFunction));
-
-        var unlikeFunction = function () {
-
-            var movieId = $("#unlikeButton").attr("movieId");
-
-            if (movieId == null)
-                return;
-
-            var unlikeObject = {
-                'IsLike': false,
-                'IMDbId': movieId
-            };
-
-            likeObject = JSON.stringify({ model: unlikeObject });
-
-            $.ajax({
-                type: 'POST',
-                url: '/Movie/LikeHandler',
-                data: likeObject,
-                contentType: 'application/json',
-                error: function (err) {
-                    alert("Error, cannot unlike movie.");
-                },
-                success: function (previewMovieArray) {
-
-                    var movieId = $("#unlikeButton").attr("movieId");
-                    var likeButtonStr = "<div class='ui green button' id='likeButton' movieId='" + movieId + "'> <i class='thumbs outline up icon'></i> Like this movie</div>";
-                    var likeButton = $($.parseHTML(likeButtonStr)).click($.debounce(debounceDelay, likeFunction));
-
-                    $("#unlikeButton").detach();
-                    $("#likeDiv").append(likeButton);
-                }
-            });
-        };
-
-        $('#unlikeButton').bind("click", $.debounce(debounceDelay, unlikeFunction));
-
-    });
 
     $('.rating').rating({
         initialRating: 5,
@@ -236,5 +156,8 @@
         interactive: false
     });
 
+    $(document).ready(function () {
+        likeDecorator();
+    });
 
 </script>

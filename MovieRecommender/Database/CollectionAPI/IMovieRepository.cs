@@ -12,6 +12,7 @@ namespace MovieRecommender.Database.CollectionAPI
     {
         IEnumerable<Movie> FilterMovies(int fromYear, int toYear, IEnumerable<string> genres, bool orderDescByRatingCount, int limit, int paginationIndex = 0);
         IEnumerable<Movie> FindMoviesLikeTitleAsync(string likeTitle, int limit, bool sortByRatingCountDesc = true);
+        IEnumerable<Movie> FindMoviesByIMDbIds(IEnumerable<string> imdbIds);
         Movie FindMovieByImdbId(string imdbId);
         IEnumerable<string> DistinctGenres();
         IEnumerable<int> DistinctYearsDesc();

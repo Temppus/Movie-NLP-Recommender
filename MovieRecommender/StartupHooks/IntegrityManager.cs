@@ -23,9 +23,9 @@ namespace MovieRecommender.StartupHooks
         {
             // remove null values from liked movies, I fucked up once :)
             var updateDefinition = Builders<ApplicationUser>.Update.Pull(u => u.LikedMovies, null);
-            var filter = Builders<ApplicationUser>.Filter.Empty;
+            var emptyFilter = Builders<ApplicationUser>.Filter.Empty;
 
-            _users.UpdateMany(filter, updateDefinition);
+            _users.UpdateMany(emptyFilter, updateDefinition);
         }
 
         public void Start()
