@@ -16,6 +16,5 @@ namespace MovieRecommender.Database.CollectionAPI
         Movie FindMovieByImdbId(string imdbId);
         IEnumerable<string> DistinctGenres();
         IEnumerable<int> DistinctYearsDesc();
-
     }
 }

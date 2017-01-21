@@ -25,18 +25,21 @@ namespace MovieRecommender.Controllers
         private readonly IMovieRepository _movieStore;
         private readonly IReviewRepository _reviewStore;
         private readonly IUserRepository _userStore;
+        private readonly IMovieMentionRepository _movieMentionRepository;
 
         private const int _movieLimit = 10;
 
         /// <summary>
         /// Parameters injected via unity IoC container
         /// </summary>
-        public MovieController(ApplicationUserManager userManager, IUserRepository userStore, IMovieRepository movieStore, IReviewRepository reviewStore)
+        public MovieController(ApplicationUserManager userManager, IUserRepository userStore, IMovieRepository movieStore,
+                                IReviewRepository reviewStore, IMovieMentionRepository movieMentionRepository)
         {
             _userStore = userStore;
             _userManager = userManager;
             _movieStore = movieStore;
             _reviewStore = reviewStore;
+            _movieMentionRepository = movieMentionRepository;
         }
 
         // GET: Movie

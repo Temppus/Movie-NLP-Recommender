@@ -235,14 +235,17 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\MovieController.cs" />
+    <Compile Include="Database\CollectionAPI\IMovieMentionRepository.cs" />
     <Compile Include="Database\CollectionAPI\IMovieRepository.cs" />
     <Compile Include="Database\CollectionAPI\IReviewRepository.cs" />
     <Compile Include="Database\CollectionAPI\IUserRepository.cs" />
     <Compile Include="Database\CollectionAPI\MongoMovieRepository.cs" />
     <Compile Include="Database\CollectionAPI\MongoReviewRepository.cs" />
     <Compile Include="Database\CollectionAPI\MongoUserRepository.cs" />
+    <Compile Include="Database\CollectionAPI\MongoMovieMentionRepository.cs" />
     <Compile Include="Database\IRepositoryManager.cs" />
     <Compile Include="Database\Models\Movie.cs" />
+    <Compile Include="Database\Models\MovieMention.cs" />
     <Compile Include="Database\Models\MovieReview.cs" />
     <Compile Include="Database\MongoDbConnectionPool.cs" />
     <Compile Include="Database\RepositoryManager.cs" />
