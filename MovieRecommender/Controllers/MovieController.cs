@@ -5,6 +5,7 @@ using MovieRecommender.Database;
 using MovieRecommender.Database.CollectionAPI;
 using MovieRecommender.Database.Models;
 using MovieRecommender.Models;
+using MovieRecommender.Recommending;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -26,6 +27,7 @@ namespace MovieRecommender.Controllers
         private readonly IReviewRepository _reviewStore;
         private readonly IUserRepository _userStore;
         private readonly IMovieMentionRepository _movieMentionRepository;
+        private readonly IRecommender _recommender;
 
         private const int _movieLimit = 10;
 
@@ -40,6 +42,8 @@ namespace MovieRecommender.Controllers
             _movieStore = movieStore;
             _reviewStore = reviewStore;
             _movieMentionRepository = movieMentionRepository;
+
+            _recommender = new NlpRecommender(_userStore, _movieMentionRepository);
         }
 
         // GET: Movie
@@ -47,8 +51,14 @@ namespace MovieRecommender.Controllers
         {
             var model = new MoviePreviewModel(_movieStore.DistinctGenres(), _movieStore.DistinctYearsDesc());
             var movies = GetMoviesByModelSearchQuery(model, _movieLimit);
+
             model.MoviePreviews = movies.Select(m => new MoviePreview(m)).ToList();
             MapMovieLikes(model);
+
+            if (User.Identity.IsAuthenticated)
+            {
+                var recommendedMovies = _recommender.RecommendForUser(User.Identity.Name);
+            }
 
             return View(model);
         }
