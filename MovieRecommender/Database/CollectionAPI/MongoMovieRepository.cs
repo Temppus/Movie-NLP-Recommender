@@ -120,5 +120,41 @@ namespace MovieRecommender.Database.CollectionAPI
             var movies = _collection.Find(filter).ToList();
             return movies;
         }
+
+        public IList<BsonDocument> FindByPersonalInfo(IEnumerable<string> genres, IEnumerable<string> keywords, IEnumerable<string> exceptIMDbIds,
+                                                            int limit, int fromYear, int minRatingCount)
+        {
+            IEnumerable<FilterDefinition<Movie>> filters = new List<FilterDefinition<Movie>>
+            {
+                Builders<Movie>.Filter.AnyIn(m => m.Genres, genres),
+                Builders<Movie>.Filter.AnyIn(m => m.Keywords, keywords),
+                Builders<Movie>.Filter.Nin(m => m.IMDBId, exceptIMDbIds),
+                Builders<Movie>.Filter.Where(m => m.PublicationYear >= fromYear && m.RatingCount >= minRatingCount)
+            };
+
+            var groupByExpression = new Dictionary<string, BsonDocument>();
+            string sumKey = "matches";
+
+            // group by id of film
+            groupByExpression.Add("_id", new BsonDocument("_id", "$_id"));
+            // count sum of keyword matches
+            groupByExpression.Add(sumKey, new BsonDocument("$sum", 1));
+
+            // include other properties in grouping output document
+            groupByExpression.Add(nameof(Movie.Title), new BsonDocument("$first", "$" + nameof(Movie.Title)));
+            groupByExpression.Add(nameof(Movie.IMDBId), new BsonDocument("$first", "$" + nameof(Movie.IMDBId)));
+            groupByExpression.Add(nameof(Movie.ImageURI), new BsonDocument("$first", "$" + nameof(Movie.ImageURI)));
+            groupByExpression.Add(nameof(Movie.Rating), new BsonDocument("$first", "$" + nameof(Movie.Rating)));
+            groupByExpression.Add(nameof(Movie.RatingCount), new BsonDocument("$first", "$" + nameof(Movie.RatingCount)));
+            groupByExpression.Add(nameof(Movie.Overview), new BsonDocument("$first", "$" + nameof(Movie.Overview)));
+
+            return _collection.Aggregate().Match(Builders<Movie>.Filter.And(filters))
+                    .Unwind(m => m.Keywords)
+                    .Match(Builders<BsonDocument>.Filter.AnyIn(nameof(Movie.Keywords), keywords))
+                    .Group(new BsonDocument(groupByExpression))
+                    .Sort(new BsonDocument(sumKey, -1))
+                    .Limit(limit)
+                    .ToList();
+        }
     }
 }

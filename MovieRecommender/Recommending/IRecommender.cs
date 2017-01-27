@@ -9,6 +9,6 @@ namespace MovieRecommender.Recommending
 {
     public interface IRecommender
     {
-        IEnumerable<MovieMention> RecommendForUser(string userName);
+        IEnumerable<Movie> RecommendForUser(string userName);
     }
 }
