@@ -17,7 +17,7 @@ namespace MovieRecommender.Recommending
             _userStore = userStore;
         }
 
-        public IEnumerable<MovieMention> RecommendForUser(string userName)
+        public IEnumerable<Movie> RecommendForUser(string userName)
         {
             if (userName == null)
                 throw new ArgumentNullException(nameof(userName));
@@ -36,7 +36,7 @@ namespace MovieRecommender.Recommending
                 recommendedMovies.Add(movieMention);
             }
 
-            return recommendedMovies;
+            return new List<Movie>();
         }
     }
 }

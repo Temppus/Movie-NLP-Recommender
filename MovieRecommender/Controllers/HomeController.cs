@@ -31,7 +31,7 @@ namespace MovieRecommender.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 var recommendedMovies = _recommender.RecommendForUser(User.Identity.Name);
-                var ForceJSON = forceModel.Compose(recommendedMovies).ToJson();
+                var ForceJSON = forceModel.Compose(new List<MovieMention>()/*recommendedMovies*/).ToJson();
 
                 HomeViewModel homeModel = new HomeViewModel()
                 {
