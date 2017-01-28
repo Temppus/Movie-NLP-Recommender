@@ -265,6 +265,7 @@
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\MovieDetailModel.cs" />
     <Compile Include="Models\MoviePreviewModel.cs" />
+    <Compile Include="Models\MovieSuggestionModel.cs" />
     <Compile Include="Models\QuickSearchResponse.cs" />
     <Compile Include="Models\SearchModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

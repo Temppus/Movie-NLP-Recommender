@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using MovieRecommender.Database.Models;
 using MovieRecommender.Database.CollectionAPI;
 using System.Linq;
+using MovieRecommender.Models;
 
 namespace MovieRecommender.Recommending
 {
@@ -17,7 +18,7 @@ namespace MovieRecommender.Recommending
             _userStore = userStore;
         }
 
-        public IEnumerable<Movie> RecommendForUser(string userName)
+        IEnumerable<MovieSuggestionModel> IRecommender.RecommendForUser(string userName)
         {
             if (userName == null)
                 throw new ArgumentNullException(nameof(userName));
@@ -36,7 +37,7 @@ namespace MovieRecommender.Recommending
                 recommendedMovies.Add(movieMention);
             }
 
-            return new List<Movie>();
+            return new List<MovieSuggestionModel>();
         }
     }
 }

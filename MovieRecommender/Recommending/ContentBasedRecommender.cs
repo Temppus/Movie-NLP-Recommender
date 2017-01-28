@@ -4,6 +4,9 @@ using System.Linq;
 using MovieRecommender.Database.Models;
 using MovieRecommender.Database.CollectionAPI;
 using MovieRecommender.Extensions;
+using MongoDB.Bson.Serialization;
+using MovieRecommender.Models;
+using MongoDB.Bson;
 
 namespace MovieRecommender.Recommending
 {
@@ -18,10 +21,8 @@ namespace MovieRecommender.Recommending
             _movieStore = movieStore;
         }
 
-        public IEnumerable<Movie> RecommendForUser(string userName)
+        public IEnumerable<MovieSuggestionModel> RecommendForUser(string userName)
         {
-            var resultMovies = new List<Movie>();
-
             var likedMovieInfos = _userStore.FindLikedMovies(userName);
             var likedMovies = _movieStore.FindMoviesByIMDbIds(likedMovieInfos.Select(m => m.IMDBId));
 
@@ -54,7 +55,7 @@ namespace MovieRecommender.Recommending
             var suggestedMovies = _movieStore.FindByPersonalInfo(weightedGenres, weightedKeywords,
                                                                 likedMovieInfos.Select(l => l.IMDBId), 20, 1990, 500);
 
-            return resultMovies;
+            return suggestedMovies.Select(s => BsonSerializer.Deserialize<MovieSuggestionModel>(s));
         }
 
         private UserWeightModel<string, int> CreateWeightModel(IEnumerable<Movie> likedMovies)

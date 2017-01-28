@@ -1,4 +1,5 @@
 ﻿using MovieRecommender.Database.Models;
+using MovieRecommender.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,6 @@ namespace MovieRecommender.Recommending
 {
     public interface IRecommender
     {
-        IEnumerable<Movie> RecommendForUser(string userName);
+        IEnumerable<MovieSuggestionModel> RecommendForUser(string userName);
     }
 }
