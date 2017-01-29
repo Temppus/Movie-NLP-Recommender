@@ -111,8 +111,7 @@
           interactive: false
       });
 
-
-    $(window).scroll(function () {
+    $(window).scroll($.debounce(200,function () {
         if ($(window).scrollTop() + $(window).height() > $(document).height() - 100) { // Check if we are near bottom
 
             var resultGrid = $('#resultGrid');
@@ -167,6 +166,10 @@
                             movieRowClone.find("[name='ratingDecimal']").attr("data-rating", Math.floor(moviePreview.Rating));
                             movieRowClone.find("[name='ratingHolder']").html(moviePreview.Rating);
 
+                            // remove decorated attribute
+                            movieRowClone.find('div[name=likeButton]').removeAttr("decorated");
+                            movieRowClone.find('div[name=unlikeButton]').removeAttr("decorated");
+
                             // remove cloned genres
                             movieRowClone.find("[name='movieGenre']").each(function () {
                                 $(this).remove();
@@ -183,10 +186,13 @@
 
                                 genreDiv.append(button);
                             }
+                 
+                            var likeContainer = movieRowClone.find("[name='likeContainer']");
 
                             // remove like container elements
-                            var likeContainer = movieRowClone.find("[name='likeContainer']");
-                            likeContainer.empty();
+                            likeContainer.children().each(function () {
+                                $(this).remove();
+                            });
 
                             if ("@User.Identity.IsAuthenticated" == "True")
                             {
@@ -220,7 +226,7 @@
                 });
             }
         }
-    });
+    }));
 </script>
 
 

@@ -9,27 +9,20 @@
 
 var debounceDelay = 200;
 
-function likeDecorator () {
+function likeDecorator() {
 
-    var likedText    = 'You liked this movie';
+    var likedText = 'You liked this movie';
     var notLikedText = 'Like this movie ?';
 
     // decorate like div holder
     $('div[name=likeButton]').each(function () {
 
+        if ($(this).attr("decorated") == "true")
+            return;
+
+        $(this).attr("decorated", "true");
         $(this).attr("class", "ui green button");
         $(this).text(notLikedText).prepend($('<i class="thumbs outline up icon"></i>'));
-    });
-
-    // decorate unlike div holder
-    $('div[name=unlikeButton]').each(function () {
-
-        $(this).attr("class", "ui red button");
-        $(this).text(likedText).prepend($('<i class="heart icon"></i>'));
-    });
-
-    // hook our js function call
-    $('div[name=likeButton]').each(function () {
 
         $(this).bind("click", $.debounce(debounceDelay,
             function () {
@@ -38,13 +31,20 @@ function likeDecorator () {
         ));
     });
 
-    // hook our js function call
+    // decorate unlike div holder
     $('div[name=unlikeButton]').each(function () {
 
+        if ($(this).attr("decorated") == "true")
+            return;
+
+        $(this).attr("decorated", "true");
+        $(this).attr("class", "ui red button");
+        $(this).text(likedText).prepend($('<i class="heart icon"></i>'));
+
         $(this).bind("click", $.debounce(debounceDelay,
-                    function () {
-                        unlikeFunction($(this));
-                    }
+            function () {
+                unlikeFunction($(this));
+            }
         ));
     });
 
