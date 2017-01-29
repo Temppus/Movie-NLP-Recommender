@@ -94,7 +94,7 @@ namespace MovieRecommender.Controllers
                                                     _movieLimit,
                                                     model.PaginationIndex);
 
-            var moviePreviews = movies.Select(m => new MoviePreview(m));
+            var moviePreviews = movies.Select(m => new MoviePreview(m)).ToList();
 
             if (User.Identity.IsAuthenticated)
             {
