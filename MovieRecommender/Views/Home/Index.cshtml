@@ -3,14 +3,6 @@
     ViewBag.Title = "Home Page";
 }
 
-<style>
-
-</style>
-
-<div class="ui container">
-    @Html.Partial("SearchMoviesPartial")
-</div>
-
 <div class="ui internally celled grid">
     <div class="row">
         <div class="three wide column">
@@ -110,11 +102,10 @@
         .attr('xlink:href',function(d,i) {return '#edgepath'+i})
         .style("pointer-events", "none")
         .text(function(d,i)
-            {
-                return d.label;
-            }
+        {
+            return d.label;
+        }
         );
-
 
     svg.append('defs').append('marker')
         .attr({'id':'arrowhead',

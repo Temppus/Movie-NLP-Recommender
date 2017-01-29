@@ -41,6 +41,17 @@
                 <i class="film icon"></i>
                 Movie Recommender
             </a>
+
+            <div class="item">
+                <div class="ui left aligned search">
+                    <div class="ui icon input">
+                        <input class="prompt" type="text" placeholder="Search movie...">
+                        <i class="search icon"></i>
+                    </div>
+                    <div class="results"></div>
+                </div>
+            </div>
+
             @Html.ActionLink("Home", "Index", "Home", null, htmlAttributes: new { @class = "item" })
             @Html.ActionLink("Movies", "Index", "Movie", null, htmlAttributes: new { @class = "item" })
             @Html.Partial("_LoginPartial")
@@ -80,7 +91,23 @@
 
         </div>
     </div>
+
     @RenderSection("scripts", required: false)
+
+    <script>
+        $('.ui.search')
+          .search({
+              searchDelay: 500,
+              maxResults: 8,
+              apiSettings: {
+                  url: '@HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Authority)/Movie/SearchMoviesLike?title={query}'
+              },
+              minCharacters: 3,
+              onResultsAdd: function (html) {
+                  return true;
+              }
+          });
+    </script>
+
 </body>
 </html>
-

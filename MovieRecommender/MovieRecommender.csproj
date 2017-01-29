@@ -504,7 +504,6 @@
     <Content Include="Views\Account\RegistrationSuccessful.cshtml" />
     <Content Include="Views\Movie\Index.cshtml" />
     <Content Include="Views\Movie\SearchMoviePartial.cshtml" />
-    <Content Include="Views\Home\SearchMoviesPartial.cshtml" />
     <Content Include="Views\Movie\Detail.cshtml" />
   </ItemGroup>
   <ItemGroup>
