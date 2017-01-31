@@ -91,6 +91,7 @@
     </div>
 </div>
 
+<!-- Embeded trailer video -->
 @if (!string.IsNullOrEmpty(Model.TrailerImageURI))
 {
     <h4 class="ui horizontal divider header">
@@ -99,9 +100,17 @@
     </h4>
 
     <div class="ui grid centered">
-        <a href="http://www.imdb.com/@Model.TrailerVideoURI" target="_blank">
-            <img alt="Trailer" title="Trailer" src="@Url.Content(Model.TrailerImageURI)" itemprop="image">
-        </a>
+
+        @{
+            string trailerBaseURI = @Model.TrailerVideoURI.Split('?').FirstOrDefault();
+        }
+
+        @if (!string.IsNullOrEmpty(trailerBaseURI))
+        {
+            string embededURI = "http://www.imdb.com" + @trailerBaseURI + "/imdb/embed?autoplay=false&width=640";
+
+            <iframe src="@embededURI" width="640" height="360" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true" frameborder="no" scrolling="no"></iframe>
+        }
     </div>
 }
 
