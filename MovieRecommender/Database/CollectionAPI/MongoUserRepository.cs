@@ -16,7 +16,7 @@ namespace MovieRecommender.Database.CollectionAPI
             _collection = dbPool.Database.GetCollection<ApplicationUser>("users");
         }
 
-        public bool CheckIfLikedMovie(string userName, string imdbId)
+        public bool CheckIfUserLikedMovie(string userName, string imdbId)
         {
             if (userName == null)
                 throw new ArgumentNullException(nameof(userName));

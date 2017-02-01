@@ -10,7 +10,7 @@ namespace MovieRecommender.Database.CollectionAPI
     public interface IUserRepository
     {
         IEnumerable<MovieLikeInfo> FindLikedMovies(string userName);
-        bool CheckIfLikedMovie(string userName, string imdbId);
+        bool CheckIfUserLikedMovie(string userName, string imdbId);
         IDictionary<string, bool> GetUserLikedMovieMappings(string userName, IEnumerable<string> imdbIds);
         void UserLikedMovie(string userName, string imdbId);
         void UserUnlikedMovie(string userName, string imdbId);

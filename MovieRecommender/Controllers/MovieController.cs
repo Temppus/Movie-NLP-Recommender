@@ -153,7 +153,7 @@ namespace MovieRecommender.Controllers
 
             if (User.Identity.IsAuthenticated)
             {
-                model.IsLikedMovie = _userStore.CheckIfLikedMovie(User.Identity.Name, imdbId);
+                model.IsLikedMovie = _userStore.CheckIfUserLikedMovie(User.Identity.Name, imdbId);
                 model.MovieSuggestions = _recommender.RecommendForUser(User.Identity.Name);
             }
 
@@ -174,14 +174,14 @@ namespace MovieRecommender.Controllers
 
             if (model.IsLike)
             {
-                if (!_userStore.CheckIfLikedMovie(user.UserName, model.IMDbId))
+                if (!_userStore.CheckIfUserLikedMovie(user.UserName, model.IMDbId))
                     _userStore.UserLikedMovie(user.UserName, model.IMDbId);
                 else
                     return Json(null);
             }
             else
             {
-                if (_userStore.CheckIfLikedMovie(user.UserName, model.IMDbId))
+                if (_userStore.CheckIfUserLikedMovie(user.UserName, model.IMDbId))
                     _userStore.UserUnlikedMovie(user.UserName, model.IMDbId);
                 else
                     return Json(null);
