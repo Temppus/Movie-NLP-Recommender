@@ -100,5 +100,60 @@ namespace MovieRecommender.Database.CollectionAPI
 
             _collection.UpdateOne(filter, updateDefinition);
         }
+
+        public void AddMovieToNotInterested(string userName, string imdbId)
+        {
+            if (userName == null)
+                throw new ArgumentNullException(nameof(userName));
+
+            if (imdbId == null)
+                throw new ArgumentNullException(nameof(imdbId));
+
+            var updateDefinition = Builders<ApplicationUser>.Update.AddToSet(u => u.NotInterestedMovies, new MovieLikeInfo() { IMDBId = imdbId });
+            var filter = Builders<ApplicationUser>.Filter.Where(u => u.UserName == userName);
+
+            _collection.UpdateOne(filter, updateDefinition);
+        }
+
+        public void RemoveMovieFromNotInterested(string userName, string imdbId)
+        {
+            if (userName == null)
+                throw new ArgumentNullException(nameof(userName));
+
+            if (imdbId == null)
+                throw new ArgumentNullException(nameof(imdbId));
+
+            var updateDefinition = Builders<ApplicationUser>.Update.PullFilter(u => u.NotInterestedMovies, x => x.IMDBId == imdbId);
+            var filter = Builders<ApplicationUser>.Filter.Where(u => u.UserName == userName);
+
+            _collection.UpdateOne(filter, updateDefinition);
+        }
+
+        public bool CheckIfUserHasMovieInNotInterested(string userName, string imdbId)
+        {
+            if (userName == null)
+                throw new ArgumentNullException(nameof(userName));
+
+            if (imdbId == null)
+                throw new ArgumentNullException(nameof(imdbId));
+
+            var userNameFilter = Builders<ApplicationUser>.Filter.Where(u => u.UserName == userName);
+            var movieIdFilter = Builders<ApplicationUser>.Filter.ElemMatch(u => u.NotInterestedMovies, n => n.IMDBId == imdbId);
+
+            var filter = Builders<ApplicationUser>.Filter.And(userNameFilter, movieIdFilter);
+
+            return _collection.Find(filter).ToList().FirstOrDefault() != null;
+        }
+
+        public IEnumerable<string> GetNotInterestedMovieIdsForUser(string userName)
+        {
+            if (userName == null)
+                throw new ArgumentNullException(nameof(userName));
+
+            var userNameFilter = Builders<ApplicationUser>.Filter.Where(u => u.UserName == userName);
+            var user = _collection.Find(userNameFilter).Single();
+
+            return user.NotInterestedMovies.Select(x => x.IMDBId);
+        }
     }
 }

@@ -189,5 +189,35 @@ namespace MovieRecommender.Controllers
 
             return Json(true);
         }
+
+        [HttpPost]
+        public JsonResult NotInterestedHandler(InterestModel model)
+        {
+            if (!User.Identity.IsAuthenticated)
+                return Json(null);
+
+            var userName = User.Identity.Name;
+            var user = _userManager.FindByNameAsync(userName).Result;
+
+            if (user == null)
+                return Json(null);
+
+            if (model.IsNotInterested) // Not interested
+            {
+                if (!_userStore.CheckIfUserHasMovieInNotInterested(user.UserName, model.IMDbId))
+                    _userStore.AddMovieToNotInterested(user.UserName, model.IMDbId);
+                else
+                    return Json(null);
+            }
+            else // user is interested in this movie again
+            {
+                if (_userStore.CheckIfUserHasMovieInNotInterested(user.UserName, model.IMDbId))
+                    _userStore.RemoveMovieFromNotInterested(user.UserName, model.IMDbId);
+                else
+                    return Json(null);
+            }
+
+            return Json(true);
+        }
     }
 }

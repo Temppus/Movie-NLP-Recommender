@@ -14,6 +14,8 @@ namespace MovieRecommender.Models
     {
         public IEnumerable<MovieLikeInfo> LikedMovies { get; set; } = new List<MovieLikeInfo>();
 
+        public IEnumerable<MovieLikeInfo> NotInterestedMovies { get; set; } = new List<MovieLikeInfo>();
+
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {
             // Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType

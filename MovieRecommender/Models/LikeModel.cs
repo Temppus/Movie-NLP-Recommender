@@ -10,4 +10,10 @@ namespace MovieRecommender.Models
         public bool IsLike { get; set; }
         public string IMDbId { get; set; }
     }
+
+    public class InterestModel
+    {
+        public bool IsNotInterested { get; set; }
+        public string IMDbId { get; set; }
+    }
 }
