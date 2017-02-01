@@ -4,7 +4,6 @@
     ViewBag.Title = Model.Title;
 }
 
-
 @section styles {
     <style>
         .ui.main.container {
@@ -115,70 +114,115 @@
                         <iframe src="@embededURI" width="640" height="360" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true" frameborder="no" scrolling="no"></iframe>
                     }
                 </div>
-            }
+                        }
         </div>
     </div>
 </div>
 
-<h4 class="ui horizontal divider header">
-    <i class="tag icon"></i>
-    Recommended movies for you
-</h4>
 
-<h4 class="ui horizontal divider header">
-    <i class="tag icon"></i>
-    Actors
-</h4>
-
-<div class="ui horizontal segments">
-
-    @foreach (var actor in Model.ActorsInfo)
-    {
-        <div class="ui center aligned segment">
-            <img class="ui avatar small image centered" src=@actor.ImageURI>
-            <div class="content">
-                <div class="header"><strong>@actor.ActorName</strong></div>
-                <strong>As</strong> @actor.As
-            </div>
-        </div>
-    }
-</div>
-
-<h4 class="ui horizontal divider header">
-    <i class="tag icon"></i>
-    Top 10 Reviews
-</h4>
-
-@foreach (var review in Model.Reviews)
+@if (User.Identity.IsAuthenticated)
 {
-    <div class="ui raised segment">
-        <div class="ui medium header" id="titleId">@review.Title</div>
-        @if (review.Rating >= 0)
+    <h4 class="ui horizontal divider header">
+        <i class="tag icon"></i>
+        Recommended movies for you
+    </h4>
+
+    <div class="ui six column grid">
+        @foreach (var suggestion in Model.MovieSuggestions.Take(6))
         {
-            <div class="ui star rating" data-rating=@review.Rating.ToString()>
+            <div class="column">
+
+                <div class="ui card">
+                    <a class="ui image" href="@Url.Action("Details","Movie", new { imdbId = @suggestion.IMDBId })">
+                        <img src="@suggestion.ImageURI">
+                    </a>
+                    <div class="content">
+                        <div class="header">@suggestion.Title</div>
+                    </div>
+                    <div class="extra">
+                        <strong>Rating: @suggestion.Rating</strong>
+                        <div class="ui star rating" data-rating="@Math.Floor(@suggestion.Rating).ToString()"></div>
+                    </div>
+
+                    <div class="ui two bottom attached buttons" name="likeContainer">
+                        <div class="ui grey  button">
+                            <i class="remove icon"></i>
+                        </div>
+                        <div name="likeButton" movieId="@suggestion.IMDBId" likeText="Like" likedText="Liked"></div>
+                    </div>
+                </div>
+
+                <div class="ui popup">
+                    <div class="header">User Rating</div>
+                    <div class="ui star rating" data-rating="3"></div>
+                </div>
+
             </div>
         }
-        <div>
-            <strong>@review.UsefullnessDescription</strong>
-        </div>
-
-        <p>@review.Text</p>
     </div>
 }
 
 
-@Scripts.Render("~/bundles/movielike")
+    @*
+        <h4 class="ui horizontal divider header">
+            <i class="tag icon"></i>
+            Actors
+        </h4>
 
-<script>
 
-    $('.rating').rating({
-        initialRating: 5,
-        maxRating: 10,
-        interactive: false
-    });
+        <div class="ui horizontal segments">
 
-    $(document).ready(function () {
-        likeDecorator();
-    });
+            @foreach (var actor in Model.ActorsInfo)
+            {
+                <div class="ui center aligned segment">
+                    <img class="ui avatar small image centered" src=@actor.ImageURI>
+                    <div class="content">
+                        <div class="header"><strong>@actor.ActorName</strong></div>
+                        <strong>As</strong> @actor.As
+                    </div>
+                </div>
+            }
+        </div>
+    *@
 
-</script>
+    <h4 class="ui horizontal divider header">
+        <i class="tag icon"></i>
+        Top 10 Reviews
+    </h4>
+
+    @foreach (var review in Model.Reviews)
+    {
+        <div class="ui raised segment">
+            <div class="ui medium header" id="titleId">@review.Title</div>
+            @if (review.Rating >= 0)
+            {
+                <div class="ui star rating" data-rating=@review.Rating.ToString()>
+                </div>
+            }
+            <div>
+                <strong>@review.UsefullnessDescription</strong>
+            </div>
+
+            <p>@review.Text</p>
+        </div>
+    }
+
+
+    @Scripts.Render("~/bundles/movielike")
+
+    <script>
+
+        $('.rating').rating({
+            initialRating: 5,
+            maxRating: 10,
+            interactive: false
+        });
+
+        $(document).ready(function () {
+            likeDecorator();
+
+            $('.ui.popup')
+              .popup();
+        });
+
+    </script>

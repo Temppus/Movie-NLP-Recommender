@@ -154,6 +154,7 @@ namespace MovieRecommender.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 model.IsLikedMovie = _userStore.CheckIfLikedMovie(User.Identity.Name, imdbId);
+                model.MovieSuggestions = _recommender.RecommendForUser(User.Identity.Name);
             }
 
             return View("Detail", model);

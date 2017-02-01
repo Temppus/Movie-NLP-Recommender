@@ -1,9 +1,11 @@
 ﻿/*
-    EXAMPLE:
-            <div name="unlikeButton" movieId="someIMDBID"></div>
-            <div name="likeButton" movieId="someIMDBID"></div>
+    Parent node must have attribute name="likeContainer" !
 
-            Parent node must have attribute name="likeContainer" !
+    EXAMPLE:
+        <div name="likeContainer">
+            <div name="unlikeButton" movieId="someIMDBID"></div>    --> Optional attributes for custom button texts (likeText="Like" likedText="Liked")
+            <div name="likeButton" movieId="someIMDBID"></div>      --> Optional attributes for custom button texts (likeText="Like" likedText="Liked")
+        </div>
 */
 
 
@@ -22,7 +24,10 @@ function likeDecorator() {
 
         $(this).attr("decorated", "true");
         $(this).attr("class", "ui green button");
-        $(this).text(notLikedText).prepend($('<i class="thumbs outline up icon"></i>'));
+
+        var _notLikedText = $(this).attr("likeText") || notLikedText;
+
+        $(this).text(_notLikedText).prepend($('<i class="thumbs outline up icon"></i>'));
 
         $(this).bind("click", $.debounce(debounceDelay,
             function () {
@@ -39,7 +44,10 @@ function likeDecorator() {
 
         $(this).attr("decorated", "true");
         $(this).attr("class", "ui red button");
-        $(this).text(likedText).prepend($('<i class="heart icon"></i>'));
+
+        var _likedText = $(this).attr("likedText") || likedText;
+
+        $(this).text(_likedText).prepend($('<i class="heart icon"></i>'));
 
         $(this).bind("click", $.debounce(debounceDelay,
             function () {
@@ -70,10 +78,11 @@ function likeDecorator() {
             error: function (err) {
                 alert("Error, cannot like movie.");
             },
-            success: function (previewMovieArray) {
+            success: function (data) {
 
                 var movieId = jqueryButton.attr("movieId");
-                var likedButtonStr = "<div class='ui red button' name='unlikeButton' movieId='" + movieId + "'> <i class='heart icon'></i> " + likedText + " </div>";
+                var _likedText = jqueryButton.attr("likedText") || likedText;
+                var likedButtonStr = "<div class='ui red button' name='unlikeButton' movieId='" + movieId + "'> <i class='heart icon'></i> " + _likedText + " </div>";
                 var likedButton = $($.parseHTML(likedButtonStr));
 
                 likedButton.click($.debounce(debounceDelay,
@@ -111,10 +120,11 @@ function likeDecorator() {
             error: function (err) {
                 alert("Error, cannot unlike movie.");
             },
-            success: function (previewMovieArray) {
+            success: function (data) {
 
                 var movieId = jqueryButton.attr("movieId");
-                var likeButtonStr = "<div class='ui green button' name='likeButton' movieId='" + movieId + "'> <i class='thumbs outline up icon'></i> " + notLikedText + "</div>";
+                var _notLikedText = jqueryButton.attr("likeText") || notLikedText;
+                var likeButtonStr = "<div class='ui green button' name='likeButton' movieId='" + movieId + "'> <i class='thumbs outline up icon'></i> " + _notLikedText + "</div>";
                 var likeButton = $($.parseHTML(likeButtonStr));
 
                 likeButton.click($.debounce(debounceDelay,

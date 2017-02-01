@@ -20,10 +20,11 @@ namespace MovieRecommender.Models
         public string ImageURI { get; set; }
         public string TrailerImageURI { get; set; }
         public string TrailerVideoURI { get; set; }
-        public List<string> Genres { get; set; }
-        public List<string> Keywords { get; set; }
-        public List<ActorModel> ActorsInfo { get; set; }
-        public IEnumerable<ReviewStructure> Reviews { get; set; }
+        public List<string> Genres { get; set; } = new List<string>();
+        public List<string> Keywords { get; set; } = new List<string>();
+        public List<ActorModel> ActorsInfo { get; set; } = new List<ActorModel>();
+        public IEnumerable<MovieSuggestionModel> MovieSuggestions { get; set; } = new List<MovieSuggestionModel>();
+        public IEnumerable<ReviewStructure> Reviews { get; set; } = new List<ReviewStructure>();
     }
 
     public class ActorModel
