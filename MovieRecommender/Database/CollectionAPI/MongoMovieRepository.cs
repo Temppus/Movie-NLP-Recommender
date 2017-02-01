@@ -121,15 +121,17 @@ namespace MovieRecommender.Database.CollectionAPI
             return movies;
         }
 
-        public IList<BsonDocument> FindByPersonalInfo(IEnumerable<string> genres, IEnumerable<string> keywords, IEnumerable<string> exceptIMDbIds,
-                                                            int limit, int fromYear, int minRatingCount)
+        public IList<BsonDocument> FindSimilarMovies(IEnumerable<string> genres, IEnumerable<string> keywords, IEnumerable<string> exceptIMDbIds,
+                                                            int limit, int fromYear, int minRatingCount, double minRating)
         {
             IEnumerable<FilterDefinition<Movie>> filters = new List<FilterDefinition<Movie>>
             {
                 Builders<Movie>.Filter.AnyIn(m => m.Genres, genres),
                 Builders<Movie>.Filter.AnyIn(m => m.Keywords, keywords),
                 Builders<Movie>.Filter.Nin(m => m.IMDBId, exceptIMDbIds),
-                Builders<Movie>.Filter.Where(m => m.PublicationYear >= fromYear && m.RatingCount >= minRatingCount)
+                Builders<Movie>.Filter.Where(m => m.PublicationYear >= fromYear),
+                Builders<Movie>.Filter.Where(m => m.RatingCount >= minRatingCount),
+                Builders<Movie>.Filter.Where(m => m.Rating > minRating)
             };
 
             var groupByExpression = new Dictionary<string, BsonDocument>();

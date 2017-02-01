@@ -52,8 +52,9 @@ namespace MovieRecommender.Recommending
                     weightedKeywords.Add(keyword);
             }
 
-            var suggestedMovies = _movieStore.FindByPersonalInfo(weightedGenres, weightedKeywords,
-                                                                likedMovieInfos.Select(l => l.IMDBId), 20, 1990, 500);
+            var suggestedMovies = _movieStore.FindSimilarMovies(weightedGenres, weightedKeywords,
+                                                                likedMovieInfos.Select(l => l.IMDBId),
+                                                                20, 1990, 500, 5.0d);
 
             return suggestedMovies.Select(s => BsonSerializer.Deserialize<MovieSuggestionModel>(s));
         }
