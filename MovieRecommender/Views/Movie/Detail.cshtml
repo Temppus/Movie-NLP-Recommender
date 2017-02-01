@@ -4,10 +4,19 @@
     ViewBag.Title = Model.Title;
 }
 
+
+@section styles {
+    <style>
+        .ui.main.container {
+            width: 85%;
+        }
+    </style>
+}
+
 <div class="ui grid" id="resultGrid">
     <div class="row">
         <!-- Image column -->
-        <div class="four wide column">
+        <div class="three wide column">
             <div class="row">
                 <img alt="Film poster" src="@Url.Content(Model.ImageURI)" id="posterImgId" class="ui centered medium image" />
             </div>
@@ -17,7 +26,7 @@
         </div>
 
         <!-- Film info column -->
-        <div class="twelve wide column">
+        <div class="five wide column">
             <div class="ui grid">
 
                 <!-- Title -->
@@ -88,31 +97,33 @@
 
             </div>
         </div>
+
+        <div class="eight wide column">
+            <!-- Embeded trailer video -->
+            @if (!string.IsNullOrEmpty(Model.TrailerImageURI))
+            {
+                <div class="ui grid centered">
+
+                    @{
+                        string trailerBaseURI = @Model.TrailerVideoURI.Split('?').FirstOrDefault();
+                    }
+
+                    @if (!string.IsNullOrEmpty(trailerBaseURI))
+                    {
+                        string embededURI = "http://www.imdb.com" + @trailerBaseURI + "/imdb/embed?autoplay=false&width=640";
+
+                        <iframe src="@embededURI" width="640" height="360" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true" frameborder="no" scrolling="no"></iframe>
+                    }
+                </div>
+            }
+        </div>
     </div>
 </div>
 
-<!-- Embeded trailer video -->
-@if (!string.IsNullOrEmpty(Model.TrailerImageURI))
-{
-    <h4 class="ui horizontal divider header">
-        <i class="tag icon"></i>
-        Trailer
-    </h4>
-
-    <div class="ui grid centered">
-
-        @{
-            string trailerBaseURI = @Model.TrailerVideoURI.Split('?').FirstOrDefault();
-        }
-
-        @if (!string.IsNullOrEmpty(trailerBaseURI))
-        {
-            string embededURI = "http://www.imdb.com" + @trailerBaseURI + "/imdb/embed?autoplay=false&width=640";
-
-            <iframe src="@embededURI" width="640" height="360" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true" frameborder="no" scrolling="no"></iframe>
-        }
-    </div>
-}
+<h4 class="ui horizontal divider header">
+    <i class="tag icon"></i>
+    Recommended movies for you
+</h4>
 
 <h4 class="ui horizontal divider header">
     <i class="tag icon"></i>
@@ -154,6 +165,7 @@
         <p>@review.Text</p>
     </div>
 }
+
 
 @Scripts.Render("~/bundles/movielike")
 
