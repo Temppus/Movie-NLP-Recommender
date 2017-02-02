@@ -17,10 +17,10 @@
         <!-- Image column -->
         <div class="three wide column">
             <div class="row">
-                <img alt="Film poster" src="@Url.Content(Model.ImageURI)" id="posterImgId" class="ui centered medium image" />
+                <img alt="Film poster" src="@Url.Content(Model.ImageURI)" class="ui centered medium image" />
             </div>
             <div class="row">
-                <a href="http://www.imdb.com/title/@Model.IMDBId" target="_blank" id="imdbLinkId">IMDb link</a>
+                <a href="http://www.imdb.com/title/@Model.IMDBId" target="_blank">IMDb link</a>
             </div>
         </div>
 
@@ -31,13 +31,13 @@
                 <!-- Title -->
                 <div class="eight wide column">
                     <div class="row">
-                        <div class="ui medium header" id="titleId">@Model.Title</div>
+                        <div class="ui medium header">@Model.Title</div>
                         <div class="ui grid">
                             <div class="twelve wide column">
-                                <div class="ui star rating" data-rating=@Math.Floor(Model.Rating).ToString() id="ratingId">
+                                <div class="ui star rating" data-rating=@Math.Floor(Model.Rating).ToString()>
                                 </div>
                             </div>
-                            <div class="two wide column" id="ratingNumberId">
+                            <div class="two wide column">
                                 @Model.Rating
                             </div>
                         </div>
@@ -63,7 +63,7 @@
                 <!-- Director -->
                 <div class="sixteen wide column">
                     <div class="row">
-                        <div class="ui small header" id="directorDivId">
+                        <div class="ui small header">
                             Director
                             <button class="tiny ui button">@Model.Director</button>
                         </div>
@@ -73,7 +73,7 @@
                 <!-- Genres -->
                 <div class="sixteen wide column">
                     <div class="row">
-                        <div class="ui small header" id="genresDivId">
+                        <div class="ui small header">
                             Genres
                             @foreach (string genre in Model.Genres)
                             {
@@ -89,7 +89,7 @@
                     <div class="row">
                         <div class="wide row">
                             <div class="ui small header">Overview</div>
-                            <p id="overviewId">@Model.Overview</p>
+                            <p>@Model.Overview</p>
                         </div>
                     </div>
                 </div>
@@ -98,16 +98,16 @@
         </div>
 
         <div class="eight wide column">
-            <!-- Embeded trailer video -->
+            <!-- Embedded trailer video -->
             @if (!string.IsNullOrEmpty(Model.TrailerImageURI))
             {
                 string trailerBaseURI = Model.TrailerVideoURI.Split('?').FirstOrDefault();
 
                 if (!string.IsNullOrEmpty(trailerBaseURI))
                 {
-                    string embededURI = "http://www.imdb.com" + trailerBaseURI + "/imdb/embed?autoplay=false&width=640";
+                    string embeddedURI = "http://www.imdb.com" + trailerBaseURI + "/imdb/embed?autoplay=false&width=640";
 
-                    <iframe src="@embededURI" width="640" height="360" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true" frameborder="no" scrolling="no"></iframe>
+                    <iframe src="@embeddedURI" width="640" height="360" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true" frameborder="no" scrolling="no"></iframe>
                 }
             }
         </div>
@@ -119,7 +119,7 @@
 {
     <h4 class="ui horizontal divider header">
         <i class="tag icon"></i>
-        Recommended movies for you
+        Similar movies recommended to you
     </h4>
 
     <div class="ui six column grid">
@@ -127,9 +127,24 @@
         {
             <div class="column">
 
+                @{
+                    var tooltipHTML = "<div class=\"ui card\">" +
+                                                "<div class=\"content\">" +
+                                                    $"<div class=\"header\">{@suggestion.Title}</div>" +
+                                                    $" <div class=\"meta\">Directed by: {@suggestion.Director}</div>" +
+                                                    "<div class=\"description\">" +
+                                                        $"<p>{@suggestion.Overview}</p>" +
+                                                    "</div>" +
+                                                "</div>" +
+                                            "</div>";
+                }
+
                 <div class="ui card" name="interestContainer">
                     <a class="ui image" href="@Url.Action("Details","Movie", new { imdbId = @suggestion.IMDBId })">
-                        <img src="@suggestion.ImageURI">
+                        <div class="movietooltip" data-html="@tooltipHTML" data-position="right center">
+                            <img src="@suggestion.ImageURI">
+                        </div>
+
                     </a>
                     <div class="content">
                         <div class="header">@suggestion.Title</div>
@@ -140,7 +155,8 @@
                     </div>
 
                     <div class="ui two bottom attached buttons" name="likeContainer">
-                        <div class="ui grey button" name="interestButton" movieId="@suggestion.IMDBId" isNotInterested="true">
+                        <div class="ui grey button notinterested" name="interestButton" movieId="@suggestion.IMDBId" isNotInterested="true"
+                             data-content="This movie will no longer be recommended to you." data-position="bottom center" data-variation="inverted">
                             <i class="remove icon"></i>
                         </div>
                         <div name="likeButton" movieId="@suggestion.IMDBId" likeText="Like" likedText="Liked"></div>
@@ -180,43 +196,54 @@
         </div>
     *@
 
-    <h4 class="ui horizontal divider header">
-        <i class="tag icon"></i>
-        Top 10 Reviews
-    </h4>
+<h4 class="ui horizontal divider header">
+    <i class="tag icon"></i>
+    Top 10 Reviews
+</h4>
 
-    @foreach (var review in Model.Reviews)
-    {
-        <div class="ui raised segment">
-            <div class="ui medium header" id="titleId">@review.Title</div>
-            @if (review.Rating >= 0)
-            {
-                <div class="ui star rating" data-rating=@review.Rating.ToString()>
-                </div>
-            }
-            <div>
-                <strong>@review.UsefullnessDescription</strong>
+@foreach (var review in Model.Reviews)
+{
+    <div class="ui raised segment">
+        <div class="ui medium header">@review.Title</div>
+        @if (review.Rating >= 0)
+        {
+            <div class="ui star rating" data-rating=@review.Rating.ToString()>
             </div>
-
-            <p>@review.Text</p>
+        }
+        <div>
+            <strong>@review.UsefullnessDescription</strong>
         </div>
-    }
+
+        <p>@review.Text</p>
+    </div>
+}
 
 
-    @Scripts.Render("~/bundles/movielike")
+@Scripts.Render("~/bundles/movielike")
 
-    <script>
+<script>
 
-        $('.rating').rating({
-            initialRating: 5,
-            maxRating: 10,
-            interactive: false
+    $('.rating').rating({
+        initialRating: 5,
+        maxRating: 10,
+        interactive: false
+    });
+
+    $(document).ready(function () {
+
+        likeDecorator();
+        notInterestedDecorator();
+
+        $('.notinterested')
+        .popup({
+            inline: true
         });
 
-        $(document).ready(function () {
-
-            likeDecorator();
-            notInterestedDecorator();
+        $('.movietooltip')
+        .popup({
+            inline: true
         });
 
-    </script>
+    });
+
+</script>

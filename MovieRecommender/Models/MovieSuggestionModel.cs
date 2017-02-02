@@ -16,5 +16,7 @@ namespace MovieRecommender.Models
         public double Rating { get; set; }
         public int RatingCount { get; set; }
         public string Overview { get; set; }
+        public string Director { get; set; }
+        public IEnumerable<string> Genres { get; set; } = new List<string>();
     }
 }

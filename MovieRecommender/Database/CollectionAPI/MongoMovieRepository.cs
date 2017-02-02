@@ -149,6 +149,8 @@ namespace MovieRecommender.Database.CollectionAPI
             groupByExpression.Add(nameof(Movie.Rating), new BsonDocument("$first", "$" + nameof(Movie.Rating)));
             groupByExpression.Add(nameof(Movie.RatingCount), new BsonDocument("$first", "$" + nameof(Movie.RatingCount)));
             groupByExpression.Add(nameof(Movie.Overview), new BsonDocument("$first", "$" + nameof(Movie.Overview)));
+            groupByExpression.Add(nameof(Movie.Director), new BsonDocument("$first", "$" + nameof(Movie.Director)));
+            groupByExpression.Add(nameof(Movie.Genres), new BsonDocument("$first", "$" + nameof(Movie.Genres)));
 
             return _collection.Aggregate().Match(Builders<Movie>.Filter.And(filters))
                     .Unwind(m => m.Keywords)

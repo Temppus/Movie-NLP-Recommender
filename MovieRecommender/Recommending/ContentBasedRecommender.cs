@@ -68,7 +68,10 @@ namespace MovieRecommender.Recommending
             var likedMovieInfos = _userStore.FindLikedMovies(userName);
             Movie movie = _movieStore.FindMovieByImdbId(movieId);
 
-            var exceptMovieIds = likedMovieInfos.Select(l => l.IMDBId).Concat(_userStore.GetNotInterestedMovieIdsForUser(userName));
+
+            var exceptMovieIds = likedMovieInfos.Select(l => l.IMDBId)
+                                                .Concat(_userStore.GetNotInterestedMovieIdsForUser(userName))
+                                                .Concat(new List<string>() { movieId });
 
             var suggestedMovies = _movieStore.FindSimilarMovies(movie.Genres, movie.Keywords, exceptMovieIds,
                                                                 20, _minYear, 500, _minRating);
