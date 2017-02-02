@@ -18,6 +18,11 @@ namespace MovieRecommender.Recommending
             _userStore = userStore;
         }
 
+        public IEnumerable<MovieSuggestionModel> RecommendForUserByMovie(string userName, string movieId)
+        {
+            throw new NotImplementedException();
+        }
+
         IEnumerable<MovieSuggestionModel> IRecommender.RecommendForUser(string userName)
         {
             if (userName == null)

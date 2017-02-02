@@ -141,3 +141,50 @@ function likeDecorator() {
     };
 
 };
+
+/*
+    <div name="interestContainer"> ---> parent element to be detached
+        <div name="interestButton" movieId="someIMDBID" isNotInterested="true" ></div>
+    </div>
+*/
+
+function notInterestedDecorator() {
+
+    $('div[name=interestButton]').each(function () {
+        $(this).click($.debounce(debounceDelay,
+                function () {
+                    notInterestedFunction($(this));
+                }
+        ));
+    });
+
+    var notInterestedFunction = function (jqueryButton) {
+
+        var movieId = jqueryButton.attr("movieId");
+        var isnotInterested = jqueryButton.attr("isNotInterested");
+        var interestContainer = jqueryButton.closest('[name=interestContainer]');
+
+        if (movieId == null || isnotInterested == null || interestContainer == null)
+            return;
+
+        var notInterestedObject = {
+            'IsNotInterested': isnotInterested == "true" ? true : false,
+            'IMDbId': movieId
+        };
+
+        var payloadObject = JSON.stringify({ model: notInterestedObject });
+
+        $.ajax({
+            type: 'POST',
+            url: '/Movie/NotInterestedHandler',
+            data: payloadObject,
+            contentType: 'application/json',
+            error: function (err) {
+                alert("Error in NotInterestedHandler " + err);
+            },
+            success: function (data) {
+                interestContainer.detach();
+            }
+        });
+    };
+}

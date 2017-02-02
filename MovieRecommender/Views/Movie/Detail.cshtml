@@ -132,7 +132,7 @@
         {
             <div class="column">
 
-                <div class="ui card">
+                <div class="ui card" name="interestContainer">
                     <a class="ui image" href="@Url.Action("Details","Movie", new { imdbId = @suggestion.IMDBId })">
                         <img src="@suggestion.ImageURI">
                     </a>
@@ -145,7 +145,7 @@
                     </div>
 
                     <div class="ui two bottom attached buttons" name="likeContainer">
-                        <div class="ui grey  button">
+                        <div class="ui grey button" name="interestButton" movieId="@suggestion.IMDBId" isNotInterested="true">
                             <i class="remove icon"></i>
                         </div>
                         <div name="likeButton" movieId="@suggestion.IMDBId" likeText="Like" likedText="Liked"></div>
@@ -219,10 +219,9 @@
         });
 
         $(document).ready(function () {
-            likeDecorator();
 
-            $('.ui.popup')
-              .popup();
+            likeDecorator();
+            notInterestedDecorator();
         });
 
     </script>

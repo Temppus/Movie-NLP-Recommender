@@ -15,6 +15,9 @@ namespace MovieRecommender.Recommending
         private readonly IUserRepository _userStore;
         private readonly IMovieRepository _movieStore;
 
+        private static double _minRating = 5.5d;
+        private static int _minYear = 1990;
+
         public ContentBasedRecommender(IUserRepository userStore, IMovieRepository movieStore)
         {
             _userStore = userStore;
@@ -55,11 +58,25 @@ namespace MovieRecommender.Recommending
             var exceptMovieIds = likedMovieInfos.Select(l => l.IMDBId).Concat(_userStore.GetNotInterestedMovieIdsForUser(userName));
 
             var suggestedMovies = _movieStore.FindSimilarMovies(weightedGenres, weightedKeywords, exceptMovieIds,
-                                                                20, 1990, 500, 5.0d);
+                                                                20, _minYear, 500, _minRating);
 
             return suggestedMovies.Select(s => BsonSerializer.Deserialize<MovieSuggestionModel>(s));
         }
 
+        public IEnumerable<MovieSuggestionModel> RecommendForUserByMovie(string userName, string movieId)
+        {
+            var likedMovieInfos = _userStore.FindLikedMovies(userName);
+            Movie movie = _movieStore.FindMovieByImdbId(movieId);
+
+            var exceptMovieIds = likedMovieInfos.Select(l => l.IMDBId).Concat(_userStore.GetNotInterestedMovieIdsForUser(userName));
+
+            var suggestedMovies = _movieStore.FindSimilarMovies(movie.Genres, movie.Keywords, exceptMovieIds,
+                                                                20, _minYear, 500, _minRating);
+
+            return suggestedMovies.Select(s => BsonSerializer.Deserialize<MovieSuggestionModel>(s));
+        }
+
+        #region Helpers
         private UserWeightModel<string, int> CreateWeightModel(IEnumerable<Movie> likedMovies)
         {
             var statModel = new UserWeightModel<string, int>();
@@ -94,6 +111,7 @@ namespace MovieRecommender.Recommending
             }
             return statModel;
         }
+        #endregion
     }
 
     public class UserWeightModel<TKey, TValue>

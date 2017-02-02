@@ -11,5 +11,6 @@ namespace MovieRecommender.Recommending
     public interface IRecommender
     {
         IEnumerable<MovieSuggestionModel> RecommendForUser(string userName);
+        IEnumerable<MovieSuggestionModel> RecommendForUserByMovie(string userName, string movieId);
     }
 }

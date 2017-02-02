@@ -137,7 +137,7 @@ namespace MovieRecommender.Controllers
         }
         #endregion
 
-        // GET: Movie/Details/5
+        [HttpGet, OutputCache(NoStore = true, Duration = 1)]
         public ActionResult Details(string imdbId)
         {
             Movie movie = _movieStore.FindMovieByImdbId(imdbId);
@@ -154,7 +154,7 @@ namespace MovieRecommender.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 model.IsLikedMovie = _userStore.CheckIfUserLikedMovie(User.Identity.Name, imdbId);
-                model.MovieSuggestions = _recommender.RecommendForUser(User.Identity.Name);
+                model.MovieSuggestions = _recommender.RecommendForUserByMovie(User.Identity.Name, imdbId);
             }
 
             return View("Detail", model);
