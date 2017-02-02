@@ -101,20 +101,15 @@
             <!-- Embeded trailer video -->
             @if (!string.IsNullOrEmpty(Model.TrailerImageURI))
             {
-                <div class="ui grid centered">
+                string trailerBaseURI = Model.TrailerVideoURI.Split('?').FirstOrDefault();
 
-                    @{
-                        string trailerBaseURI = @Model.TrailerVideoURI.Split('?').FirstOrDefault();
-                    }
+                if (!string.IsNullOrEmpty(trailerBaseURI))
+                {
+                    string embededURI = "http://www.imdb.com" + trailerBaseURI + "/imdb/embed?autoplay=false&width=640";
 
-                    @if (!string.IsNullOrEmpty(trailerBaseURI))
-                    {
-                        string embededURI = "http://www.imdb.com" + @trailerBaseURI + "/imdb/embed?autoplay=false&width=640";
-
-                        <iframe src="@embededURI" width="640" height="360" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true" frameborder="no" scrolling="no"></iframe>
-                    }
-                </div>
-                        }
+                    <iframe src="@embededURI" width="640" height="360" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true" frameborder="no" scrolling="no"></iframe>
+                }
+            }
         </div>
     </div>
 </div>
