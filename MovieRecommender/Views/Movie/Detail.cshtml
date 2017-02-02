@@ -47,7 +47,7 @@
                 <!-- Like segment -->
                 <div class="eight wide right aligned column" name="likeContainer">
 
-                    @if (User.Identity.IsAuthenticated)
+                    @if (Request.IsAuthenticated)
                     {
                         if (Model.IsLikedMovie)
                         {
@@ -115,7 +115,7 @@
 </div>
 
 
-@if (User.Identity.IsAuthenticated)
+@if (Request.IsAuthenticated)
 {
     <h4 class="ui horizontal divider header">
         <i class="tag icon"></i>

@@ -28,7 +28,7 @@ namespace MovieRecommender.Controllers
         {
             ForceLayoutModel forceModel = new ForceLayoutModel();
 
-            if (User.Identity.IsAuthenticated)
+            if (Request.IsAuthenticated)
             {
                 var recommendedMovies = _recommender.RecommendForUser(User.Identity.Name);
                 var ForceJSON = forceModel.Compose(new List<MovieMention>()/*recommendedMovies*/).ToJson();

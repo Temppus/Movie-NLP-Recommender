@@ -48,7 +48,7 @@
                     <!-- Like segment -->
                     <div class="eight wide right aligned column" name="likeContainer">
 
-                        @if (User.Identity.IsAuthenticated)
+                        @if (Request.IsAuthenticated)
                         {
                             if (@moviePreview.IsLikedByUser)
                             {
@@ -111,7 +111,7 @@
           interactive: false
       });
 
-    $(window).scroll($.debounce(200,function () {
+    $(window).scroll($.debounce(200, function () {
         if ($(window).scrollTop() + $(window).height() > $(document).height() - 100) { // Check if we are near bottom
 
             var resultGrid = $('#resultGrid');
@@ -186,7 +186,7 @@
 
                                 genreDiv.append(button);
                             }
-                 
+
                             var likeContainer = movieRowClone.find("[name='likeContainer']");
 
                             // remove like container elements
@@ -194,15 +194,12 @@
                                 $(this).remove();
                             });
 
-                            if ("@User.Identity.IsAuthenticated" == "True")
-                            {
-                                if (moviePreview.IsLikedByUser)
-                                {
+                            if ("@Request.IsAuthenticated" == "True") {
+                                if (moviePreview.IsLikedByUser) {
                                     var unlikeDiv = $("<div name='unlikeButton' movieId='" + moviePreview.IMDBId + "'></div>");
                                     likeContainer.append(unlikeDiv);
                                 }
-                                else
-                                {
+                                else {
                                     var likeDiv = $("<div name='likeButton' movieId='" + moviePreview.IMDBId + "'></div>");
                                     likeContainer.append(likeDiv);
                                 }

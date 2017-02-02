@@ -56,7 +56,7 @@ namespace MovieRecommender.Controllers
             model.MoviePreviews = movies.Select(m => new MoviePreview(m)).ToList();
             MapMovieLikes(model);
 
-            if (User.Identity.IsAuthenticated)
+            if (Request.IsAuthenticated)
             {
                 var recommendedMovies = _recommender.RecommendForUser(User.Identity.Name);
             }
@@ -96,7 +96,7 @@ namespace MovieRecommender.Controllers
 
             var moviePreviews = movies.Select(m => new MoviePreview(m)).ToList();
 
-            if (User.Identity.IsAuthenticated)
+            if (Request.IsAuthenticated)
             {
                 var likeMappings = _userStore.GetUserLikedMovieMappings(User.Identity.Name, moviePreviews.Select(p => p.IMDBId));
 
@@ -125,7 +125,7 @@ namespace MovieRecommender.Controllers
 
         private void MapMovieLikes(MoviePreviewModel model)
         {
-            if (User.Identity.IsAuthenticated)
+            if (Request.IsAuthenticated)
             {
                 var likeMappings = _userStore.GetUserLikedMovieMappings(User.Identity.Name, model.MoviePreviews.Select(p => p.IMDBId));
 
@@ -151,7 +151,7 @@ namespace MovieRecommender.Controllers
             model.Reviews = _reviewStore.FindReviewsByReviewId(movie.ReviewId);
             model.IsLikedMovie = false;
 
-            if (User.Identity.IsAuthenticated)
+            if (Request.IsAuthenticated)
             {
                 model.IsLikedMovie = _userStore.CheckIfUserLikedMovie(User.Identity.Name, imdbId);
                 model.MovieSuggestions = _recommender.RecommendForUserByMovie(User.Identity.Name, imdbId);
@@ -163,7 +163,7 @@ namespace MovieRecommender.Controllers
         [HttpPost]
         public JsonResult LikeHandler(LikeModel model)
         {
-            if (!User.Identity.IsAuthenticated)
+            if (!Request.IsAuthenticated)
                 return Json(null);
 
             var userName = User.Identity.Name;
@@ -193,7 +193,7 @@ namespace MovieRecommender.Controllers
         [HttpPost]
         public JsonResult NotInterestedHandler(InterestModel model)
         {
-            if (!User.Identity.IsAuthenticated)
+            if (!Request.IsAuthenticated)
                 return Json(null);
 
             var userName = User.Identity.Name;

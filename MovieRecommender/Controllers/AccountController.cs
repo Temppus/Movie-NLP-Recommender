@@ -412,7 +412,7 @@ namespace MovieRecommender.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ExternalLoginConfirmation(ExternalLoginConfirmationViewModel model, string returnUrl)
         {
-            if (User.Identity.IsAuthenticated)
+            if (Request.IsAuthenticated)
             {
                 return RedirectToAction("Index", "Manage");
             }
