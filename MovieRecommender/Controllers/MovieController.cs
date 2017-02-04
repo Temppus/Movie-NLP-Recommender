@@ -48,6 +48,7 @@ namespace MovieRecommender.Controllers
         }
 
         // GET: Movie
+        [HttpGet]
         public ActionResult Index()
         {
             var model = new MoviePreviewModel(_movieStore.DistinctGenres(), _movieStore.DistinctYearsDesc());
@@ -64,6 +65,17 @@ namespace MovieRecommender.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        public ActionResult Browse()
+        {
+            var model = new MoviePreviewModel(_movieStore.DistinctGenres(), _movieStore.DistinctYearsDesc());
+            var movies = GetMoviesByModelSearchQuery(model, _movieLimit);
+
+            model.MoviePreviews = movies.Select(m => new MoviePreview(m)).ToList();
+            MapMovieLikes(model);
+
+            return View(model);
+        }
 
         [HttpPost]
         public ActionResult Search(MoviePreviewModel model)

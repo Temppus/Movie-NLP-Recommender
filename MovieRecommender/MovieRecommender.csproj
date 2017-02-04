@@ -502,7 +502,7 @@
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Account\RegistrationSuccessful.cshtml" />
-    <Content Include="Views\Movie\Index.cshtml" />
+    <Content Include="Views\Movie\Browse.cshtml" />
     <Content Include="Views\Movie\SearchMoviePartial.cshtml" />
     <Content Include="Views\Movie\Detail.cshtml" />
   </ItemGroup>
