@@ -22,9 +22,21 @@
 }
 else
 {
+    RouteValueDictionary routeValueDic = new RouteValueDictionary(ViewContext.RouteData.Values);
+    foreach (string key in Request.QueryString.Keys)
+    {
+        routeValueDic[key] = Request.QueryString[key].ToString();
+    }
+
+    string returnURL = Url.Action(ViewContext.RouteData.Values["action"].ToString(),
+                      ViewContext.RouteData.Values["controller"].ToString(),
+                      routeValueDic);
+
     <div class="right menu">
         <div class="item">
-            @Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { @class = "ui primary button" })
+            @Html.ActionLink("Log in", "Login", "Account",
+           new { @returnUrl = returnURL },
+           htmlAttributes: new { @class = "ui primary button" })
         </div>
         <div class="item">
             @Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { @class = "ui  button" })

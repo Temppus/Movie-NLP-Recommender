@@ -39,6 +39,7 @@ namespace MovieRecommender.Controllers
         //
         // GET: /Account/Login
         [AllowAnonymous]
+        [OutputCache(NoStore = true, Duration = 0, VaryByParam = "None")]
         public ActionResult Login(string returnUrl)
         {
             ViewBag.ReturnUrl = returnUrl;
@@ -50,6 +51,7 @@ namespace MovieRecommender.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
+        [OutputCache(NoStore = true, Duration = 0, VaryByParam = "None")]
         public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
         {
             var signInResult = await _signInHelper.PasswordSignIn(model.UserName, model.Password, model.RememberMe, shouldLockout: false);
