@@ -174,27 +174,26 @@
 }
 
 
-    @*
-        <h4 class="ui horizontal divider header">
-            <i class="tag icon"></i>
-            Actors
-        </h4>
 
+<h4 class="ui horizontal divider header">
+    <i class="tag icon"></i>
+    Actors
+</h4>
 
-        <div class="ui horizontal segments">
+<div class="ui horizontal segments">
 
-            @foreach (var actor in Model.ActorsInfo)
-            {
-                <div class="ui center aligned segment">
-                    <img class="ui avatar small image centered" src=@actor.ImageURI>
-                    <div class="content">
-                        <div class="header"><strong>@actor.ActorName</strong></div>
-                        <strong>As</strong> @actor.As
-                    </div>
-                </div>
-            }
+    @foreach (var actor in Model.ActorsInfo)
+    {
+        <div class="ui center aligned segment">
+            <img class="ui avatar small image centered" src=@actor.ImageURI>
+            <div class="content">
+                <div class="header"><strong>@actor.ActorName</strong></div>
+                <strong>As</strong> @actor.As
+            </div>
         </div>
-    *@
+    }
+</div>
+
 
 <h4 class="ui horizontal divider header">
     <i class="tag icon"></i>
