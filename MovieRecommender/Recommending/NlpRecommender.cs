@@ -30,13 +30,13 @@ namespace MovieRecommender.Recommending
 
             var recommendedMovies = new List<MovieMention>();
 
-            var likedMovies = _userStore.FindLikedMovies(userName).Select(m => m.IMDBId);
-            IEnumerable<MovieMention> movieMantions = _movieMentionRepository.GetMovieMentionsForMovies(likedMovies);
+            var likedMovieIds = _userStore.FindLikedMovieIds(userName);
+            IEnumerable<MovieMention> movieMantions = _movieMentionRepository.GetMovieMentionsForMovies(likedMovieIds);
 
             foreach (MovieMention movieMention in movieMantions)
             {
                 // If user saw and liked mentioned film -> skip it
-                if (likedMovies.Contains(movieMention.MentionedIMDBId))
+                if (likedMovieIds.Contains(movieMention.MentionedIMDBId))
                     continue;
 
                 recommendedMovies.Add(movieMention);

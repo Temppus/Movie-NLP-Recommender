@@ -32,7 +32,12 @@ namespace MovieRecommender.Database.CollectionAPI
             return _collection.Find(filter).ToList().FirstOrDefault() != null;
         }
 
-        public IEnumerable<MovieLikeInfo> FindLikedMovies(string userName)
+        public IEnumerable<string> FindLikedMovieIds(string userName)
+        {
+            return FindLikedMoviesInfo(userName).Select(m => m.IMDBId);
+        }
+
+        public IEnumerable<MovieLikeInfo> FindLikedMoviesInfo(string userName)
         {
             if (userName == null)
                 throw new ArgumentNullException(nameof(userName));

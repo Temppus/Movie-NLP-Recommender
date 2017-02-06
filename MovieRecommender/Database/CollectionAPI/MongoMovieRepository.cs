@@ -160,5 +160,33 @@ namespace MovieRecommender.Database.CollectionAPI
                     .Limit(limit)
                     .ToList();
         }
+
+        public IEnumerable<Movie> FindMostPopularMoviesByGenre(string genre, int fromYear, IEnumerable<string> exceptIds, int limit)
+        {
+            if (genre == null)
+                throw new ArgumentNullException(nameof(genre));
+
+            if (exceptIds == null)
+                throw new ArgumentNullException(nameof(exceptIds));
+
+            if (limit <= 0)
+                throw new ArgumentException(nameof(limit) + " must be > 0");
+
+            if (fromYear <= 0)
+                throw new ArgumentException(nameof(fromYear) + " must be > 0");
+
+            IEnumerable<FilterDefinition<Movie>> filters = new List<FilterDefinition<Movie>>
+            {
+                Builders<Movie>.Filter.Where(m => m.Genres.Contains(genre)),
+                Builders<Movie>.Filter.Nin(m => m.IMDBId, exceptIds),
+                Builders<Movie>.Filter.Where(m => m.PublicationYear >= fromYear),
+            };
+
+            var movies = _collection.Find(Builders<Movie>.Filter.And(filters))
+                                    .SortByDescending(m => m.RatingCount)
+                                    .Limit(limit)
+                                    .ToList();
+            return movies;
+        }
     }
 }

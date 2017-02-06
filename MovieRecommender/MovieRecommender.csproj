@@ -258,6 +258,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\ColdStartModel.cs" />
     <Compile Include="Models\ForceLayoutModel.cs" />
     <Compile Include="Models\HomeViewModel.cs" />
     <Compile Include="Models\IdentityModels.cs" />
@@ -505,6 +506,8 @@
     <Content Include="Views\Movie\Browse.cshtml" />
     <Content Include="Views\Movie\SearchMoviePartial.cshtml" />
     <Content Include="Views\Movie\Detail.cshtml" />
+    <Content Include="Views\Home\_ColdStartPartial.cshtml" />
+    <Content Include="Views\Home\_ForcePartialView.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

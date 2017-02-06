@@ -59,7 +59,7 @@ namespace MovieRecommender.Controllers
                 BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId)
             };
 
-            var userLikedMovieInfos = _userRepository.FindLikedMovies(User.Identity.Name);
+            var userLikedMovieInfos = _userRepository.FindLikedMoviesInfo(User.Identity.Name);
             var userLikedMovies = _movieStore.FindMoviesByIMDbIds(userLikedMovieInfos.Select(m => m.IMDBId));
 
             var likedMovies = userLikedMovies.Select(m => new LikedMovie()

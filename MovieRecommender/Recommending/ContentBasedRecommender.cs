@@ -26,8 +26,8 @@ namespace MovieRecommender.Recommending
 
         public IEnumerable<MovieSuggestionModel> RecommendForUser(string userName)
         {
-            var likedMovieInfos = _userStore.FindLikedMovies(userName);
-            var likedMovies = _movieStore.FindMoviesByIMDbIds(likedMovieInfos.Select(m => m.IMDBId));
+            var likedMovieIds = _userStore.FindLikedMovieIds(userName);
+            var likedMovies = _movieStore.FindMoviesByIMDbIds(likedMovieIds);
 
             var weightModel = CreateWeightModel(likedMovies);
 
@@ -55,7 +55,7 @@ namespace MovieRecommender.Recommending
                     weightedKeywords.Add(keyword);
             }
 
-            var exceptMovieIds = likedMovieInfos.Select(l => l.IMDBId).Concat(_userStore.GetNotInterestedMovieIdsForUser(userName));
+            var exceptMovieIds = likedMovieIds.Concat(_userStore.GetNotInterestedMovieIdsForUser(userName));
 
             var suggestedMovies = _movieStore.FindSimilarMovies(weightedGenres, weightedKeywords, exceptMovieIds,
                                                                 20, _minYear, 500, _minRating);
@@ -65,13 +65,12 @@ namespace MovieRecommender.Recommending
 
         public IEnumerable<MovieSuggestionModel> RecommendForUserByMovie(string userName, string movieId)
         {
-            var likedMovieInfos = _userStore.FindLikedMovies(userName);
+            var likedMovieIds = _userStore.FindLikedMovieIds(userName);
             Movie movie = _movieStore.FindMovieByImdbId(movieId);
 
-
-            var exceptMovieIds = likedMovieInfos.Select(l => l.IMDBId)
-                                                .Concat(_userStore.GetNotInterestedMovieIdsForUser(userName))
-                                                .Concat(new List<string>() { movieId });
+            var exceptMovieIds = likedMovieIds
+                                .Concat(_userStore.GetNotInterestedMovieIdsForUser(userName))
+                                .Concat(new List<string>() { movieId });
 
             var suggestedMovies = _movieStore.FindSimilarMovies(movie.Genres, movie.Keywords, exceptMovieIds,
                                                                 20, _minYear, 500, _minRating);
