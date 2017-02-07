@@ -253,6 +253,7 @@
     <Compile Include="Database\Models\MovieReview.cs" />
     <Compile Include="Database\MongoDbConnectionPool.cs" />
     <Compile Include="Database\RepositoryManager.cs" />
+    <Compile Include="Exceptions\DatabaseException.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

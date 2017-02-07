@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Driver;
+using MovieRecommender.Exceptions;
 using MovieRecommender.Models;
 using System;
 using System.Collections.Generic;
@@ -86,6 +87,9 @@ namespace MovieRecommender.Database.CollectionAPI
             if (imdbId == null)
                 throw new ArgumentNullException(nameof(imdbId));
 
+            if (CheckIfUserLikedMovie(userName, imdbId))
+                throw new UserPreferenceException($"Can not like movie {imdbId} for user {userName}. User already liked movie.");
+
             var updateDefinition = Builders<ApplicationUser>.Update.AddToSet(u => u.LikedMovies, new MovieLikeInfo() { IMDBId = imdbId });
             var filter = Builders<ApplicationUser>.Filter.Where(u => u.UserName == userName);
 
@@ -99,6 +103,9 @@ namespace MovieRecommender.Database.CollectionAPI
 
             if (imdbId == null)
                 throw new ArgumentNullException(nameof(imdbId));
+
+            if (!CheckIfUserLikedMovie(userName, imdbId))
+                throw new UserPreferenceException($"Can not unlike movie {imdbId} for user {userName}. User did not liked this movie.");
 
             var updateDefinition = Builders<ApplicationUser>.Update.PullFilter(u => u.LikedMovies, x => x.IMDBId == imdbId);
             var filter = Builders<ApplicationUser>.Filter.Where(u => u.UserName == userName);
@@ -114,6 +121,9 @@ namespace MovieRecommender.Database.CollectionAPI
             if (imdbId == null)
                 throw new ArgumentNullException(nameof(imdbId));
 
+            if (CheckIfUserHasMovieInNotInterested(userName, imdbId))
+                throw new UserPreferenceException($"Can not add movie {imdbId} to not interested set for user {userName}. User already has this movie in not interested.");
+
             var updateDefinition = Builders<ApplicationUser>.Update.AddToSet(u => u.NotInterestedMovies, new MovieLikeInfo() { IMDBId = imdbId });
             var filter = Builders<ApplicationUser>.Filter.Where(u => u.UserName == userName);
 
@@ -127,6 +137,9 @@ namespace MovieRecommender.Database.CollectionAPI
 
             if (imdbId == null)
                 throw new ArgumentNullException(nameof(imdbId));
+
+            if (!CheckIfUserHasMovieInNotInterested(userName, imdbId))
+                throw new UserPreferenceException($"Can not remove movie {imdbId} from not interested set for user {userName}. User does not have this movie in not interested.");
 
             var updateDefinition = Builders<ApplicationUser>.Update.PullFilter(u => u.NotInterestedMovies, x => x.IMDBId == imdbId);
             var filter = Builders<ApplicationUser>.Filter.Where(u => u.UserName == userName);

@@ -17,6 +17,7 @@ using System.Web.Mvc;
 
 namespace MovieRecommender.Controllers
 {
+    [Authorize]
     public class MovieController : Controller
     {
         // Identity
@@ -49,6 +50,7 @@ namespace MovieRecommender.Controllers
 
         // GET: Movie
         [HttpGet]
+        [AllowAnonymous]
         public ActionResult Index()
         {
             var model = new MoviePreviewModel(_movieStore.DistinctGenres(), _movieStore.DistinctYearsDesc());
@@ -66,6 +68,7 @@ namespace MovieRecommender.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public ActionResult Browse()
         {
             var model = new MoviePreviewModel(_movieStore.DistinctGenres(), _movieStore.DistinctYearsDesc());
@@ -78,6 +81,7 @@ namespace MovieRecommender.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public ActionResult Search(MoviePreviewModel model)
         {
             model.SelectedGenres = model.SelectedGenres ?? new List<string>(); // model binder is binding empty collections as nulls
@@ -90,6 +94,7 @@ namespace MovieRecommender.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public JsonResult PaginationSearch(SearchModel model)
         {
             model.SelectedGenres = model.SelectedGenres ?? new List<string>(); // model binder is binding empty collections as nulls
@@ -122,6 +127,7 @@ namespace MovieRecommender.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public string SearchMoviesLike(string title)
         {
             var movies = _movieStore.FindMoviesLikeTitleAsync(title, 10, true);
@@ -150,6 +156,7 @@ namespace MovieRecommender.Controllers
         #endregion
 
         [HttpGet, OutputCache(NoStore = true, Duration = 1)]
+        [AllowAnonymous]
         public ActionResult Details(string imdbId)
         {
             Movie movie = _movieStore.FindMovieByImdbId(imdbId);
@@ -175,28 +182,15 @@ namespace MovieRecommender.Controllers
         [HttpPost]
         public JsonResult LikeHandler(LikeModel model)
         {
-            if (!Request.IsAuthenticated)
-                return Json(null);
-
-            var userName = User.Identity.Name;
-            var user = _userManager.FindByNameAsync(userName).Result;
-
-            if (user == null)
-                return Json(null);
+            string userName = User.Identity.Name;
 
             if (model.IsLike)
             {
-                if (!_userStore.CheckIfUserLikedMovie(user.UserName, model.IMDbId))
-                    _userStore.UserLikedMovie(user.UserName, model.IMDbId);
-                else
-                    return Json(null);
+                _userStore.UserLikedMovie(userName, model.IMDbId);
             }
             else
             {
-                if (_userStore.CheckIfUserLikedMovie(user.UserName, model.IMDbId))
-                    _userStore.UserUnlikedMovie(user.UserName, model.IMDbId);
-                else
-                    return Json(null);
+                _userStore.UserUnlikedMovie(userName, model.IMDbId);
             }
 
             return Json(true);
@@ -205,28 +199,15 @@ namespace MovieRecommender.Controllers
         [HttpPost]
         public JsonResult NotInterestedHandler(InterestModel model)
         {
-            if (!Request.IsAuthenticated)
-                return Json(null);
+            string userName = User.Identity.Name;
 
-            var userName = User.Identity.Name;
-            var user = _userManager.FindByNameAsync(userName).Result;
-
-            if (user == null)
-                return Json(null);
-
-            if (model.IsNotInterested) // Not interested
+            if (model.IsNotInterested)
             {
-                if (!_userStore.CheckIfUserHasMovieInNotInterested(user.UserName, model.IMDbId))
-                    _userStore.AddMovieToNotInterested(user.UserName, model.IMDbId);
-                else
-                    return Json(null);
+                _userStore.AddMovieToNotInterested(userName, model.IMDbId);
             }
             else // user is interested in this movie again
             {
-                if (_userStore.CheckIfUserHasMovieInNotInterested(user.UserName, model.IMDbId))
-                    _userStore.RemoveMovieFromNotInterested(user.UserName, model.IMDbId);
-                else
-                    return Json(null);
+                _userStore.RemoveMovieFromNotInterested(userName, model.IMDbId);
             }
 
             return Json(true);
