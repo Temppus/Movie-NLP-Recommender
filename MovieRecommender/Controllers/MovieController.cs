@@ -99,10 +99,8 @@ namespace MovieRecommender.Controllers
         {
             model.SelectedGenres = model.SelectedGenres ?? new List<string>(); // model binder is binding empty collections as nulls
 
-            if (model.SelectedGenres == null || model.SelectedFromYear < 0 || model.SelectedToYear < 0 || model.PaginationIndex < 0)
+            if (model.SelectedFromYear < 0 || model.SelectedToYear < 0 || model.PaginationIndex < 0)
                 return Json(null);
-
-            model.SelectedGenres = model.SelectedGenres ?? new List<string>(); // model binder is binding empty collections as nulls
 
             var movies = _movieStore.FilterMovies(model.SelectedFromYear,
                                                     model.SelectedToYear,
