@@ -13,13 +13,12 @@ using AutoMapper;
 using MovieRecommender.Database.Models;
 using MovieRecommender.Models;
 using MovieRecommender.StartupHooks;
+using Serilog.Core;
 
 namespace MovieRecommender
 {
     public class MvcApplication : System.Web.HttpApplication
     {
-        private readonly IRepositoryManager _db;
-
         // Register all possible on start application hooks
         private static List<IRunOnApplicationStart> onStartHooks = new List<IRunOnApplicationStart>
         {
@@ -27,14 +26,9 @@ namespace MovieRecommender
                 new IntegrityManager()
         };
 
-        public MvcApplication() : this(UnityConfig.GetConfiguredContainer().Resolve<RepositoryManager>())
+        public MvcApplication()
         {
 
-        }
-
-        public MvcApplication(IRepositoryManager repoManager)
-        {
-            _db = repoManager;
         }
 
         protected void Application_Start()
@@ -51,6 +45,15 @@ namespace MovieRecommender
             });
 
             onStartHooks.ForEach(x => x.Start());
+        }
+
+        protected void Application_Error(object sender, EventArgs e)
+        {
+            Exception exception = Server.GetLastError();
+
+            // Log all exceptions
+            var logger = UnityConfig.GetConfiguredContainer().Resolve<Logger>();
+            logger.Error(exception, "ApplicationError");
         }
     }
 }

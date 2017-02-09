@@ -9,6 +9,9 @@ using Microsoft.Owin.Security;
 using MovieRecommender.Database;
 using MovieRecommender.App_Start.IdentityConfiguration;
 using MovieRecommender.Database.CollectionAPI;
+using Serilog;
+using Serilog.Core;
+using System.Configuration;
 
 namespace MovieRecommender.App_Start
 {
@@ -48,9 +51,15 @@ namespace MovieRecommender.App_Start
             container.RegisterType<ApplicationRoleManager>();
             container.RegisterType<SignInHelper>();
 
-            var mongoPool = new MongoDbConnectionPool();
+            MongoDbConnectionPool mongoPool = new MongoDbConnectionPool();
 
-            container.RegisterInstance(mongoPool); // Rgister "singleton" like object dependency
+            Logger logger = new LoggerConfiguration()
+                            .WriteTo.MongoDBCapped(mongoPool.Database, collectionName : "logs", cappedMaxSizeMb: 50, cappedMaxDocuments: 1000)
+                            .CreateLogger();
+
+            // Register "singleton" like object dependencies
+            container.RegisterInstance(mongoPool);
+            container.RegisterInstance(logger);
 
             container.RegisterType<IMovieRepository, MongoMovieRepository>(new InjectionConstructor(container.Resolve<MongoDbConnectionPool>()));
             container.RegisterType<IMovieMentionRepository, MongoMovieMentionRepository>(new InjectionConstructor(container.Resolve<MongoDbConnectionPool>()));
