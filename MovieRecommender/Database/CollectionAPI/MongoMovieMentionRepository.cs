@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using MovieRecommender.Extensions;
 
 namespace MovieRecommender.Database.CollectionAPI
 {
@@ -18,10 +19,9 @@ namespace MovieRecommender.Database.CollectionAPI
 
         public IEnumerable<MovieMention> GetMovieMentionsForMovies(IEnumerable<string> movieIds)
         {
-            IList<MovieMention> mentions = new List<MovieMention>();
+            movieIds.ThrowIfNull(nameof(movieIds));
 
-            if (movieIds == null)
-                throw new ArgumentNullException(nameof(movieIds));
+            IList<MovieMention> mentions = new List<MovieMention>();
 
             var filter = Builders<MovieMention>.Filter.In(mm => mm.FromIMDBId, movieIds);
             var likedMoviesInfo = _collection.Find(filter).ToList();

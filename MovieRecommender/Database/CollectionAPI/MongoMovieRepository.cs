@@ -7,6 +7,7 @@ using MongoDB.Driver;
 using MovieRecommender.Database.Models;
 using System.Runtime.Caching;
 using MongoDB.Bson;
+using MovieRecommender.Extensions;
 
 namespace MovieRecommender.Database.CollectionAPI
 {
@@ -21,17 +22,10 @@ namespace MovieRecommender.Database.CollectionAPI
 
         public IEnumerable<Movie> FilterMovies(int fromYear, int toYear, IEnumerable<string> genres, bool orderDescByRatingCount, int limit, int paginationIndex)
         {
-            if (fromYear <= 0)
-                throw new ArgumentException(nameof(fromYear) + " must be > 0");
-
-            if (toYear <= 0)
-                throw new ArgumentException(nameof(toYear) + " must be > 0");
-
-            if (limit <= 0)
-                throw new ArgumentException(nameof(limit) + " must be > 0");
-
-            if (genres == null)
-                throw new ArgumentNullException(nameof(genres));
+            fromYear.ThrowIfNegativeOrZero(nameof(fromYear));
+            toYear.ThrowIfNegativeOrZero(nameof(toYear));
+            limit.ThrowIfNegativeOrZero(nameof(limit));
+            genres.ThrowIfNull(nameof(genres));
 
             var filter = Builders<Movie>.Filter.Where(m => m.PublicationYear >= fromYear && m.PublicationYear <= toYear);
 
@@ -87,8 +81,7 @@ namespace MovieRecommender.Database.CollectionAPI
 
         public IEnumerable<Movie> FindMoviesLikeTitleAsync(string likeTitle, int limit, bool sortByRatingCountDesc)
         {
-            if (limit <= 0)
-                throw new ArgumentException(nameof(limit) + " must be > 0");
+            limit.ThrowIfNegativeOrZero(nameof(limit));
 
             var filter = Builders<Movie>.Filter.Regex("Title", new BsonRegularExpression(likeTitle, "i"));
 
@@ -112,8 +105,7 @@ namespace MovieRecommender.Database.CollectionAPI
 
         public IEnumerable<Movie> FindMoviesByIMDbIds(IEnumerable<string> imdbIds)
         {
-            if (imdbIds == null)
-                throw new ArgumentNullException(nameof(imdbIds));
+            imdbIds.ThrowIfNull(nameof(imdbIds));
 
             var filter = Builders<Movie>.Filter.In(m => m.IMDBId, imdbIds);
 
@@ -163,17 +155,10 @@ namespace MovieRecommender.Database.CollectionAPI
 
         public IEnumerable<Movie> FindMostPopularMoviesByGenre(string genre, int fromYear, IEnumerable<string> exceptIds, int limit)
         {
-            if (genre == null)
-                throw new ArgumentNullException(nameof(genre));
-
-            if (exceptIds == null)
-                throw new ArgumentNullException(nameof(exceptIds));
-
-            if (limit <= 0)
-                throw new ArgumentException(nameof(limit) + " must be > 0");
-
-            if (fromYear <= 0)
-                throw new ArgumentException(nameof(fromYear) + " must be > 0");
+            genre.ThrowIfNull(nameof(genre));
+            exceptIds.ThrowIfNull(nameof(exceptIds));
+            limit.ThrowIfNegativeOrZero(nameof(limit));
+            fromYear.ThrowIfNegativeOrZero(nameof(fromYear));
 
             IEnumerable<FilterDefinition<Movie>> filters = new List<FilterDefinition<Movie>>
             {

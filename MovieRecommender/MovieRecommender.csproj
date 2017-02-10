@@ -267,6 +267,7 @@
     <Compile Include="Database\RepositoryManager.cs" />
     <Compile Include="Exceptions\DatabaseException.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
+    <Compile Include="Extensions\ExceptionExtensions.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

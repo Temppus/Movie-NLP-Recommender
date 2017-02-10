@@ -5,6 +5,7 @@ using MovieRecommender.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MovieRecommender.Extensions;
 
 namespace MovieRecommender.Database.CollectionAPI
 {
@@ -19,11 +20,8 @@ namespace MovieRecommender.Database.CollectionAPI
 
         public bool CheckIfUserLikedMovie(string userName, string imdbId)
         {
-            if (userName == null)
-                throw new ArgumentNullException(nameof(userName));
-
-            if (imdbId == null)
-                throw new ArgumentNullException(nameof(imdbId));
+            userName.ThrowIfNull(nameof(userName));
+            imdbId.ThrowIfNull(nameof(imdbId));
 
             var userNameFilter = Builders<ApplicationUser>.Filter.Where(u => u.UserName == userName);
             var movieIdFilter = Builders<ApplicationUser>.Filter.ElemMatch(u => u.LikedMovies, l => l.IMDBId == imdbId);
@@ -40,8 +38,7 @@ namespace MovieRecommender.Database.CollectionAPI
 
         public IEnumerable<MovieLikeInfo> FindLikedMoviesInfo(string userName)
         {
-            if (userName == null)
-                throw new ArgumentNullException(nameof(userName));
+            userName.ThrowIfNull(nameof(userName));
 
             var filter = Builders<ApplicationUser>.Filter.Where(u => u.UserName == userName);
             var user = _collection.Find(filter).FirstOrDefault();
@@ -54,11 +51,8 @@ namespace MovieRecommender.Database.CollectionAPI
 
         public IDictionary<string, bool> GetUserLikedMovieMappings(string userName, IEnumerable<string> imdbIds)
         {
-            if (userName == null)
-                throw new ArgumentNullException(nameof(userName));
-
-            if (imdbIds == null)
-                throw new ArgumentNullException(nameof(imdbIds));
+            userName.ThrowIfNull(nameof(userName));
+            imdbIds.ThrowIfNull(nameof(imdbIds));
 
             var userNameFilter = Builders<ApplicationUser>.Filter.Where(u => u.UserName == userName);
             var idsFilter = Builders<ApplicationUser>.Filter.ElemMatch(u => u.LikedMovies, l => imdbIds.Contains(l.IMDBId));
@@ -81,11 +75,8 @@ namespace MovieRecommender.Database.CollectionAPI
 
         public void UserLikedMovie(string userName, string imdbId)
         {
-            if (userName == null)
-                throw new ArgumentNullException(nameof(userName));
-
-            if (imdbId == null)
-                throw new ArgumentNullException(nameof(imdbId));
+            userName.ThrowIfNull(nameof(userName));
+            imdbId.ThrowIfNull(nameof(imdbId));
 
             if (CheckIfUserLikedMovie(userName, imdbId))
                 throw new UserPreferenceException($"Can not like movie {imdbId} for user {userName}. User already liked movie.");
@@ -98,11 +89,8 @@ namespace MovieRecommender.Database.CollectionAPI
 
         public void UserUnlikedMovie(string userName, string imdbId)
         {
-            if (userName == null)
-                throw new ArgumentNullException(nameof(userName));
-
-            if (imdbId == null)
-                throw new ArgumentNullException(nameof(imdbId));
+            userName.ThrowIfNull(nameof(userName));
+            imdbId.ThrowIfNull(nameof(imdbId));
 
             if (!CheckIfUserLikedMovie(userName, imdbId))
                 throw new UserPreferenceException($"Can not unlike movie {imdbId} for user {userName}. User did not liked this movie.");
@@ -115,11 +103,8 @@ namespace MovieRecommender.Database.CollectionAPI
 
         public void AddMovieToNotInterested(string userName, string imdbId)
         {
-            if (userName == null)
-                throw new ArgumentNullException(nameof(userName));
-
-            if (imdbId == null)
-                throw new ArgumentNullException(nameof(imdbId));
+            userName.ThrowIfNull(nameof(userName));
+            imdbId.ThrowIfNull(nameof(imdbId));
 
             if (CheckIfUserHasMovieInNotInterested(userName, imdbId))
                 throw new UserPreferenceException($"Can not add movie {imdbId} to not interested set for user {userName}. User already has this movie in not interested.");
@@ -132,11 +117,8 @@ namespace MovieRecommender.Database.CollectionAPI
 
         public void RemoveMovieFromNotInterested(string userName, string imdbId)
         {
-            if (userName == null)
-                throw new ArgumentNullException(nameof(userName));
-
-            if (imdbId == null)
-                throw new ArgumentNullException(nameof(imdbId));
+            userName.ThrowIfNull(nameof(userName));
+            imdbId.ThrowIfNull(nameof(imdbId));
 
             if (!CheckIfUserHasMovieInNotInterested(userName, imdbId))
                 throw new UserPreferenceException($"Can not remove movie {imdbId} from not interested set for user {userName}. User does not have this movie in not interested.");
@@ -149,11 +131,8 @@ namespace MovieRecommender.Database.CollectionAPI
 
         public bool CheckIfUserHasMovieInNotInterested(string userName, string imdbId)
         {
-            if (userName == null)
-                throw new ArgumentNullException(nameof(userName));
-
-            if (imdbId == null)
-                throw new ArgumentNullException(nameof(imdbId));
+            userName.ThrowIfNull(nameof(userName));
+            imdbId.ThrowIfNull(nameof(imdbId));
 
             var userNameFilter = Builders<ApplicationUser>.Filter.Where(u => u.UserName == userName);
             var movieIdFilter = Builders<ApplicationUser>.Filter.ElemMatch(u => u.NotInterestedMovies, n => n.IMDBId == imdbId);
@@ -165,8 +144,7 @@ namespace MovieRecommender.Database.CollectionAPI
 
         public IEnumerable<string> GetNotInterestedMovieIdsForUser(string userName)
         {
-            if (userName == null)
-                throw new ArgumentNullException(nameof(userName));
+            userName.ThrowIfNull(nameof(userName));
 
             var userNameFilter = Builders<ApplicationUser>.Filter.Where(u => u.UserName == userName);
             var user = _collection.Find(userNameFilter).Single();
