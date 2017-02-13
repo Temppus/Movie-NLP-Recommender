@@ -72,7 +72,7 @@ namespace MovieRecommender.Recommending
                                 .Concat(_userStore.GetNotInterestedMovieIdsForUser(userName))
                                 .Concat(new List<string>() { movieId });
 
-            var suggestedMovies = _movieStore.FindSimilarMovies(movie.Genres, movie.Keywords, exceptMovieIds,
+            var suggestedMovies = _movieStore.FindSimilarMovies(movie.Genres, movie.KeyWords, exceptMovieIds,
                                                                 20, _minYear, 500, _minRating);
 
             return suggestedMovies.Select(s => BsonSerializer.Deserialize<MovieSuggestionModel>(s));
@@ -99,7 +99,7 @@ namespace MovieRecommender.Recommending
                 }
 
                 // fill keyword map
-                foreach (var keyword in movie.Keywords)
+                foreach (var keyword in movie.KeyWords)
                 {
                     if (!statModel.KeyWordMap.ContainsKey(keyword))
                     {

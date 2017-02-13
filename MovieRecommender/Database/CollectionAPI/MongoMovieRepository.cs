@@ -119,7 +119,7 @@ namespace MovieRecommender.Database.CollectionAPI
             IEnumerable<FilterDefinition<Movie>> filters = new List<FilterDefinition<Movie>>
             {
                 Builders<Movie>.Filter.AnyIn(m => m.Genres, genres),
-                Builders<Movie>.Filter.AnyIn(m => m.Keywords, keywords),
+                Builders<Movie>.Filter.AnyIn(m => m.KeyWords, keywords),
                 Builders<Movie>.Filter.Nin(m => m.IMDBId, exceptIMDbIds),
                 Builders<Movie>.Filter.Where(m => m.PublicationYear >= fromYear),
                 Builders<Movie>.Filter.Where(m => m.RatingCount >= minRatingCount),
@@ -145,24 +145,24 @@ namespace MovieRecommender.Database.CollectionAPI
             groupByExpression.Add(nameof(Movie.Genres), new BsonDocument("$first", "$" + nameof(Movie.Genres)));
 
             return _collection.Aggregate().Match(Builders<Movie>.Filter.And(filters))
-                    .Unwind(m => m.Keywords)
-                    .Match(Builders<BsonDocument>.Filter.AnyIn(nameof(Movie.Keywords), keywords))
+                    .Unwind(m => m.KeyWords)
+                    .Match(Builders<BsonDocument>.Filter.AnyIn(nameof(Movie.KeyWords), keywords))
                     .Group(new BsonDocument(groupByExpression))
                     .Sort(new BsonDocument(sumKey, -1))
                     .Limit(limit)
                     .ToList();
         }
 
-        public IEnumerable<Movie> FindMostPopularMoviesByGenre(string genre, int fromYear, IEnumerable<string> exceptIds, int limit)
+        public IEnumerable<Movie> FindMostPopularMoviesByGenres(IEnumerable<string> genres, int fromYear, IEnumerable<string> exceptIds, int limit)
         {
-            genre.ThrowIfNull(nameof(genre));
+            genres.ThrowIfNull(nameof(genres));
             exceptIds.ThrowIfNull(nameof(exceptIds));
             limit.ThrowIfNegativeOrZero(nameof(limit));
             fromYear.ThrowIfNegativeOrZero(nameof(fromYear));
 
             IEnumerable<FilterDefinition<Movie>> filters = new List<FilterDefinition<Movie>>
             {
-                Builders<Movie>.Filter.Where(m => m.Genres.Contains(genre)),
+                Builders<Movie>.Filter.AnyIn(m => m.Genres, genres),
                 Builders<Movie>.Filter.Nin(m => m.IMDBId, exceptIds),
                 Builders<Movie>.Filter.Where(m => m.PublicationYear >= fromYear),
             };

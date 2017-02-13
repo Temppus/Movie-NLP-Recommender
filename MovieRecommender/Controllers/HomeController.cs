@@ -62,14 +62,19 @@ namespace MovieRecommender.Controllers
 
             var likedMovieIds = _userStore.FindLikedMovieIds(User.Identity.Name);
 
-            var genres = _movieStore.DistinctGenres();
+            var genres = _movieStore.DistinctGenres().ToList();
+
+            genres.Remove("TV Movie");
+            genres.Remove("Music");
+            genres.Remove("Documentary");
+            genres.Remove("Foreign");
 
             HashSet<string> uniqueMovieIds = new HashSet<string>();
 
             foreach (string genre in genres)
             {
                 var exceptIds = likedMovieIds.Concat(uniqueMovieIds);
-                var movies = _movieStore.FindMostPopularMoviesByGenre(genre, 2000, exceptIds, 100);
+                var movies = _movieStore.FindMostPopularMoviesByGenres(new List<string> { genre }, 2000, exceptIds, 100);
 
                 uniqueMovieIds.UnionWith(movies.Select(m => m.IMDBId));
 

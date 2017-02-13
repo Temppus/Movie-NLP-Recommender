@@ -7,6 +7,7 @@ using System.Web;
 
 namespace MovieRecommender.Database.Models
 {
+    [BsonIgnoreExtraElements]
     public class Movie
     {
         [BsonId]
@@ -24,7 +25,7 @@ namespace MovieRecommender.Database.Models
         public string TrailerImageURI { get; set; }
         public string TrailerVideoURI { get; set; }
         public List<string> Genres { get; set; }
-        public List<string> Keywords { get; set; }
+        public List<string> KeyWords { get; set; }
         public List<ActorsInfo> ActorsInfo { get; set; }
 
         public ObjectId ReviewId { get; set; }

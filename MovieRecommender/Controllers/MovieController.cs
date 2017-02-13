@@ -90,7 +90,7 @@ namespace MovieRecommender.Controllers
             model.MoviePreviews = movies.Select(m => new MoviePreview(m)).ToList();
             MapMovieLikes(model);
 
-            return View("Index", model);
+            return View("Browse", model);
         }
 
         [HttpPost]
