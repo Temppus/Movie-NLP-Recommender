@@ -31,7 +31,7 @@
                 <!-- Title -->
                 <div class="eight wide column">
                     <div class="row">
-                        <div class="ui medium header">@Model.Title</div>
+                        <div class="ui medium header" id="title">@Model.Title</div>
                         <div class="ui grid">
                             <div class="twelve wide column">
                                 <div class="ui star rating" data-rating=@Math.Floor(Model.Rating).ToString()>
@@ -109,6 +109,13 @@
 
                     <iframe src="@embeddedURI" width="640" height="360" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true" frameborder="no" scrolling="no"></iframe>
                 }
+            }
+            else
+            {
+                <div class="ui active dimmer" id="dimmerDivId">
+                    <div class="ui indeterminate medium text loader" id="trailerLoaderId">Looking for video trailer</div>
+                </div>
+                <div class="ui embed"></div>
             }
         </div>
     </div>
@@ -233,6 +240,12 @@
         likeDecorator();
         notInterestedDecorator();
 
+        if ($("#dimmerDivId").length > 0) {
+            findTrailerFunction();
+        }
+
+        $('.ui.embed').embed();
+
         $('.notinterested')
         .popup({
             inline: true
@@ -244,5 +257,46 @@
         });
 
     });
+
+
+    var findTrailerFunction = function ()
+    {
+        var movieTitle = $("#title").text();
+
+        var search_url = "https://www.googleapis.com/youtube/v3/search?part=snippet&key=AIzaSyAeSHR4A7hqHaiOZMqYYqknyYQtm9xwh4k&q=";
+        search_url += encodeURIComponent(movieTitle + " trailer");
+
+        $.ajax({
+            type: 'GET',
+            url: search_url,
+            contentType: 'application/json',
+            error: function (err) {
+                $("#trailerLoaderId").text("Youtube API error.");
+            },
+            success: function (data) {
+
+                var found = false;
+
+                $.each(data.items, function (i, items) {
+                    found = true;
+                    var videoId = items.id.videoId;
+
+                    $("#dimmerDivId").hide();
+
+                    $('.ui.embed').embed({
+                        source: 'youtube',
+                        id: videoId
+                    });
+
+                    return false;
+                });
+
+                if (found == false)
+                {
+                    $("#trailerLoaderId").text("No trailer found");
+                }
+            }
+        });
+    }
 
 </script>
