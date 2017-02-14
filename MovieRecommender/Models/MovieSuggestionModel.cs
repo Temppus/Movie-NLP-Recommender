@@ -11,6 +11,7 @@ namespace MovieRecommender.Models
     public class MovieSuggestionModel
     {
         public string Title { get; set; }
+        public int PublicationYear { get; set; }
         public string IMDBId { get; set; }
         public string ImageURI { get; set; }
         public double Rating { get; set; }

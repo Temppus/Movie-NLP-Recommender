@@ -136,6 +136,7 @@ namespace MovieRecommender.Database.CollectionAPI
 
             // include other properties in grouping output document
             groupByExpression.Add(nameof(Movie.Title), new BsonDocument("$first", "$" + nameof(Movie.Title)));
+            groupByExpression.Add(nameof(Movie.PublicationYear), new BsonDocument("$first", "$" + nameof(Movie.PublicationYear)));
             groupByExpression.Add(nameof(Movie.IMDBId), new BsonDocument("$first", "$" + nameof(Movie.IMDBId)));
             groupByExpression.Add(nameof(Movie.ImageURI), new BsonDocument("$first", "$" + nameof(Movie.ImageURI)));
             groupByExpression.Add(nameof(Movie.Rating), new BsonDocument("$first", "$" + nameof(Movie.Rating)));

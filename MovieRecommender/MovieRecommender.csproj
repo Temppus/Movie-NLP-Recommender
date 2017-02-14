@@ -291,6 +291,8 @@
     <Compile Include="StartupHooks\CheckDbVersionOnStartup.cs" />
     <Compile Include="StartupHooks\IntegrityManager.cs" />
     <Compile Include="StartupHooks\IRunOnApplicationStart.cs" />
+    <Compile Include="Utils\DuplicateKeyComparer.cs" />
+    <Compile Include="Utils\MathUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\Components\accordion.css" />

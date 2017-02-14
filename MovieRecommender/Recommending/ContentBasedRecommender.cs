@@ -7,6 +7,7 @@ using MovieRecommender.Extensions;
 using MongoDB.Bson.Serialization;
 using MovieRecommender.Models;
 using MongoDB.Bson;
+using MovieRecommender.Utils;
 
 namespace MovieRecommender.Recommending
 {
@@ -72,10 +73,31 @@ namespace MovieRecommender.Recommending
                                 .Concat(_userStore.GetNotInterestedMovieIdsForUser(userName))
                                 .Concat(new List<string>() { movieId });
 
-            var suggestedMovies = _movieStore.FindSimilarMovies(movie.Genres, movie.KeyWords, exceptMovieIds,
-                                                                20, _minYear, 500, _minRating);
+            var suggestedBsonMovies = _movieStore.FindSimilarMovies(movie.Genres, movie.KeyWords, exceptMovieIds,
+                                                                100, _minYear, 500, _minRating);
 
-            return suggestedMovies.Select(s => BsonSerializer.Deserialize<MovieSuggestionModel>(s));
+            var suggestedMovies = suggestedBsonMovies.Select(s => BsonSerializer.Deserialize<MovieSuggestionModel>(s));
+
+            SortedList<double, MovieSuggestionModel> priorityList = new SortedList<double, MovieSuggestionModel>(new DuplicateKeyComparer<double>());
+
+            double minYearDiff = suggestedMovies.Select(d => Math.Abs(d.PublicationYear - movie.PublicationYear)).Min();
+            double maxYearDiff = suggestedMovies.Select(d => Math.Abs(d.PublicationYear - movie.PublicationYear)).Max();
+
+            double minRatingDiff = suggestedMovies.Select(d => Math.Abs(d.Rating - movie.Rating)).Min();
+            double maxRatingDiff = suggestedMovies.Select(d => Math.Abs(d.Rating - movie.Rating)).Max();
+
+            foreach (var suggestedMovie in suggestedMovies)
+            {
+                int yearDiff = Math.Abs(suggestedMovie.PublicationYear - movie.PublicationYear);
+                double ratingDiff = Math.Abs(suggestedMovie.Rating - movie.Rating);
+
+                double normalizedYearDiff = MathUtil.Normalize(yearDiff, minYearDiff, maxYearDiff);
+                double normalizedRatingDiff = MathUtil.Normalize(ratingDiff, minRatingDiff, maxRatingDiff);
+
+                priorityList.Add(normalizedYearDiff + normalizedRatingDiff, suggestedMovie);
+            }
+
+            return priorityList.Select(x => x.Value);
         }
 
         #region Helpers
