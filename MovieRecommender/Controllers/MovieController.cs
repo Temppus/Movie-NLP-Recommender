@@ -153,8 +153,10 @@ namespace MovieRecommender.Controllers
         }
         #endregion
 
-        [HttpGet, OutputCache(NoStore = true, Duration = 1)]
+        [HttpGet, OutputCache(NoStore = true, Duration = 0)]
         [AllowAnonymous]
+        [Route("Movie/Details")]
+        [Route("Movie/Movie/Details")] // workaround because semantic ui search bug
         public ActionResult Details(string imdbId)
         {
             Movie movie = _movieStore.FindMovieByImdbId(imdbId);
