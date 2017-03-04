@@ -30,8 +30,8 @@ namespace MovieRecommender.Models
 
             if (yearListDesc.Count() != 0)
             {
-                FromYear = yearListDesc.First() - 2;
-                SelectedFromYear = FromYear;
+                int fromYear = yearListDesc.First() - 2;
+                SelectedFromYear = fromYear;
                 SelectedToYear = yearListDesc.First();
             }
 
@@ -40,8 +40,6 @@ namespace MovieRecommender.Models
 
         [Display(Name = "From Year")]
         public IEnumerable<int> FromYearList { get; set; }
-
-        public int FromYear { get; set; }
 
         [Display(Name = "To Year")]
         public IEnumerable<int> ToYearList { get; set; }

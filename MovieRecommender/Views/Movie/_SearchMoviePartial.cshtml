@@ -5,7 +5,7 @@
     <div class="five fields">
         <div class="two wide field">
             @Html.LabelFor(x => x.FromYearList)
-            @Html.DropDownListFor(x => x.SelectedFromYear, new SelectList(Model.FromYearList), Model.FromYear.ToString(),
+            @Html.DropDownListFor(x => x.SelectedFromYear, new SelectList(Model.FromYearList),
                             new Dictionary<string, object> { { "class", "ui fluid dropdown" }})
 
             @for (int i = 0; i < Model.FromYearList.Count(); i++)
