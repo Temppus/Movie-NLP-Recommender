@@ -30,7 +30,7 @@ namespace MovieRecommender.Recommending
             var likedMovieIds = _userStore.FindLikedMovieIds(userName);
             var likedMovies = _movieStore.FindMoviesByIMDbIds(likedMovieIds);
 
-            var weightModel = CreateWeightModel(likedMovies);
+            var weightModel = UserWeightHelper.CreateWeightModel(likedMovies);
 
             IList<string> weightedGenres = new List<string>();
 
@@ -59,7 +59,34 @@ namespace MovieRecommender.Recommending
             var exceptMovieIds = likedMovieIds.Concat(_userStore.GetNotInterestedMovieIdsForUser(userName));
 
             var suggestedMovies = _movieStore.FindSimilarMovies(weightedGenres, weightedKeywords, exceptMovieIds,
-                                                                20, _minYear, 500, _minRating);
+                                                                20, _minYear, int.MaxValue, 500, _minRating);
+
+            return suggestedMovies.Select(s => BsonSerializer.Deserialize<MovieSuggestionModel>(s));
+        }
+
+        public IEnumerable<MovieSuggestionModel> RecommendForUser(string userName, IEnumerable<string> genres, int fromYear, int toYear, double minRating, int limit)
+        {
+            var likedMovieIds = _userStore.FindLikedMovieIds(userName);
+            var likedMovies = _movieStore.FindMoviesByIMDbIds(likedMovieIds);
+
+            var weightModel = UserWeightHelper.CreateWeightModel(likedMovies);
+
+            IList<string> weightedKeywords = new List<string>();
+
+            for (int i = 0; i < 25; i++)
+            {
+                string keyword = weightModel.KeyWordMap.RandomElementByWeight(g => g.Value).Key;
+
+                weightModel.KeyWordMap.Remove(keyword);
+
+                if (!weightedKeywords.Contains(keyword))
+                    weightedKeywords.Add(keyword);
+            }
+
+            var exceptMovieIds = likedMovieIds.Concat(_userStore.GetNotInterestedMovieIdsForUser(userName));
+
+            var suggestedMovies = _movieStore.FindSimilarMovies(genres, weightedKeywords, exceptMovieIds,
+                                                                limit, fromYear, toYear, 500, minRating);
 
             return suggestedMovies.Select(s => BsonSerializer.Deserialize<MovieSuggestionModel>(s));
         }
@@ -74,7 +101,7 @@ namespace MovieRecommender.Recommending
                                 .Concat(new List<string>() { movieId });
 
             var suggestedBsonMovies = _movieStore.FindSimilarMovies(movie.Genres, movie.KeyWords, exceptMovieIds,
-                                                                100, _minYear, 500, _minRating);
+                                                                100, _minYear, int.MaxValue, 500, _minRating);
 
             var suggestedMovies = suggestedBsonMovies.Select(s => BsonSerializer.Deserialize<MovieSuggestionModel>(s));
 
@@ -99,48 +126,5 @@ namespace MovieRecommender.Recommending
 
             return priorityList.Select(x => x.Value);
         }
-
-        #region Helpers
-        private UserWeightModel<string, int> CreateWeightModel(IEnumerable<Movie> likedMovies)
-        {
-            var statModel = new UserWeightModel<string, int>();
-
-            foreach (var movie in likedMovies)
-            {
-                // fill genre map
-                foreach (var genre in movie.Genres)
-                {
-                    if (!statModel.GenreMap.ContainsKey(genre))
-                    {
-                        statModel.GenreMap.Add(genre, 1);
-                    }
-                    else
-                    {
-                        statModel.GenreMap[genre] += 1;
-                    }
-                }
-
-                // fill keyword map
-                foreach (var keyword in movie.KeyWords)
-                {
-                    if (!statModel.KeyWordMap.ContainsKey(keyword))
-                    {
-                        statModel.KeyWordMap.Add(keyword, 1);
-                    }
-                    else
-                    {
-                        statModel.KeyWordMap[keyword] += 1;
-                    }
-                }
-            }
-            return statModel;
-        }
-        #endregion
-    }
-
-    public class UserWeightModel<TKey, TValue>
-    {
-        public IDictionary<TKey, TValue> GenreMap { get; set; } = new Dictionary<TKey, TValue>();
-        public IDictionary<TKey, TValue> KeyWordMap { get; set; } = new Dictionary<TKey, TValue>();
     }
 }

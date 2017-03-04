@@ -1,4 +1,4 @@
-﻿@model MovieRecommender.Models.ColdStartModel
+﻿@model MovieRecommender.Models.HomeRecommendationModel
 @{
     ViewBag.Title = "Home Page";
 }
@@ -13,13 +13,93 @@
 
 @if (Request.IsAuthenticated)
 {
-    @Html.Partial("_ColdStartPartial")
+    <div class="ui text container">
+        @Html.Partial("_SearchMoviePartial")
+    </div>
+
+    <h4 class="ui horizontal divider header">
+        <i class="tag icon"></i>
+        Movies you may like
+    </h4>
+
+    <div class="ui six column grid">
+        @foreach (var suggestion in Model.RecommendedMovies.Take(50))
+        {
+            <div class="column">
+
+                @{
+                    var tooltipHTML = "<div class=\"ui card\">" +
+                                                "<div class=\"content\">" +
+                                                    $"<div class=\"header\">{@suggestion.Title}</div>" +
+                                                    $" <div class=\"meta\">Directed by: {@suggestion.Director}</div>" +
+                                                    "<div class=\"description\">" +
+                                                        $"<p>{@suggestion.Overview}</p>" +
+                                                    "</div>" +
+                                                "</div>" +
+                                            "</div>";
+                }
+
+                <div class="ui card" name="interestContainer">
+                    <a class="ui image" href="@Url.Action("Details","Movie", new { imdbId = @suggestion.IMDBId })">
+                        <div class="movietooltip" data-html="@tooltipHTML" data-position="right center">
+                            <img src="@suggestion.ImageURI">
+                        </div>
+
+                    </a>
+                    <div class="content">
+                        <div class="header">@suggestion.Title</div>
+                    </div>
+                    <div class="extra">
+                        <strong>Rating: @suggestion.Rating</strong>
+                        <div class="ui star rating" data-rating="@Math.Floor(@suggestion.Rating).ToString()"></div>
+                    </div>
+
+                    <div class="ui two bottom attached buttons" name="likeContainer">
+                        <div class="ui grey button notinterested" name="interestButton" movieId="@suggestion.IMDBId" isNotInterested="true"
+                             data-content="This movie will no longer be recommended to you." data-position="bottom center" data-variation="inverted">
+                            <i class="remove icon"></i>
+                        </div>
+                        <div name="likeButton" movieId="@suggestion.IMDBId" likeText="Like" likedText="Liked"></div>
+                    </div>
+                </div>
+
+                <div class="ui popup">
+                    <div class="header">User Rating</div>
+                    <div class="ui star rating" data-rating="3"></div>
+                </div>
+
+            </div>
+        }
+    </div>
 }
 else
 {
-    <h2>Log in to start :)</h2>
+    <h2> Log in to start :)</h2>
 }
 
+@Scripts.Render("~/bundles/movielike")
 
+<script>
+        $('.rating').rating({
+            initialRating: 5,
+            maxRating: 10,
+            interactive: false
+        });
 
+        $(document).ready(function () {
 
+            likeDecorator();
+            notInterestedDecorator();
+
+            $('.notinterested')
+            .popup({
+                inline: true
+            });
+
+            $('.movietooltip')
+            .popup({
+                inline: true
+            });
+
+        });
+</script>

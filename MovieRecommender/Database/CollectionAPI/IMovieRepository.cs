@@ -16,7 +16,7 @@ namespace MovieRecommender.Database.CollectionAPI
         IEnumerable<Movie> FindMoviesLikeTitleAsync(string likeTitle, int limit, bool sortByRatingCountDesc = true);
         IEnumerable<Movie> FindMoviesByIMDbIds(IEnumerable<string> imdbIds);
         IList<BsonDocument> FindSimilarMovies(IEnumerable<string> genres, IEnumerable<string> keywords, IEnumerable<string> exceptIMDbIds,
-                                                     int limit, int fromYear, int minRatingCount, double minRating);
+                                                     int limit, int fromYear, int toYear, int minRatingCount, double minRating);
         IEnumerable<Movie> FindMostPopularMoviesByGenres(IEnumerable<string> genres, int fromYear, IEnumerable<string> exceptIds, int limit);
         IEnumerable<string> DistinctGenres();
         IEnumerable<int> DistinctYearsDesc();

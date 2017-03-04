@@ -1,0 +1,57 @@
+﻿@model MovieRecommender.Models.HomeRecommendationModel
+
+@using (Html.BeginForm("Search", "Home", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "ui form" }))
+{
+    <div class="five fields">
+        <div class="two wide field">
+            @Html.LabelFor(x => x.FromYearList)
+            @Html.DropDownListFor(x => x.SelectedFromYear, new SelectList(Model.FromYearList),
+                            new Dictionary<string, object> { { "class", "ui fluid dropdown" }})
+
+            @for (int i = 0; i < Model.FromYearList.Count(); i++)
+            {
+                @Html.Hidden("FromYearList[" + i + "]", Model.FromYearList.ElementAt(i))
+            }
+        </div>
+        <div class="two wide field">
+            @Html.LabelFor(x => x.ToYearList)
+            @Html.DropDownListFor(x => x.SelectedToYear, new SelectList(Model.ToYearList),
+                            new Dictionary<string, object> { { "class", "ui fluid dropdown" } })
+
+
+            @for (int i = 0; i < Model.ToYearList.Count(); i++)
+            {
+                @Html.Hidden("ToYearList[" + i + "]", Model.ToYearList.ElementAt(i))
+            }
+        </div>
+        <div class="eight wide field">
+            @Html.LabelFor(x => x.Genres)
+            @Html.ListBoxFor(x => x.SelectedGenres, new SelectList(Model.Genres),
+                            new Dictionary<string, object> { { "class", "ui fluid dropdown selection multiple" }, { "multiple", "" } })
+
+            @for (int i = 0; i < Model.Genres.Count(); i++ )
+            {
+                @Html.Hidden("Genres[" + i + "]", Model.Genres.ElementAt(i))
+            }
+        </div>
+        <div class="two wide field">
+            @Html.LabelFor(x => x.MinRatingsDesc)
+            @Html.DropDownListFor(x => x.SelectedMinRating, new SelectList(Model.MinRatingsDesc),
+                            new Dictionary<string, object> { { "class", "ui fluid dropdown" } })
+
+
+            @for (int i = 0; i < Model.MinRatingsDesc.Count(); i++)
+            {
+                @Html.Hidden("MinRatingsDesc[" + i + "]", Model.MinRatingsDesc.ElementAt(i))
+            }
+        </div>
+        <div class="two wide field">
+            <label>Search</label>
+            <input type="submit" value="Search" class="ui primary button" />
+        </div>
+    </div>
+}
+
+<script>
+    $('.ui.dropdown').dropdown();
+</script>

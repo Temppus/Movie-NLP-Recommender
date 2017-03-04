@@ -40,7 +40,7 @@
 <body>
     <div class="ui fixed inverted menu">
         <div class="ui container">
-            <a class="header item">
+            <a class="header item" href="/Home">
                 <i class="film icon"></i>
                 Movie Recommender
             </a>
@@ -57,6 +57,7 @@
 
             @Html.ActionLink("Home", "Index", "Home", null, htmlAttributes: new { @class = "item" })
             @Html.ActionLink("Movies", "Browse", "Movie", null, htmlAttributes: new { @class = "item" })
+            @Html.ActionLink("Profile", "Index", "Manage", null, htmlAttributes: new { @class = "item" })
             @Html.Partial("_LoginPartial")
         </div>
     </div>

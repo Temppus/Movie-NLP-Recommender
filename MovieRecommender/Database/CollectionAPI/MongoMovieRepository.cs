@@ -114,7 +114,7 @@ namespace MovieRecommender.Database.CollectionAPI
         }
 
         public IList<BsonDocument> FindSimilarMovies(IEnumerable<string> genres, IEnumerable<string> keywords, IEnumerable<string> exceptIMDbIds,
-                                                            int limit, int fromYear, int minRatingCount, double minRating)
+                                                            int limit, int fromYear, int toYear, int minRatingCount, double minRating)
         {
             IEnumerable<FilterDefinition<Movie>> filters = new List<FilterDefinition<Movie>>
             {
@@ -122,6 +122,7 @@ namespace MovieRecommender.Database.CollectionAPI
                 Builders<Movie>.Filter.AnyIn(m => m.KeyWords, keywords),
                 Builders<Movie>.Filter.Nin(m => m.IMDBId, exceptIMDbIds),
                 Builders<Movie>.Filter.Where(m => m.PublicationYear >= fromYear),
+                Builders<Movie>.Filter.Where(m => m.PublicationYear <= toYear),
                 Builders<Movie>.Filter.Where(m => m.RatingCount >= minRatingCount),
                 Builders<Movie>.Filter.Where(m => m.Rating > minRating)
             };

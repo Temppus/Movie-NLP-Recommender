@@ -274,6 +274,7 @@
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ColdStartModel.cs" />
     <Compile Include="Models\ForceLayoutModel.cs" />
+    <Compile Include="Models\HomeRecommendationModel.cs" />
     <Compile Include="Models\HomeViewModel.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\LikeModel.cs" />
@@ -287,6 +288,7 @@
     <Compile Include="Recommending\ContentBasedRecommender.cs" />
     <Compile Include="Recommending\IRecommender.cs" />
     <Compile Include="Recommending\NlpRecommender.cs" />
+    <Compile Include="Recommending\UserWeightModel.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="StartupHooks\CheckDbVersionOnStartup.cs" />
     <Compile Include="StartupHooks\IntegrityManager.cs" />
@@ -520,10 +522,12 @@
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Account\RegistrationSuccessful.cshtml" />
     <Content Include="Views\Movie\Browse.cshtml" />
-    <Content Include="Views\Movie\SearchMoviePartial.cshtml" />
+    <Content Include="Views\Movie\_SearchMoviePartial.cshtml" />
     <Content Include="Views\Movie\Detail.cshtml" />
     <Content Include="Views\Home\_ColdStartPartial.cshtml" />
     <Content Include="Views\Home\_ForcePartialView.cshtml" />
+    <Content Include="Views\Home\ColdStart.cshtml" />
+    <Content Include="Views\Home\_SearchMoviePartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

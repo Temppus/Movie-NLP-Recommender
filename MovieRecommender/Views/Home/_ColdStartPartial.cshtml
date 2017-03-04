@@ -1,5 +1,11 @@
 ﻿@model MovieRecommender.Models.ColdStartModel
 
+<div class="ui one column stackable center aligned page grid">
+    <div class="column">
+        <h3>Please liked at least 10 films to enable recommendation feature.</h3>
+    </div>
+</div>
+
 @foreach (var genreModel in Model.MoviesDic)
 {
     <h4 class="ui horizontal divider header">
@@ -54,6 +60,17 @@
     </div>
 }
 
+<div class="ui one column stackable center aligned page grid">
+    <div class="column">
+        <div class="ui big red animated button" id="finishButton">
+            <div class="visible content">Finish</div>
+            <div class="hidden content">
+                <i class="right arrow icon"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
 @Scripts.Render("~/bundles/movielike")
 
 <script>
@@ -76,6 +93,31 @@
         $('.movietooltip')
         .popup({
             inline: true
+        });
+
+        $('#finishButton').click(function () {
+
+            var checkObject = { userName: "@User.Identity.Name" };
+
+            $.ajax({
+                type: 'GET',
+                url: '/Home/CheckLikedMovies',
+                data: checkObject,
+                contentType: 'application/json',
+                error: function (err) {
+                    alert("Error finishing cold start form.");
+                },
+                success: function (data) {
+
+                    if (data.Ok == false) {
+                        alert(data.Message);
+                    }
+                    else {
+                        window.location.href = "/Home/Index";
+                        location.reload();
+                    }
+                }
+            });
         });
 
     });

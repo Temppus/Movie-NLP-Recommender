@@ -10,8 +10,11 @@ using System.Web.Mvc;
 
 namespace MovieRecommender.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
+        private const int _minLikedMovies = 10;
+
         private readonly IUserRepository _userStore;
         private readonly IMovieRepository _movieStore;
         private readonly IMovieMentionRepository _movieMentionRepository;
@@ -53,7 +56,54 @@ namespace MovieRecommender.Controllers
             }
         }*/
 
+        [AllowAnonymous]
         public ActionResult Index()
+        {
+            HomeRecommendationModel model = new HomeRecommendationModel(_movieStore.DistinctGenres(), _movieStore.DistinctYearsDesc());
+
+            if (!Request.IsAuthenticated)
+            {
+                return View(model);
+            }
+
+            if (_userStore.FindLikedMovieIds(User.Identity.Name).Count() < _minLikedMovies)
+                return RedirectToAction("ColdStart");
+
+            model.ColdStartDone = true;
+
+            model.RecommendedMovies = _recommender.RecommendForUser(minRating: model.SelectedMinRating,
+                                                                    fromYear : model.SelectedFromYear,
+                                                                    toYear: model.SelectedToYear,
+                                                                    genres : _movieStore.DistinctGenres(),
+                                                                    limit : 100,
+                                                                    userName : User.Identity.Name)
+                                                                    .ToList();
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult Search(HomeRecommendationModel model)
+        {
+            bool noGenresSelected = model.SelectedGenres == null;
+
+            model.ColdStartDone = true;
+            model.RecommendedMovies = _recommender.RecommendForUser(minRating: model.SelectedMinRating,
+                                                                    fromYear: model.SelectedFromYear,
+                                                                    toYear: model.SelectedToYear,
+                                                                    genres: noGenresSelected ? _movieStore.DistinctGenres() : model.SelectedGenres,
+                                                                    limit: 100,
+                                                                    userName: User.Identity.Name)
+                                                                    .ToList();
+            
+            if (noGenresSelected)
+                model.SelectedGenres = new List<string>(); // model binder is binding empty collections as nulls
+
+            return View("Index", model);
+        }
+
+
+        [AllowAnonymous]
+        public ActionResult ColdStart()
         {
             ColdStartModel model = new ColdStartModel();
 
@@ -84,6 +134,21 @@ namespace MovieRecommender.Controllers
             return View(model);
         }
 
+        [AllowAnonymous]
+        [HttpGet]
+        public JsonResult CheckLikedMovies(string userName)
+        {
+            int likedMovies = _userStore.FindLikedMovieIds(userName).Count();
+
+            if (likedMovies < _minLikedMovies)
+            {
+                return Json(new { Ok = false,  Message = $"You must like at least {_minLikedMovies} movies to proceed. You liked only {likedMovies} so far." }, JsonRequestBehavior.AllowGet);
+            }
+
+            return Json(new { Ok = true, Message = string.Empty }, JsonRequestBehavior.AllowGet);
+        }
+
+        [AllowAnonymous]
         public ActionResult About()
         {
             ViewBag.Message = "Your application description page.";
@@ -91,6 +156,7 @@ namespace MovieRecommender.Controllers
             return View();
         }
 
+        [AllowAnonymous]
         public ActionResult Contact()
         {
             ViewBag.Message = "Your contact page.";

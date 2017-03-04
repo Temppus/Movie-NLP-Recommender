@@ -1,0 +1,25 @@
+﻿@model MovieRecommender.Models.ColdStartModel
+@{
+    ViewBag.Title = "Movie Cold Start";
+}
+
+@section styles {
+    <style>
+        .ui.main.container {
+            width: 85%;
+        }
+    </style>
+}
+
+@if (Request.IsAuthenticated)
+{
+    @Html.Partial("_ColdStartPartial")
+}
+else
+{
+    <h2>Log in to start :)</h2>
+}
+
+
+
+
