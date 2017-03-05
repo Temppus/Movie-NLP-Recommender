@@ -129,8 +129,8 @@
         Similar movies recommended to you
     </h4>
 
-    <div class="ui six column grid">
-        @foreach (var suggestion in Model.MovieSuggestions.Take(6))
+    <div class="ui five column grid">
+        @foreach (var suggestion in Model.MovieSuggestions.Take(5))
         {
             <div class="column">
 
@@ -161,11 +161,15 @@
                         <div class="ui star rating" data-rating="@Math.Floor(@suggestion.Rating).ToString()"></div>
                     </div>
 
-                    <div class="ui two bottom attached buttons" name="likeContainer">
+                    <div class="ui three bottom attached buttons" name="likeContainer">
                         <div name="likeButton" movieId="@suggestion.IMDBId" likeText="Like" likedText="Liked"></div>
-                        <div class="ui grey button notinterested" name="interestButton" movieId="@suggestion.IMDBId" isNotInterested="true"
+                        <div class="ui red button notinterested" name="interestButton" movieId="@suggestion.IMDBId" isNotInterested="true"
                              data-content="This movie will no longer be recommended to you." data-position="bottom center" data-variation="inverted">
                             <i class="remove icon"></i>
+                        </div>
+                        <div class="ui teal button explaintooltip"
+                             data-content="Why is this movie recommended?" data-position="top center" data-variation="inverted">
+                            <i class="help icon"></i>
                         </div>
                     </div>
                 </div>
@@ -252,6 +256,12 @@
         });
 
         $('.movietooltip')
+        .popup({
+            inline: true
+        });
+
+        
+        $('.explaintooltip')
         .popup({
             inline: true
         });
