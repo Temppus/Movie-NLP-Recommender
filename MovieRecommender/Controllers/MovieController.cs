@@ -156,7 +156,11 @@ namespace MovieRecommender.Controllers
         [HttpGet, OutputCache(NoStore = true, Duration = 0)]
         [AllowAnonymous]
         [Route("Movie/Details")]
-        [Route("Movie/Movie/Details")] // workaround because semantic ui search bug
+        /* Routing workaround because semantic ui search url sometimes redirects to wrong URL */
+        [Route("Movie/Movie/Details")] 
+        [Route("Account/Movie/Details")]
+        [Route("Home/Movie/Details")]
+        [Route("Manage/Movie/Details")]
         public ActionResult Details(string imdbId)
         {
             Movie movie = _movieStore.FindMovieByImdbId(imdbId);
