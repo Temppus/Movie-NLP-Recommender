@@ -6,10 +6,10 @@
 @section styles {
     <style>
         .ui.main.container {
-            width: 85%;
+            width: 95%;
         }
 
-        #viz {
+        .treemapDiv{
             height: 500px;
         }
     </style>
@@ -19,108 +19,118 @@
 
     <script src="//d3plus.org/js/d3.js"></script>
     <script src="//d3plus.org/js/d3plus.js"></script>
-
-    <script>
-        // sample data array
-        var sample_data = [
-            { "value": 70, "name": "dsfasfsadfsadfs f asf sadfsdafsadf sfd sa fasd f sf" },
-            { "value": 80, "name": "betsdfsadfsdfsdaf s fas fs fas faswerfaesf fa" },
-            { "value": 80, "name": "fsaf ashrhnbt yjtssfcsfcafawaf " }
-        ]
-
-        var attributes = [
-            { "name": "alpha", "hex": "#CC0000" },
-            { "name": "beta", "hex": "#00CC00" }
-        ]
-
-        // instantiate d3plus
-        var visualization = d3plus.viz()
-            .container("#viz")  // container DIV to hold the visualization
-            .data(sample_data)  // data to use with the visualization
-            .type("tree_map")   // visualization type
-            .id("name")         // key for which our data is unique on
-            .size("value")      // sizing of blocks
-            .attrs(attributes)
-            .color("hex")
-            .draw()             // finally, draw the visualization!
-
-    </script>
 }
 
 @if (Request.IsAuthenticated)
 {
-    <div class="ui text container">
-        @Html.Partial("_SearchMoviePartial")
-    </div>
+    <div class="ui celled grid" id="resultGrid">
 
-    <h4 class="ui horizontal divider header">
-        <i class="tag icon"></i>
-        Movies you may like
-    </h4>
+        @{ int currentId = 0;}
 
-    <div class="ui five column grid">
-        @foreach (var suggestion in Model.RecommendedMovies.Take(50))
+        @foreach (var moviePreview in Model.RecommendedMovies)
         {
-            <div class="column">
+            currentId++;
 
-                @{
-                    var tooltipHTML = "<div class=\"ui card\">" +
-                                                "<div class=\"content\">" +
-                                                    $"<div class=\"header\">{@suggestion.Title}</div>" +
-                                                    $" <div class=\"meta\">Directed by: {@suggestion.Director}</div>" +
-                                                    "<div class=\"description\">" +
-                                                        $"<p>{@suggestion.Overview}</p>" +
-                                                    "</div>" +
-                                                "</div>" +
-                                            "</div>";
-                }
-
-                <div class="ui card" name="interestContainer">
-                    <a class="ui image" href="@Url.Action("Details","Movie", new { imdbId = @suggestion.IMDBId })">
-                        <div class="movietooltip" data-html="@tooltipHTML" data-position="right center">
-                            <img src="@suggestion.ImageURI">
-                        </div>
-
-                    </a>
-                    <div class="content">
-                        <div class="header">@suggestion.Title</div>
-                    </div>
-                    <div class="extra">
-                        <strong>Rating: @suggestion.Rating</strong>
-                        <div class="ui star rating" data-rating="@Math.Floor(@suggestion.Rating).ToString()"></div>
-                    </div>
-
-                    <div class="ui three bottom attached buttons" name="likeContainer">
-
-                        <div name="likeButton" movieId="@suggestion.IMDBId" likeText="Like" likedText="Liked"></div>
-
-                        <div class="ui red button notinterested" name="interestButton" movieId="@suggestion.IMDBId" isNotInterested="true"
-                             data-content="This movie will no longer be recommended to you." data-position="bottom center" data-variation="inverted">
-                            <i class="remove icon"></i>
-                        </div>
-
-                        <div class="ui teal button explaintooltip"
-                             data-content="Why is this movie recommended?" data-position="top center" data-variation="inverted">
-                            <i class="help icon"></i>
-                        </div>
+            <div class="row">
+                <!-- Image column -->
+                <div class="four wide column">
+                    <div class="row">
+                        <a href="@Url.Action("Details","Movie", new { imdbId = @moviePreview.IMDBId })" name="movieDetailLink">
+                            <img alt="Film poster" src="@Url.Content(moviePreview.ImageURI)" name="posterURI" class="ui centered medium image" />
+                        </a>
                     </div>
                 </div>
 
-                <div class="ui popup">
-                    <div class="header">User Rating</div>
-                    <div class="ui star rating" data-rating="3"></div>
-                </div>
+                <!-- Film info column -->
+                <div class="six wide column">
+                    <div class="ui grid">
 
+                        <!-- Title -->
+                        <div class="eight wide column">
+                            <div class="row">
+                                <div class="ui medium header" name="movieTitle">@moviePreview.Title</div>
+                                <div class="ui grid">
+                                    <div class="twelve wide column">
+                                        <div class="ui star rating" data-rating=@Math.Floor(moviePreview.Rating).ToString() name="ratingDecimal">
+                                        </div>
+                                    </div>
+                                    <div class="two wide column" name="ratingHolder">
+                                        @moviePreview.Rating
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Genres -->
+                        <div class="sixteen wide column">
+                            <div class="row">
+                                <div class="ui small header" name="genresHolder">
+                                    Genres
+                                    @foreach (string genre in moviePreview.Genres)
+                                    {
+                                        <button class="tiny ui button" name="movieGenre">@genre</button>
+                                    }
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="twelve wide column">
+                            <!-- Overview -->
+                            <div class="row">
+                                <div class="wide row">
+                                    <div class="ui small header">Overview</div>
+                                    <p name="movieOverview">@moviePreview.Overview</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="sixteen wide column">
+                            <div class="row">
+
+                                <!-- Saw button -->
+                                <div class="ui green button" movieId="@moviePreview.IMDBId" name="sawButton">
+                                    I saw this movie
+                                </div>
+
+                                <!-- Explanation button -->
+                                <div class="ui violet button" name="likeExplanationButton" movieId="@moviePreview.IMDBId">
+                                    I like explanation
+                                </div>
+
+                                <!-- Explanation button -->
+                                <div class="ui red button" name="dontlikeExplanationButton" movieTitle="@moviePreview.Title">
+                                    I dont like explanation
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="six wide column">
+                    <div class="row">
+                        @{ string vizId = "viz" + @currentId; }
+
+                        <div id="@vizId" class="treemapDiv">
+                            @foreach (var sh in moviePreview.Explanation.SentimentHolders.Take(5))
+                            {
+                                <div class="explanationDiv" score="@sh.Score" sentence='@sh.Sentence'></div>
+                            }
+                        </div>
+                    </div>
+                </div>
             </div>
-                    }
+        }
     </div>
-                    }
-                    else
-                    {
-                        <div class="ui container" id="viz"></div>
+}
+else
+{
+    <div class="ui container" id="viz"></div>
 
-                        <h2> Log in to start :)</h2>
-                    }
+    <h2> Log in to start :)</h2>
+}
 
 @Scripts.Render("~/bundles/movielike")
 
@@ -136,20 +146,64 @@
         likeDecorator();
         notInterestedDecorator();
 
-        $('.notinterested')
-        .popup({
-            inline: true
+        $(".treemapDiv").each(function (index, element) {
+
+            var dataArray = [];
+
+            $(this).children(".explanationDiv").each(function (index, element) {
+                var obj = {
+                    "name": $(element).attr('sentence'),
+                    "value": parseInt(($(element).attr('score')))
+                };
+                dataArray.push(obj);
+            });
+
+            var colorAttributes = [];
+
+            for (var i = 0; i < dataArray.length; i++) {
+                var obj = { "name": dataArray[i].name };
+
+                switch (i) {
+                    case 0:
+                        obj.hex = "#237C4E";
+                        break;
+                    case 1:
+                        obj.hex = "#75BB7D";
+                        break;
+                    case 2:
+                        obj.hex = "#96D696";
+                        break;
+                    case 3:
+                        obj.hex = "#C3F0A9";
+                        break;
+                    case 4:
+                        obj.hex = "#D6FCC2";
+                        break;
+                }
+
+                colorAttributes.push(obj);
+            }
+
+            var modalDiv = $('.ui.modal').first();
+
+            var visualization = d3plus.viz()
+                .container("#" + $(this).attr('id'))  // container DIV to hold the visualization
+                .data(dataArray)  // data to use with the visualization
+                .type("tree_map")   // visualization type
+                .id("name")         // key for which our data is unique on
+                .size("value")      // sizing of blocks
+                .attrs(colorAttributes)
+                .color("hex")
+                .draw();             // finally, draw the visualization!*/
+
+            modalDiv.modal({
+
+                onHidden: function () {
+                    $("#viz").html(''); // why the fuck is this hack needed ?
+                }
+            }).modal('show');
         });
 
-        $('.movietooltip')
-        .popup({
-            inline: true
-        });
-
-        $('.explaintooltip')
-        .popup({
-            inline: true
-        });
 
     });
 </script>

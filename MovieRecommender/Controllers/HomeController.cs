@@ -17,44 +17,19 @@ namespace MovieRecommender.Controllers
 
         private readonly IUserRepository _userStore;
         private readonly IMovieRepository _movieStore;
+        private readonly IReviewRepository _reviewStore;
         private readonly IMovieMentionRepository _movieMentionRepository;
         private readonly IRecommender _recommender;
 
-        public HomeController(IUserRepository userStore, IMovieMentionRepository movieMentionRepository, IMovieRepository movieStore)
+        public HomeController(IUserRepository userStore, IMovieMentionRepository movieMentionRepository, IMovieRepository movieStore, IReviewRepository reviewStore)
         {
             _userStore = userStore;
             _movieMentionRepository = movieMentionRepository;
             _movieStore = movieStore;
+            _reviewStore = reviewStore;
 
             _recommender = new ContentBasedRecommender(_userStore, _movieStore);
         }
-
-        /*public ActionResult Index()
-        {
-            ForceLayoutModel forceModel = new ForceLayoutModel();
-
-            if (Request.IsAuthenticated)
-            {
-                var recommendedMovies = _recommender.RecommendForUser(User.Identity.Name);
-                var ForceJSON = forceModel.Compose(new List<MovieMention>()).ToJson();
-
-                HomeViewModel homeModel = new HomeViewModel()
-                {
-                    ForceModelJson = ForceJSON
-                };
-
-                return View(homeModel);
-            }
-            else
-            {
-                HomeViewModel homeModel = new HomeViewModel()
-                {
-                    ForceModelJson = forceModel.ToJson()
-                };
-
-                return View(homeModel);
-            }
-        }*/
 
         [AllowAnonymous]
         public ActionResult Index()
@@ -72,12 +47,30 @@ namespace MovieRecommender.Controllers
             model.ColdStartDone = true;
 
             model.RecommendedMovies = _recommender.RecommendForUser(minRating: model.SelectedMinRating,
-                                                                    fromYear : model.SelectedFromYear,
+                                                                    fromYear: model.SelectedFromYear,
                                                                     toYear: model.SelectedToYear,
-                                                                    genres : _movieStore.DistinctGenres(),
-                                                                    limit : 100,
-                                                                    userName : User.Identity.Name)
+                                                                    genres: _movieStore.DistinctGenres(),
+                                                                    limit: 100,
+                                                                    userName: User.Identity.Name)
                                                                     .ToList();
+
+
+            var movies = _movieStore.FindMoviesByIMDbIds(model.RecommendedMovies.Select(m => m.IMDBId));
+
+            foreach (var movie in movies)
+            {
+                var reviews = _reviewStore.FindReviewsByReviewId(movie.ReviewId).OrderByDescending(r => r.Rating).Take(5);
+
+                var explanation = new Explanation();
+
+                foreach (var review in reviews)
+                {
+                    explanation.SentimentHolders.Add(new SentimentHolder(sentence: review.Title, score: review.Rating));
+                }
+
+                model.RecommendedMovies.First(m => m.IMDBId == movie.IMDBId).Explanation = explanation;
+            }
+
             return View(model);
         }
 
@@ -94,7 +87,7 @@ namespace MovieRecommender.Controllers
                                                                     limit: 100,
                                                                     userName: User.Identity.Name)
                                                                     .ToList();
-            
+
             if (noGenresSelected)
                 model.SelectedGenres = new List<string>(); // model binder is binding empty collections as nulls
 
@@ -142,7 +135,7 @@ namespace MovieRecommender.Controllers
 
             if (likedMovies < _minLikedMovies)
             {
-                return Json(new { Ok = false,  Message = $"You must like at least {_minLikedMovies} movies to proceed. You liked only {likedMovies} so far." }, JsonRequestBehavior.AllowGet);
+                return Json(new { Ok = false, Message = $"You must like at least {_minLikedMovies} movies to proceed. You liked only {likedMovies} so far." }, JsonRequestBehavior.AllowGet);
             }
 
             return Json(new { Ok = true, Message = string.Empty }, JsonRequestBehavior.AllowGet);

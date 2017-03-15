@@ -10,6 +10,7 @@ namespace MovieRecommender.Models
     [BsonIgnoreExtraElements]
     public class MovieSuggestionModel
     {
+        public bool IsLikedByUser { get; set; }
         public string Title { get; set; }
         public int PublicationYear { get; set; }
         public string IMDBId { get; set; }
@@ -19,24 +20,19 @@ namespace MovieRecommender.Models
         public string Overview { get; set; }
         public string Director { get; set; }
         public IEnumerable<string> Genres { get; set; } = new List<string>();
-        public Explanation Explanation { get; set; } = new Explanation
-            (
-                new List<SentimentHolder>()
-                {
-                    new SentimentHolder("Insanely Brilliant ! Nolan has outdone himself !!", 1.0),
-                    new SentimentHolder("Nolan's first true masterpiece", 0.98),
-                    new SentimentHolder("In a Decade, \"Inception\" May Be A Religion", 0.9),
-                    new SentimentHolder("Sci-fi perfection. A truly mesmerizing film", 0.8),
-                    new SentimentHolder("The perfect summer blockbuster?", 0.8)
-                }
-            );
+        public Explanation Explanation { get; set; } = new Explanation();
     }
 
     public class Explanation
     {
-        public IEnumerable<SentimentHolder> SentimentHolders { get; set; }
+        public IList<SentimentHolder> SentimentHolders { get; set; } = new List<SentimentHolder>();
 
-        public Explanation(IEnumerable<SentimentHolder> sentimentHolders)
+        public Explanation()
+        {
+
+        }
+
+        public Explanation(IList<SentimentHolder> sentimentHolders)
         {
             SentimentHolders = sentimentHolders;
         }
