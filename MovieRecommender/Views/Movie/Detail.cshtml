@@ -9,7 +9,17 @@
         .ui.main.container {
             width: 85%;
         }
+        #viz{
+            height: 500px;
+            width: 800px;
+        }
     </style>
+}
+
+@section scripts {
+
+    <script src="//d3plus.org/js/d3.js"></script>
+    <script src="//d3plus.org/js/d3plus.js"></script>
 }
 
 <div class="ui grid" id="resultGrid">
@@ -157,7 +167,7 @@
                         <div class="header">@suggestion.Title</div>
                     </div>
                     <div class="extra">
-                        <strong>Rating: @suggestion.Rating</strong>
+                        <strong>Rating: @string.Format("{0:0.0}", @suggestion.Rating) </strong>
                         <div class="ui star rating" data-rating="@Math.Floor(@suggestion.Rating).ToString()"></div>
                     </div>
 
@@ -167,10 +177,18 @@
                              data-content="This movie will no longer be recommended to you." data-position="bottom center" data-variation="inverted">
                             <i class="remove icon"></i>
                         </div>
+
+
+                        <!-- Explanation button -->
                         <div class="ui teal button explaintooltip"
-                             data-content="Why is this movie recommended?" data-position="top center" data-variation="inverted">
-                            <i class="help icon"></i>
+                             data-content="Why is this movie recommended?" data-position="top center" data-variation="inverted" movieTitle="@suggestion.Title">
+                            Why?
+                            @foreach(var sh in suggestion.Explanation.SentimentHolders.Take(5))
+                            {
+                                <div class="explanationDiv" score="@sh.Score" sentence='@sh.Sentence'></div>
+                            }                  
                         </div>
+
                     </div>
                 </div>
 
@@ -231,6 +249,14 @@
 
 @Scripts.Render("~/bundles/movielike")
 
+
+<div class="ui modal">
+    <div class="header" id="modalHeader">Jozo</div>
+    <div class="content">
+        <div id="viz"></div>
+    </div>
+</div>
+
 <script>
 
     $('.rating').rating({
@@ -260,17 +286,83 @@
             inline: true
         });
 
-        
         $('.explaintooltip')
         .popup({
             inline: true
         });
 
+        $('.explaintooltip').click(function () {
+
+            $('#modalHeader').text($(this).attr('movieTitle'));
+
+            var dataArray = [];
+
+            $(this).children(".explanationDiv").each(function (index, element)
+            {
+                var obj = {
+                    "name": $(element).attr('sentence'),
+                    "value": parseInt(($(element).attr('score')))
+                };
+                dataArray.push(obj);
+            });
+
+            var colorAttributes = [];
+
+            for (var i = 0; i < dataArray.length; i++)
+            {
+                var obj = { "name": dataArray[i].name };
+
+                switch(i)
+                {
+                    case 0:
+                        obj.hex = "#237C4E";
+                        break;
+                    case 1:
+                        obj.hex = "#75BB7D";
+                        break;
+                    case 2:
+                        obj.hex = "#96D696";
+                        break;
+                    case 3:
+                        obj.hex = "#C3F0A9";
+                        break;
+                    case 4:
+                        obj.hex = "#D6FCC2";
+                        break;
+                }
+
+                colorAttributes.push(obj);
+            }
+
+            var modalDiv = $('.ui.modal').first();
+
+            var visualization = d3plus.viz()
+                .container("#viz")  // container DIV to hold the visualization
+                .data(dataArray)  // data to use with the visualization
+                .type("tree_map")   // visualization type
+                .id("name")         // key for which our data is unique on
+                .size("value")      // sizing of blocks
+                .attrs(colorAttributes)
+                .color("hex")
+                .draw();             // finally, draw the visualization!*/
+
+            modalDiv.modal({
+
+                onShow: function () {
+                    ;
+                },
+
+                onHidden: function () {
+                    $("#viz").html(''); // why the fuck is this hack needed ?
+                }
+            }).modal('show');
+
+
+        });
     });
 
 
-    var findTrailerFunction = function ()
-    {
+    var findTrailerFunction = function () {
         var movieTitle = $("#title").text();
 
         var search_url = "https://www.googleapis.com/youtube/v3/search?part=snippet&key=AIzaSyAeSHR4A7hqHaiOZMqYYqknyYQtm9xwh4k&q=";
@@ -301,8 +393,7 @@
                     return false;
                 });
 
-                if (found == false)
-                {
+                if (found == false) {
                     $("#trailerLoaderId").text("No trailer found");
                 }
             }
