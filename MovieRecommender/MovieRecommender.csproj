@@ -528,6 +528,7 @@
     <Content Include="Views\Home\_ForcePartialView.cshtml" />
     <Content Include="Views\Home\ColdStart.cshtml" />
     <Content Include="Views\Home\_SearchMoviePartial.cshtml" />
+    <Content Include="Views\Home\IndexReal.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

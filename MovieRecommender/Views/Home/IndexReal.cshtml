@@ -1,0 +1,155 @@
+﻿@model MovieRecommender.Models.HomeRecommendationModel
+@{
+    ViewBag.Title = "Home Page";
+}
+
+@section styles {
+    <style>
+        .ui.main.container {
+            width: 85%;
+        }
+
+        #viz {
+            height: 500px;
+        }
+    </style>
+}
+
+@section scripts {
+
+    <script src="//d3plus.org/js/d3.js"></script>
+    <script src="//d3plus.org/js/d3plus.js"></script>
+
+    <script>
+        // sample data array
+        var sample_data = [
+            { "value": 70, "name": "dsfasfsadfsadfs f asf sadfsdafsadf sfd sa fasd f sf" },
+            { "value": 80, "name": "betsdfsadfsdfsdaf s fas fs fas faswerfaesf fa" },
+            { "value": 80, "name": "fsaf ashrhnbt yjtssfcsfcafawaf " }
+        ]
+
+        var attributes = [
+            { "name": "alpha", "hex": "#CC0000" },
+            { "name": "beta", "hex": "#00CC00" }
+        ]
+
+        // instantiate d3plus
+        var visualization = d3plus.viz()
+            .container("#viz")  // container DIV to hold the visualization
+            .data(sample_data)  // data to use with the visualization
+            .type("tree_map")   // visualization type
+            .id("name")         // key for which our data is unique on
+            .size("value")      // sizing of blocks
+            .attrs(attributes)
+            .color("hex")
+            .draw()             // finally, draw the visualization!
+
+    </script>
+}
+
+@if (Request.IsAuthenticated)
+{
+    <div class="ui text container">
+        @Html.Partial("_SearchMoviePartial")
+    </div>
+
+    <h4 class="ui horizontal divider header">
+        <i class="tag icon"></i>
+        Movies you may like
+    </h4>
+
+    <div class="ui five column grid">
+        @foreach (var suggestion in Model.RecommendedMovies.Take(50))
+        {
+            <div class="column">
+
+                @{
+                    var tooltipHTML = "<div class=\"ui card\">" +
+                                                "<div class=\"content\">" +
+                                                    $"<div class=\"header\">{@suggestion.Title}</div>" +
+                                                    $" <div class=\"meta\">Directed by: {@suggestion.Director}</div>" +
+                                                    "<div class=\"description\">" +
+                                                        $"<p>{@suggestion.Overview}</p>" +
+                                                    "</div>" +
+                                                "</div>" +
+                                            "</div>";
+                }
+
+                <div class="ui card" name="interestContainer">
+                    <a class="ui image" href="@Url.Action("Details","Movie", new { imdbId = @suggestion.IMDBId })">
+                        <div class="movietooltip" data-html="@tooltipHTML" data-position="right center">
+                            <img src="@suggestion.ImageURI">
+                        </div>
+
+                    </a>
+                    <div class="content">
+                        <div class="header">@suggestion.Title</div>
+                    </div>
+                    <div class="extra">
+                        <strong>Rating: @suggestion.Rating</strong>
+                        <div class="ui star rating" data-rating="@Math.Floor(@suggestion.Rating).ToString()"></div>
+                    </div>
+
+                    <div class="ui three bottom attached buttons" name="likeContainer">
+
+                        <div name="likeButton" movieId="@suggestion.IMDBId" likeText="Like" likedText="Liked"></div>
+
+                        <div class="ui red button notinterested" name="interestButton" movieId="@suggestion.IMDBId" isNotInterested="true"
+                             data-content="This movie will no longer be recommended to you." data-position="bottom center" data-variation="inverted">
+                            <i class="remove icon"></i>
+                        </div>
+
+                        <div class="ui teal button explaintooltip"
+                             data-content="Why is this movie recommended?" data-position="top center" data-variation="inverted">
+                            <i class="help icon"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui popup">
+                    <div class="header">User Rating</div>
+                    <div class="ui star rating" data-rating="3"></div>
+                </div>
+
+            </div>
+                    }
+    </div>
+                    }
+                    else
+                    {
+                        <div class="ui container" id="viz"></div>
+
+                        <h2> Log in to start :)</h2>
+                    }
+
+@Scripts.Render("~/bundles/movielike")
+
+<script>
+    $('.rating').rating({
+        initialRating: 5,
+        maxRating: 10,
+        interactive: false
+    });
+
+    $(document).ready(function () {
+
+        likeDecorator();
+        notInterestedDecorator();
+
+        $('.notinterested')
+        .popup({
+            inline: true
+        });
+
+        $('.movietooltip')
+        .popup({
+            inline: true
+        });
+
+        $('.explaintooltip')
+        .popup({
+            inline: true
+        });
+
+    });
+</script>
