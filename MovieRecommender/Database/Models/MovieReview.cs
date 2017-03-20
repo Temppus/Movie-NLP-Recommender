@@ -28,5 +28,16 @@ namespace MovieRecommender.Database.Models
         public string ReviewDate { get; set; }
         public bool IsSpoilerReview { get; set; }
         public int Rating { get; set; }
+
+        public int GetUsefullnessVotes()
+        {
+            int score = 0;
+
+            //9 out of 9 people found the following review useful:
+            if (int.TryParse(UsefullnessDescription.Split(new string[] { " out of " }, StringSplitOptions.None).FirstOrDefault(), out score))
+                return score;
+
+            return score;
+        }
     }
 }

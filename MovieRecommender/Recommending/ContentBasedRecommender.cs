@@ -8,6 +8,8 @@ using MongoDB.Bson.Serialization;
 using MovieRecommender.Models;
 using MongoDB.Bson;
 using MovieRecommender.Utils;
+using MovieRecommender.App_Start;
+using Microsoft.Practices.Unity;
 
 namespace MovieRecommender.Recommending
 {
@@ -72,6 +74,7 @@ namespace MovieRecommender.Recommending
             var weightModel = UserWeightHelper.CreateWeightModel(likedMovies);
 
             IList<string> weightedKeywords = new List<string>();
+            IDictionary<string, int> KeywordsDicCopy = new Dictionary<string, int>(weightModel.KeyWordMap);
 
             for (int i = 0; i < 25; i++)
             {
@@ -86,9 +89,45 @@ namespace MovieRecommender.Recommending
             var exceptMovieIds = likedMovieIds.Concat(_userStore.GetNotInterestedMovieIdsForUser(userName));
 
             var suggestedMovies = _movieStore.FindSimilarMovies(genres, weightedKeywords, exceptMovieIds,
-                                                                limit, fromYear, toYear, 500, minRating);
+                                                                limit, fromYear, toYear, 2500, minRating);
 
-            return suggestedMovies.Select(s => BsonSerializer.Deserialize<MovieSuggestionModel>(s));
+            var suggestions = suggestedMovies.Select(s => BsonSerializer.Deserialize<MovieSuggestionModel>(s)).ToList();
+
+            // Explain by random method
+            Random rnd = new Random();
+
+            var sentimentExplanations = ExplainBySentiment(suggestions.Select(m => m.IMDBId));
+            var keywordExplanations = ExplainByKeywords(suggestions.Select(m => m.IMDBId), KeywordsDicCopy);
+
+            var randomExplanations = new List<ExplanationTuple>();
+
+            bool explainBySentiment = rnd.Next(0, 2) == 1;
+
+            for (int i = 0; i < suggestions.Count(); i++)
+            {
+                var suggestion = suggestions.ElementAt(i);
+
+                if (explainBySentiment)
+                {
+                    randomExplanations.Add(sentimentExplanations.First(s => s.ImdbId == suggestion.IMDBId));
+                }
+                else
+                {
+                    randomExplanations.Add(keywordExplanations.First(s => s.ImdbId == suggestion.IMDBId));
+                }
+
+                explainBySentiment = !explainBySentiment;
+            }
+
+            foreach (var explTuple in randomExplanations)
+            {
+                var suggestion = suggestions.FirstOrDefault(m => m.IMDBId == explTuple.ImdbId);
+
+                if (suggestion != null)
+                    suggestion.Explanation = explTuple.Explanation;
+            }
+
+            return suggestions;
         }
 
         public IEnumerable<MovieSuggestionModel> RecommendForUserByMovie(string userName, string movieId)
@@ -125,6 +164,68 @@ namespace MovieRecommender.Recommending
             }
 
             return priorityList.Select(x => x.Value);
+        }
+
+        public IEnumerable<ExplanationTuple> ExplainBySentiment(IEnumerable<string> imdbIds)
+        {
+            IList<ExplanationTuple> explanations = new List<ExplanationTuple>();
+
+            var movies = _movieStore.FindMoviesByIMDbIds(imdbIds);
+            var reviewStore = UnityConfig.GetConfiguredContainer().Resolve<IReviewRepository>();
+
+            foreach (var movie in movies)
+            {
+                var reviews = reviewStore.FindReviewsByReviewId(movie.ReviewId).OrderByDescending(r => r.Rating).Take(5);
+
+                var explanation = new Explanation() { IsSentimental = true };
+
+                foreach (var review in reviews)
+                {
+                    explanation.SentimentHolders.Add(new SentimentHolder(sentence: review.Title, score: review.GetUsefullnessVotes()));
+                }
+
+                explanations.Add(new ExplanationTuple(movie.IMDBId, explanation));
+            }
+
+            return explanations;
+        }
+
+        private IEnumerable<ExplanationTuple> ExplainByKeywords(IEnumerable<string> imdbIds, IDictionary<string, int> keywordsDic)
+        {
+            IList<ExplanationTuple> explanations = new List<ExplanationTuple>();
+
+            var movies = _movieStore.FindMoviesByIMDbIds(imdbIds);
+
+            foreach (var movie in movies)
+            {
+                var explanation = new Explanation();
+
+                foreach (KeyValuePair<string, int> keyItem in keywordsDic.OrderByDescending(key => key.Value))
+                {
+                    if (movie.KeyWords.Contains(keyItem.Key))
+                        explanation.SentimentHolders.Add(new SentimentHolder(sentence: keyItem.Key, score: keyItem.Value));
+                }
+
+                int toAddCount = 5 - explanation.SentimentHolders.Count;
+
+                if (toAddCount > 0)
+                {
+                    foreach (var keyword in movie.KeyWords)
+                    {
+                        var sentimentHolder = explanation.SentimentHolders.FirstOrDefault(s => s.Sentence == keyword);
+
+                        if (sentimentHolder != null)
+                            continue;
+
+                        if (movie.KeyWords.Contains(keyword) && toAddCount-- > 0)
+                            explanation.SentimentHolders.Add(new SentimentHolder(sentence: keyword, score: explanation.SentimentHolders.Min(x => x.Score)));
+                    }
+                }
+
+                explanations.Add(new ExplanationTuple(movie.IMDBId, explanation));
+            }
+
+            return explanations;
         }
     }
 }

@@ -7,7 +7,7 @@ using MovieRecommender.Models;
 
 namespace MovieRecommender.Recommending
 {
-    public class NlpRecommender : IRecommender
+    /*public class NlpRecommender : IRecommender
     {
         private readonly IMovieMentionRepository _movieMentionRepository;
         private readonly IUserRepository _userStore;
@@ -49,5 +49,5 @@ namespace MovieRecommender.Recommending
 
             return new List<MovieSuggestionModel>();
         }
-    }
+    }*/
 }

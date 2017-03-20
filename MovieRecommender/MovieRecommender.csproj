@@ -286,6 +286,7 @@
     <Compile Include="Models\SearchModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Recommending\ContentBasedRecommender.cs" />
+    <Compile Include="Recommending\IExplainable.cs" />
     <Compile Include="Recommending\IRecommender.cs" />
     <Compile Include="Recommending\NlpRecommender.cs" />
     <Compile Include="Recommending\UserWeightModel.cs" />

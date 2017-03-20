@@ -53,24 +53,6 @@ namespace MovieRecommender.Controllers
                                                                     limit: 100,
                                                                     userName: User.Identity.Name)
                                                                     .ToList();
-
-
-            var movies = _movieStore.FindMoviesByIMDbIds(model.RecommendedMovies.Select(m => m.IMDBId));
-
-            foreach (var movie in movies)
-            {
-                var reviews = _reviewStore.FindReviewsByReviewId(movie.ReviewId).OrderByDescending(r => r.Rating).Take(5);
-
-                var explanation = new Explanation();
-
-                foreach (var review in reviews)
-                {
-                    explanation.SentimentHolders.Add(new SentimentHolder(sentence: review.Title, score: review.Rating));
-                }
-
-                model.RecommendedMovies.First(m => m.IMDBId == movie.IMDBId).Explanation = explanation;
-            }
-
             return View(model);
         }
 

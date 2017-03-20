@@ -25,16 +25,13 @@ namespace MovieRecommender.Models
 
     public class Explanation
     {
+        public bool IsSentimental { get; set; } = false;
+
         public IList<SentimentHolder> SentimentHolders { get; set; } = new List<SentimentHolder>();
 
         public Explanation()
         {
 
-        }
-
-        public Explanation(IList<SentimentHolder> sentimentHolders)
-        {
-            SentimentHolders = sentimentHolders;
         }
     }
 
