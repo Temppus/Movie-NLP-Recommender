@@ -8,10 +8,6 @@
         .ui.main.container {
             width: 95%;
         }
-
-        .treemapDiv{
-            height: 500px;
-        }
     </style>
 }
 
@@ -35,7 +31,7 @@
                 <!-- Image column -->
                 <div class="four wide column">
                     <div class="row">
-                        <a href="@Url.Action("Details","Movie", new { imdbId = @moviePreview.IMDBId })" name="movieDetailLink">
+                        <a href="@Url.Action("Details","Movie", new { imdbId = @moviePreview.IMDBId })" name="movieDetailLink" target="_blank">>
                             <img alt="Film poster" src="@Url.Content(moviePreview.ImageURI)" name="posterURI" class="ui centered medium image" />
                         </a>
                     </div>
@@ -56,6 +52,16 @@
                                     </div>
                                     <div class="two wide column" name="ratingHolder">
                                         @moviePreview.Rating
+                                    </div>
+                                </div>
+
+                                <!-- Rating count -->
+                                <div class="row">
+                                    <div class="ui four column grid">
+                                        <div class="wide row">
+                                            <div class="wide column"><strong>Ratings</strong></div>
+                                            <div class="wide column"><p>@moviePreview.RatingCount</p></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -110,10 +116,24 @@
                     </div>
                 </div>
                 <div class="six wide column">
+
                     <div class="row">
+                        @if (moviePreview.Explanation.IsSentimental)
+                        {
+                            <div class="ui small header">Positive reviews from other users :</div>
+                        }
+                        else
+                        {
+                            <div class="ui small header">Keywords :</div>
+                        }
+
+                    </div>
+                    <div class="row">
+
                         @{ string vizId = "viz" + @currentId; }
 
                         <div id="@vizId" class="treemapDiv">
+
                             @foreach (var sh in moviePreview.Explanation.SentimentHolders.Take(5))
                             {
                                 <div class="explanationDiv" score="@sh.Score" sentence='@sh.Sentence'></div>

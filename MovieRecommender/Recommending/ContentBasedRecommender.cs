@@ -89,7 +89,7 @@ namespace MovieRecommender.Recommending
             var exceptMovieIds = likedMovieIds.Concat(_userStore.GetNotInterestedMovieIdsForUser(userName));
 
             var suggestedMovies = _movieStore.FindSimilarMovies(genres, weightedKeywords, exceptMovieIds,
-                                                                limit, fromYear, toYear, 2500, minRating);
+                                                                limit, fromYear, toYear, 50000, minRating);
 
             var suggestions = suggestedMovies.Select(s => BsonSerializer.Deserialize<MovieSuggestionModel>(s)).ToList();
 

@@ -93,6 +93,8 @@ namespace MovieRecommender.Controllers
             genres.Remove("Music");
             genres.Remove("Documentary");
             genres.Remove("Foreign");
+            genres.Remove("Animation");
+            genres.Remove("History");
 
             HashSet<string> uniqueMovieIds = new HashSet<string>();
 
@@ -103,7 +105,7 @@ namespace MovieRecommender.Controllers
 
                 uniqueMovieIds.UnionWith(movies.Select(m => m.IMDBId));
 
-                model.MoviesDic.Add(genre, movies);
+                model.MoviesDic.Add(genre, movies.OrderByDescending(m => m.RatingCount).Take(50).OrderByDescending(x => x.Rating * 25000 + x.RatingCount));
             }
 
             return View(model);
