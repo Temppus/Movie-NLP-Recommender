@@ -16,11 +16,16 @@ namespace MovieRecommender.Models
 
         public IEnumerable<MovieLikeInfo> NotInterestedMovies { get; set; } = new List<MovieLikeInfo>();
 
+        public bool ExperimentDone { get; set; } = false;
+
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {
             // Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType
             var userIdentity = await manager.CreateIdentityAsync(this, DefaultAuthenticationTypes.ApplicationCookie);
+
             // Add custom user claims here
+            userIdentity.AddClaim(new Claim("ExperimentDone", ExperimentDone ? "True" : "False"));
+
             return userIdentity;
         }
     }

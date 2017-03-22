@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using MovieRecommender.Extensions
+
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -55,10 +57,19 @@
                 </div>
             </div>
 
-            @Html.ActionLink("Home", "Index", "Home", null, htmlAttributes: new { @class = "item" })
-            @Html.ActionLink("Movies", "Browse", "Movie", null, htmlAttributes: new { @class = "item" })
+            @{
+                string experimentClaimDone = User?.Identity?.IsExperimentDone();
+                bool isExperimentDone = string.IsNullOrEmpty(experimentClaimDone) || experimentClaimDone == "False" ? false : true;
+            }
 
-            @if (Request.IsAuthenticated)
+            @Html.ActionLink("Home", "Index", "Home", null, htmlAttributes: new { @class = "item" })
+
+            @if (isExperimentDone)
+            {
+                @Html.ActionLink("Movies", "Browse", "Movie", null, htmlAttributes: new { @class = "item" })
+            }
+
+            @if (Request.IsAuthenticated && isExperimentDone)
             {
                 @Html.ActionLink("Profile", "Index", "Manage", null, htmlAttributes: new { @class = "item" })
             }
