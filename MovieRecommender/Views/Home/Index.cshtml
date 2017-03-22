@@ -144,12 +144,79 @@
             </div>
         }
     </div>
+
+
+    <div class="ui small second coupled modal">
+        <div class="header">
+            Inštrukcie (2/2)
+        </div>
+        <div class="content">
+            <div class="description">
+                <h3>1. Uvidíte zoznam 15 filmov, ktoré boli pre vás odporučené. </h3>
+                <h3>2. Ku každému odporúčaniu uvidíte na pravej strane vysvetlenie prečo vám bol daný film odporučený. </h3>
+                <h3>3. Pre každý odporučený film určite, či ste ho už videli.</h3>
+                <h3>3. Pre každý film si preštudujte vysvetlenie na pravej strane. Označte, či by ste si daný film podľa tohoto vysvetlenia pozreli.</h3>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui approve button">
+                <i class="checkmark icon"></i>
+                OK
+            </div>
+        </div>
+    </div>
 }
 else
 {
-    <div class="ui container" id="viz"></div>
+    <div class="ui internally celled grid">
+        <div class="row">
+            <div class="four wide column">
+                @{ string leftPosterURL = "https://images-na.ssl-images-amazon.com/images/M/MV5BMTUyMTE0ODcxNF5BMl5BanBnXkFtZTgwODE4NDQzNTE@._V1_SY1000_CR0,0,687,1000_AL_.jpg"; }
+                <img alt="Mad Max: Fury Road Poster" title="Mad Max: Fury Road Poster" src="@leftPosterURL" itemprop="image">
+            </div>
+            <div class="eight wide column">
 
-    <h2> Log in to start :)</h2>
+                <div class="ui one column centered grid">
+                    <div class="row">
+                        <h1 class="ui centered header">Priebeh experimentu</h1>
+                    </div>
+                </div>
+                <div class="ui two column grid">
+                    <div class="one wide column">
+                    </div>
+                    <div class="fifteen column">
+                        <div class="row">
+                            <div class="ui ordered steps">
+                                <div class="active step">
+                                    <div class="content">
+                                        <div class="title">Registrácia</div>
+                                        <div class="description">Vytvorte si účet</div>
+                                    </div>
+                                </div>
+                                <div class="active step">
+                                    <div class="content">
+                                        <div class="title">Prihlásenie</div>
+                                        <div class="description">Prihláste sa s vytvoreným účtom</div>
+                                    </div>
+                                </div>
+                                <div class="active step">
+                                    <div class="content">
+                                        <div class="title">Začnite</div>
+                                        <div class="description">Riadte sa daľšími inštrukciami :)</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="four wide column">
+                @{ string rightPosterURL = "https://images-na.ssl-images-amazon.com/images/M/MV5BOTJiNDEzOWYtMTVjOC00ZjlmLWE0NGMtZmE1OWVmZDQ2OWJhXkEyXkFqcGdeQXVyNTIzOTk5ODM@._V1_SY1000_SX675_AL_.jpg"; }
+                <img alt="Mad Max: Fury Road Poster" title="Mad Max: Fury Road Poster" src="@rightPosterURL" itemprop="image">
+            </div>
+        </div>
+    </div>
 }
 
 @Scripts.Render("~/bundles/movielike")
@@ -162,6 +229,8 @@ else
     });
 
     $(document).ready(function () {
+
+        $('.small.modal').modal('show');
 
         likeDecorator();
         notInterestedDecorator();

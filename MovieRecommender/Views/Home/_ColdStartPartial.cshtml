@@ -71,6 +71,26 @@
     </div>
 </div>
 
+<div class="ui small second coupled modal">
+    <div class="header">
+        Inštrukcie (1/2)
+    </div>
+    <div class="content">
+        <div class="description">
+            <h3>1. Uvidíte zoznam populárnych filmov z rôznych žánrov, označte tie filmy (zelené tlačidlo like), ktoré ste videli a páčili sa vám.</h3>
+            <h3>2. Musíte však označiť minimálne 10 filmov. </h3>
+            <h3>3. K druhej časti experimentu sa dostanete tlačidlom Finish na spodu stránky.</h3>
+        </div>
+    </div>
+    <div class="actions">
+        <div class="ui approve button">
+            <i class="checkmark icon"></i>
+            OK
+        </div>
+    </div>
+</div>
+
+
 @Scripts.Render("~/bundles/movielike")
 
 <script>
@@ -82,6 +102,9 @@
     });
 
     $(document).ready(function () {
+
+
+        $('.small.modal').modal('show');
 
         likeDecorator();
 

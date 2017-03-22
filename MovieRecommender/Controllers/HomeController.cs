@@ -50,7 +50,7 @@ namespace MovieRecommender.Controllers
                                                                     fromYear: model.SelectedFromYear,
                                                                     toYear: model.SelectedToYear,
                                                                     genres: _movieStore.DistinctGenres(),
-                                                                    limit: 100,
+                                                                    limit: 15,
                                                                     userName: User.Identity.Name)
                                                                     .ToList();
             return View(model);
