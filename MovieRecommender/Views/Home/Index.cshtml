@@ -8,6 +8,10 @@
         .ui.main.container {
             width: 95%;
         }
+
+        .ui.grid.explanation {
+            min-height: 90%;
+        }
     </style>
 }
 
@@ -19,7 +23,7 @@
 
 @if (Request.IsAuthenticated)
 {
-    <div class="ui celled grid" id="resultGrid">
+    <div class="ui celled relaxed grid" id="resultGrid">
 
         @{ int currentId = 0;}
 
@@ -81,7 +85,7 @@
                             </div>
                         </div>
 
-                        <div class="twelve wide column">
+                        <div class="sixteen wide column">
                             <!-- Overview -->
                             <div class="row">
                                 <div class="wide row">
@@ -96,18 +100,13 @@
                             <div class="row">
 
                                 <!-- Saw button -->
-                                <div class="ui green button" movieId="@moviePreview.IMDBId" name="sawButton">
-                                    I saw this movie
+                                <div class="ui grey button" movieId="@moviePreview.IMDBId" name="sawButton">
+                                    I already saw this film
                                 </div>
 
-                                <!-- Explanation button -->
-                                <div class="ui violet button" name="likeExplanationButton" movieId="@moviePreview.IMDBId">
-                                    I like explanation
-                                </div>
-
-                                <!-- Explanation button -->
-                                <div class="ui red button" name="dontlikeExplanationButton" movieTitle="@moviePreview.Title">
-                                    I dont like explanation
+                                <!-- Would watch button -->
+                                <div class="ui green button" movieId="@moviePreview.IMDBId" name="wouldWatchButton">
+                                    I would watch this film
                                 </div>
 
                             </div>
@@ -116,33 +115,48 @@
                     </div>
                 </div>
                 <div class="six wide column">
+                        <div class="ui three column grid explanation">
+                            <div class="one wide column"></div>
+                            <div class="fourteen wide column">
+                                <div class="row">
+                                    @if (moviePreview.Explanation.IsSentimental)
+                                    {
+                                        <div class="ui small header">What others are saying about this film :</div>
+                                    }
+                                    else
+                                    {
+                                        <div class="ui small header">Main keywords :</div>
+                                    }
 
-                    <div class="row">
-                        @if (moviePreview.Explanation.IsSentimental)
-                        {
-                            <div class="ui small header">Positive reviews from other users :</div>
-                        }
-                        else
-                        {
-                            <div class="ui small header">Keywords :</div>
-                        }
+                                </div>
+                                <div class="row">
+                                        @{ string vizId = "viz" + @currentId; }
 
-                    </div>
-                    <div class="row">
+                                        <div id="@vizId" class="treemapDiv">
 
-                        @{ string vizId = "viz" + @currentId; }
+                                            @foreach (var sh in moviePreview.Explanation.ExplanationHolders.Take(5))
+                                            {
+                                                <div class="explanationDiv" score="@sh.Score" sentence='@sh.Sentence'></div>
+                                            }
+                                        </div>
 
-                        <div id="@vizId" class="treemapDiv">
 
-                            @foreach (var sh in moviePreview.Explanation.ExplanationHolders.Take(5))
-                            {
-                                <div class="explanationDiv" score="@sh.Score" sentence='@sh.Sentence'></div>
-                            }
+                                </div>
+                            </div>
+                            <div class="one wide column"></div>
                         </div>
-                    </div>
                 </div>
             </div>
         }
+    </div>
+
+    <div class="ui two column centered grid">
+        <div class="column">
+            <div class="ui green button"></div>
+        </div>
+        <div class="column">
+            <div class="ui green button"></div>
+        </div>
     </div>
 
 
@@ -227,6 +241,35 @@ else
         interactive: false
     });
 
+
+    $('.finishbutton').click(function () {
+
+        //todo liked movies
+
+        var likedMovieIds = [];
+
+        var likeObject = {
+            'IsLike': true,
+            'IMDbId': likedMovieIds
+        };
+
+        likeObject = JSON.stringify({ model: likeObject });
+
+        $.ajax({
+            type: 'POST',
+            url: '/Movie/LikeHandler',
+            data: likeObject,
+            contentType: 'application/json',
+            error: function (err) {
+                alert("Error, cannot like movie.");
+            },
+            success: function (data) {
+
+            }
+        });
+
+    });
+
     $(document).ready(function () {
 
         $('.small.modal').modal('show');
@@ -248,24 +291,25 @@ else
 
             var colorAttributes = [];
 
+            // http://colorsafe.co
             for (var i = 0; i < dataArray.length; i++) {
                 var obj = { "name": dataArray[i].name };
 
                 switch (i) {
                     case 0:
-                        obj.hex = "#2e66ff"; 
+                        obj.hex = "#1c2a43";
                         break;
                     case 1:
-                        obj.hex = "#4da7fb";
+                        obj.hex = "#16405b";
                         break;
                     case 2:
-                        obj.hex = "#51ccfb";
+                        obj.hex = "#3a539b";
                         break;
                     case 3:
-                        obj.hex = "#bee2f4";
+                        obj.hex = "#008080";
                         break;
                     case 4:
-                        obj.hex = "#ffffff";
+                        obj.hex = "#4183d7";
                         break;
                 }
 
@@ -273,6 +317,8 @@ else
             }
 
             var modalDiv = $('.ui.modal').first();
+
+            // https://github.com/alexandersimoes/d3plus/wiki/Visualizations
 
             var visualization = d3plus.viz()
                 .container("#" + $(this).attr('id'))  // container DIV to hold the visualization
@@ -282,6 +328,8 @@ else
                 .size("value")      // sizing of blocks
                 .attrs(colorAttributes)
                 .color("hex")
+                .labels({ "resize": false, "font": { "size": 20 } })
+                .legend({ "value": false })
                 .draw();             // finally, draw the visualization!*/
 
             modalDiv.modal({
