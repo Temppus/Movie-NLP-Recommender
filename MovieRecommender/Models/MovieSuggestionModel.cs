@@ -27,7 +27,7 @@ namespace MovieRecommender.Models
     {
         public bool IsSentimental { get; set; } = false;
 
-        public IList<SentimentHolder> SentimentHolders { get; set; } = new List<SentimentHolder>();
+        public IList<ExplanationHolder> ExplanationHolders { get; set; } = new List<ExplanationHolder>();
 
         public Explanation()
         {
@@ -35,19 +35,21 @@ namespace MovieRecommender.Models
         }
     }
 
-    public class SentimentHolder
+    public class ExplanationHolder
     {
         /// <summary>
         /// Sentiment sentence
         /// </summary>
         public string Sentence { get; set; }
 
-        /// <summary>
-        /// Rounded to interval 0 - 100
-        /// </summary>
         public int Score { get; set; }
 
-        public SentimentHolder(string sentence, double score)
+
+        /// <summary>
+        /// </summary>
+        /// <param name="sentence"></param>
+        /// <param name="score">Score will be multiplied by 100 and converted to int</param>
+        public ExplanationHolder(string sentence, double score)
         {
             Sentence = sentence;
             Score = (int)(score * 100.0d);

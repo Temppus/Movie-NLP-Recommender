@@ -183,7 +183,7 @@
                             <div class="ui teal button explaintooltip"
                                  data-content="Why is this movie recommended?" data-position="top center" data-variation="inverted" movieTitle="@suggestion.Title">
                                 Why?
-                                @foreach(var sh in suggestion.Explanation.SentimentHolders.Take(5))
+                                @foreach(var sh in suggestion.Explanation.ExplanationHolders.Take(5))
                                 {
                                     <div class="explanationDiv" score="@sh.Score" sentence='@sh.Sentence'></div>
                                 }

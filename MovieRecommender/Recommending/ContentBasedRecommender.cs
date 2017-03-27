@@ -181,7 +181,7 @@ namespace MovieRecommender.Recommending
 
                 foreach (var review in reviews)
                 {
-                    explanation.SentimentHolders.Add(new SentimentHolder(sentence: review.Title, score: review.GetUsefullnessVotes()));
+                    explanation.ExplanationHolders.Add(new ExplanationHolder(sentence: review.Title, score: review.GetUsefullnessVotes()));
                 }
 
                 explanations.Add(new ExplanationTuple(movie.IMDBId, explanation));
@@ -203,22 +203,22 @@ namespace MovieRecommender.Recommending
                 foreach (KeyValuePair<string, int> keyItem in keywordsDic.OrderByDescending(key => key.Value))
                 {
                     if (movie.KeyWords.Contains(keyItem.Key))
-                        explanation.SentimentHolders.Add(new SentimentHolder(sentence: keyItem.Key, score: keyItem.Value));
+                        explanation.ExplanationHolders.Add(new ExplanationHolder(sentence: keyItem.Key, score: keyItem.Value));
                 }
 
-                int toAddCount = 5 - explanation.SentimentHolders.Count;
+                int toAddCount = 5 - explanation.ExplanationHolders.Count;
 
                 if (toAddCount > 0)
                 {
                     foreach (var keyword in movie.KeyWords)
                     {
-                        var sentimentHolder = explanation.SentimentHolders.FirstOrDefault(s => s.Sentence == keyword);
+                        var sentimentHolder = explanation.ExplanationHolders.FirstOrDefault(s => s.Sentence == keyword);
 
                         if (sentimentHolder != null)
                             continue;
 
                         if (movie.KeyWords.Contains(keyword) && toAddCount-- > 0)
-                            explanation.SentimentHolders.Add(new SentimentHolder(sentence: keyword, score: explanation.SentimentHolders.Min(x => x.Score)));
+                            explanation.ExplanationHolders.Add(new ExplanationHolder(sentence: keyword, score: explanation.ExplanationHolders.Min(x => x.Score)));
                     }
                 }
 

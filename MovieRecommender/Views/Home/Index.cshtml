@@ -134,7 +134,7 @@
 
                         <div id="@vizId" class="treemapDiv">
 
-                            @foreach (var sh in moviePreview.Explanation.SentimentHolders.Take(5))
+                            @foreach (var sh in moviePreview.Explanation.ExplanationHolders.Take(5))
                             {
                                 <div class="explanationDiv" score="@sh.Score" sentence='@sh.Sentence'></div>
                             }
