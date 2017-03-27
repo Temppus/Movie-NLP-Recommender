@@ -41,15 +41,31 @@ namespace MovieRecommender.Controllers
                 return View(model);
             }
 
-            if (_userStore.FindLikedMovieIds(User.Identity.Name).Count() < _minLikedMovies)
+            var likedMovieIds = _userStore.FindLikedMovieIds(User.Identity.Name);
+
+            if (likedMovieIds.Count() < _minLikedMovies)
                 return RedirectToAction("ColdStart");
 
             model.ColdStartDone = true;
 
-            model.RecommendedMovies = _recommender.RecommendForUser(minRating: model.SelectedMinRating,
-                                                                    fromYear: model.SelectedFromYear,
-                                                                    toYear: model.SelectedToYear,
-                                                                    genres: _movieStore.DistinctGenres(),
+            var likedMovies = _movieStore.FindMoviesByIMDbIds(likedMovieIds);
+
+            int minYear = likedMovies.Select(m => m.PublicationYear).Min() - 5;
+            int maxYear = likedMovies.Select(m => m.PublicationYear).Max() + 5;
+            double minRating = likedMovies.Select(m => m.Rating).Min();
+            var genres = likedMovies.Select(m => m.Genres);
+
+            ISet<string> genreSet = new HashSet<string>();
+
+            foreach (var movieGenres in genres)
+            {
+                genreSet.UnionWith(movieGenres);
+            }
+
+            model.RecommendedMovies = _recommender.RecommendForUser(minRating: minRating,
+                                                                    fromYear: minYear,
+                                                                    toYear: maxYear,
+                                                                    genres: genreSet,
                                                                     limit: 15,
                                                                     userName: User.Identity.Name)
                                                                     .ToList();
