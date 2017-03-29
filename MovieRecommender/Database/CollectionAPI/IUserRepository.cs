@@ -9,6 +9,8 @@ namespace MovieRecommender.Database.CollectionAPI
 {
     public interface IUserRepository
     {
+        void SetOrAddExperiment(string userName, ExperimentResultModel experimentModel);
+        bool IsExperimentDone(string userName);
         IEnumerable<MovieLikeInfo> FindLikedMoviesInfo(string userName);
         IEnumerable<string> FindLikedMovieIds(string userName);
         bool CheckIfUserLikedMovie(string userName, string imdbId);

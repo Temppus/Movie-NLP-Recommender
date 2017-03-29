@@ -3,6 +3,8 @@
     ViewBag.Title = "Home Page";
 }
 
+@using MovieRecommender.Extensions
+
 @section styles {
     <style>
         .ui.main.container {
@@ -23,11 +25,16 @@
 
 @if (Request.IsAuthenticated)
 {
+    <h4 class="ui horizontal divider header">
+        <i class="tag icon"></i>
+        Movies recommended for you
+    </h4>
+
     <div class="ui celled relaxed grid" id="resultGrid">
 
         @{ int currentId = 0;}
 
-        @foreach (var moviePreview in Model.RecommendedMovies)
+        @foreach (var moviePreview in Model.RecommendedMovies.Take(2))
         {
             currentId++;
 
@@ -35,7 +42,7 @@
                 <!-- Image column -->
                 <div class="four wide column">
                     <div class="row">
-                        <a href="@Url.Action("Details","Movie", new { imdbId = @moviePreview.IMDBId })" name="movieDetailLink" target="_blank">>
+                        <a href="@Url.Action("Details", "Movie", new { imdbId = @moviePreview.IMDBId })" name="movieDetailLink" target="_blank">>
                             <img alt="Film poster" src="@Url.Content(moviePreview.ImageURI)" name="posterURI" class="ui centered medium image" />
                         </a>
                     </div>
@@ -177,13 +184,13 @@
 
     <div class="ui small modal second coupled" id="instructions">
         <div class="header">
-            Inštrukcie (2/2)
+            Inštrukcie (2/3)
         </div>
         <div class="content">
             <div class="description">
-                <h3>1. Uvidíte zoznam 15 filmov, ktoré boli pre vás odporučené. </h3>
-                <h3>3. Pre každý odporučený film určite, či ste ho už videli a taktiež či by ste si tento film pozreli.</h3>
-                <h3>3. V prípade, že ste tento film videli skúste vyhodnotiť, či by ste si tento film pozreli podľa zobrazených informácií o filme.</h3>
+                <h3>1. Uvidíte zoznam @Model.RecommendedMovies.Count filmov, ktoré boli pre vás odporučené. </h3>
+                <h3>2. Pre každý odporučený film určite, či ste ho už videli alebo nie.</h3>
+                <h3>3. Taktiež pre každý film označte, či by ste si ho pozreli podľa zobrazených informácií o ňom !</h3>
             </div>
         </div>
         <div class="actions">
@@ -194,22 +201,36 @@
         </div>
     </div>
 
-    <div class="ui small test modal" id="finishModal">
+    <div class="ui small test modal" id="almostFinish">
         <div class="header">
-            Ďakujem za účasť na experimente.
+            Naozaj ukončiť ?
         </div>
         <div class="content">
-            <p>Dotazník ...</p>
+            <p>V prípade, že chcete skončiť kliknite na tlačidlo finish.</p>
+            <p>Ak máte čas a chuť, môžete pokračovať ďalej a ohodnotiť ďalších 15 filmov. Budem veľmi vďačný.</p>
         </div>
 
         <div class="actions">
-            <div class="ui negative right labeled icon button">
-                Skončiť
-                <i class="checkmark icon"></i>
-            </div>
-            <div class="ui positive button">
-                Pokračovať znova
-            </div>
+            <div class="ui positive button">Finish</div>
+            <div class="ui cancel violet button">Next 15 movies</div>
+        </div>
+    </div>
+
+    <div class="ui small test modal" id="finishModal">
+        <div class="header">
+            (3/3) Vyplnenie krátkeho dotazníka :)
+        </div>
+        <div class="content">
+            <p>Ako poslednú vec vás poprosím vyplniť jednoduchý dotazník s pár otázkami. Kliknite na link nižšie :</p>
+            @{
+                string userNameEncoded = HttpUtility.UrlEncode(User.Identity.Name); 
+                string url = "https://docs.google.com/forms/d/e/1FAIpQLSeCYn--3o2_ypE5r94f3SnVluXrVvxHOtDJORo0_hW8DBo6eQ/viewform?entry.1042920984=" + userNameEncoded;
+            }
+            <a href="@url" target="_blank">@url</a>
+        </div>
+
+        <div class="actions">
+            <div class="ui positive button">OK</div>
         </div>
     </div>
 }
@@ -304,8 +325,8 @@ else
 
         if ($('body').find("div[choiceValue='none']").length > 0)
         {
-            //alert('Experiment noy finished yet. Some information still needed !');
-            //return;
+            alert('Experiment not finished yet. You must finish experiment first!');
+            return;
         }
 
         var likedMovieIds = [];
@@ -356,7 +377,23 @@ else
                 alert("Error while processing final experiment data.");
             },
             success: function (data) {
-                $('#finishModal').modal('show');
+
+                $('#almostFinish').modal({
+                    closable: false,
+                    onApprove: function () { // finish
+
+                        $('#finishModal').modal({
+                            closable: false,
+                            onApprove: function () {
+                                window.location.href = "/Movie/Browse";
+                            }
+                        }).modal('show');
+                    },
+                    onDeny: function () { // next 15
+                        window.location.href = "/Home/Index";
+                    }
+                }).modal('show');
+
             }
         });
     });
@@ -369,7 +406,12 @@ else
 
     $(document).ready(function () {
 
-        //$('#instructions').modal('show');
+        var isExperimentDone = "@User.Identity.IsExperimentDone()";
+
+        if (isExperimentDone !== "True")
+        {
+            $('#instructions').modal('show');
+        }
 
         $(".treemapDiv").each(function (index, element) {
 

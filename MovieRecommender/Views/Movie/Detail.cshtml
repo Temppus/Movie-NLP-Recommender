@@ -1,8 +1,9 @@
 ﻿@model MovieRecommender.Models.MovieDetailModel
-
 @{
     ViewBag.Title = Model.Title;
 }
+
+@using MovieRecommender.Extensions
 
 @section styles {
     <style>
@@ -131,77 +132,83 @@
     </div>
 </div>
 
-@*
-    @if (Request.IsAuthenticated)
-    {
-        <h4 class="ui horizontal divider header">
-            <i class="tag icon"></i>
-            Similar movies recommended to you
-        </h4>
+@{
+    string experimentClaimDone = User?.Identity?.IsExperimentDone();
+    bool isExperimentDone = string.IsNullOrEmpty(experimentClaimDone) || experimentClaimDone == "False" ? false : true;
+}
 
-        <div class="ui five column grid">
-            @foreach (var suggestion in Model.MovieSuggestions.Take(5))
-            {
-                <div class="column">
+@if (Request.IsAuthenticated && isExperimentDone)
+{
+    <h4 class="ui horizontal divider header">
+        <i class="tag icon"></i>
+        Similar movies recommended to you
+    </h4>
 
-                    @{
-                        var tooltipHTML = "<div class=\"ui card\">" +
-                                                    "<div class=\"content\">" +
-                                                        $"<div class=\"header\">{@suggestion.Title}</div>" +
-                                                        $" <div class=\"meta\">Directed by: {@suggestion.Director}</div>" +
-                                                        "<div class=\"description\">" +
-                                                            $"<p>{@suggestion.Overview}</p>" +
-                                                        "</div>" +
+    <div class="ui five column grid">
+        @foreach (var suggestion in Model.MovieSuggestions.Take(5))
+        {
+            <div class="column">
+
+                @{
+                    var tooltipHTML = "<div class=\"ui card\">" +
+                                                "<div class=\"content\">" +
+                                                    $"<div class=\"header\">{@suggestion.Title}</div>" +
+                                                    $" <div class=\"meta\">Directed by: {@suggestion.Director}</div>" +
+                                                    "<div class=\"description\">" +
+                                                        $"<p>{@suggestion.Overview}</p>" +
                                                     "</div>" +
-                                                "</div>";
-                    }
+                                                "</div>" +
+                                            "</div>";
+                }
 
-                    <div class="ui card" name="interestContainer">
-                        <a class="ui image" href="@Url.Action("Details","Movie", new { imdbId = @suggestion.IMDBId })">
-                            <div class="movietooltip" data-html="@tooltipHTML" data-position="right center">
-                                <img src="@suggestion.ImageURI">
-                            </div>
-
-                        </a>
-                        <div class="content">
-                            <div class="header">@suggestion.Title</div>
-                        </div>
-                        <div class="extra">
-                            <strong>Rating: @string.Format("{0:0.0}", @suggestion.Rating) </strong>
-                            <div class="ui star rating" data-rating="@Math.Floor(@suggestion.Rating).ToString()"></div>
+                <div class="ui card" name="interestContainer">
+                    <a class="ui image" href="@Url.Action("Details","Movie", new { imdbId = @suggestion.IMDBId })">
+                        <div class="movietooltip" data-html="@tooltipHTML" data-position="right center">
+                            <img src="@suggestion.ImageURI">
                         </div>
 
-                        <div class="ui three bottom attached buttons" name="likeContainer">
-                            <div name="likeButton" movieId="@suggestion.IMDBId" likeText="Like" likedText="Liked"></div>
-                            <div class="ui red button notinterested" name="interestButton" movieId="@suggestion.IMDBId" isNotInterested="true"
-                                 data-content="This movie will no longer be recommended to you." data-position="bottom center" data-variation="inverted">
-                                <i class="remove icon"></i>
-                            </div>
-
-
-                            <!-- Explanation button -->
-                            <div class="ui teal button explaintooltip"
-                                 data-content="Why is this movie recommended?" data-position="top center" data-variation="inverted" movieTitle="@suggestion.Title">
-                                Why?
-                                @foreach(var sh in suggestion.Explanation.ExplanationHolders.Take(5))
-                                {
-                                    <div class="explanationDiv" score="@sh.Score" sentence='@sh.Sentence'></div>
-                                }
-                            </div>
-
-                        </div>
+                    </a>
+                    <div class="content">
+                        <div class="header">@suggestion.Title</div>
                     </div>
-
-                    <div class="ui popup">
-                        <div class="header">User Rating</div>
-                        <div class="ui star rating" data-rating="3"></div>
+                    <div class="extra">
+                        <strong>Rating: @string.Format("{0:0.0}", @suggestion.Rating) </strong>
+                        <div class="ui star rating" data-rating="@Math.Floor(@suggestion.Rating).ToString()"></div>
                     </div>
+@*
+    TODO FIX ME
 
-                </div>
+    <div class="ui three bottom attached buttons" name="likeContainer">
+        <div name="likeButton" movieId="@suggestion.IMDBId" likeText="Like" likedText="Liked"></div>
+        <div class="ui red button notinterested" name="interestButton" movieId="@suggestion.IMDBId" isNotInterested="true"
+                data-content="This movie will no longer be recommended to you." data-position="bottom center" data-variation="inverted">
+            <i class="remove icon"></i>
+        </div>
+
+
+        <!-- Explanation button -->
+        <div class="ui teal button explaintooltip"
+                data-content="Why is this movie recommended?" data-position="top center" data-variation="inverted" movieTitle="@suggestion.Title">
+            Why?
+            @foreach(var sh in suggestion.Explanation.ExplanationHolders.Take(5))
+            {
+                <div class="explanationDiv" score="@sh.Score" sentence='@sh.Sentence'></div>
             }
         </div>
-    }*@
 
+    </div>
+*@
+                </div>
+
+                <div class="ui popup">
+                    <div class="header">User Rating</div>
+                    <div class="ui star rating" data-rating="3"></div>
+                </div>
+
+            </div>
+        }
+    </div>
+}
 
 
 <h4 class="ui horizontal divider header">

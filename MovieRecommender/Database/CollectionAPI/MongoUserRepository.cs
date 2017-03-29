@@ -18,6 +18,48 @@ namespace MovieRecommender.Database.CollectionAPI
             _collection = dbPool.Database.GetCollection<ApplicationUser>("users");
         }
 
+        public void SetOrAddExperiment(string userName, ExperimentResultModel experimentModel)
+        {
+            userName.ThrowIfNull(nameof(userName));
+
+            var userFilter = Builders<ApplicationUser>.Filter.Where(u => u.UserName == userName);
+            var existsFilter = Builders<ApplicationUser>.Filter.Exists(u => u.ExperimentResult, true);
+            var notNullFilter = Builders<ApplicationUser>.Filter.Where(u => u.ExperimentResult != null);
+
+            bool exists = _collection.Find(Builders<ApplicationUser>.Filter.And(userFilter, existsFilter, notNullFilter)).ToList().Count > 0;
+
+            if (exists)
+            {
+                var up1 = Builders<ApplicationUser>.Update.AddToSetEach(u => u.ExperimentResult.WatchedIds, experimentModel.WatchedIds);
+                var up2 = Builders<ApplicationUser>.Update.AddToSetEach(u => u.ExperimentResult.NotWatchedIds, experimentModel.NotWatchedIds);
+                var up3 = Builders<ApplicationUser>.Update.AddToSetEach(u => u.ExperimentResult.WouldWatchIds, experimentModel.WouldWatchIds);
+                var up4 = Builders<ApplicationUser>.Update.AddToSetEach(u => u.ExperimentResult.WouldNotWatchIds, experimentModel.WouldNotWatchIds);
+                var combineUpdate = Builders<ApplicationUser>.Update.Combine(up1, up2, up3, up4);
+                _collection.UpdateOne(userFilter, combineUpdate);
+            }
+            else
+            {
+                Experiment experiment = new Experiment()
+                {
+                    WatchedIds = experimentModel.WatchedIds,
+                    NotWatchedIds = experimentModel.NotWatchedIds,
+                    WouldWatchIds = experimentModel.WouldWatchIds,
+                    WouldNotWatchIds = experimentModel.WouldNotWatchIds,
+                };
+
+                var updateDefinition = Builders<ApplicationUser>.Update.Set(u => u.ExperimentResult, experiment);
+                _collection.UpdateOne(userFilter, updateDefinition);
+            }
+        }
+
+        public bool IsExperimentDone(string userName)
+        {
+            userName.ThrowIfNull(nameof(userName));
+
+            var filter = Builders<ApplicationUser>.Filter.Where(u => u.UserName == userName && u.ExperimentResult != null);
+            return _collection.Find(filter).ToList().Count > 0;
+        }
+
         public bool CheckIfUserLikedMovie(string userName, string imdbId)
         {
             userName.ThrowIfNull(nameof(userName));
@@ -92,11 +134,11 @@ namespace MovieRecommender.Database.CollectionAPI
             userName.ThrowIfNull(nameof(userName));
             imdbIds.ThrowIfNull(nameof(imdbIds));
 
-            foreach(var imdbId in imdbIds)
+            /*foreach(var imdbId in imdbIds)
             {
                 if (CheckIfUserLikedMovie(userName, imdbId))
                     throw new UserPreferenceException($"Can not like movie {imdbId} for user {userName}. User already liked movie.");
-            }
+            }*/
 
             var movieLikeInfos = imdbIds.Select(imdbId => new MovieLikeInfo() { IMDBId = imdbId });
 

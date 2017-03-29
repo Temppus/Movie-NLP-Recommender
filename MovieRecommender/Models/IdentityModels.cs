@@ -10,13 +10,14 @@ using MongoDB.Bson;
 namespace MovieRecommender.Models
 {
     // You can add profile data for the user by adding more properties to your ApplicationUser class, please visit http://go.microsoft.com/fwlink/?LinkID=317594 to learn more.
+    [BsonIgnoreExtraElements]
     public class ApplicationUser : IdentityUser
     {
         public IEnumerable<MovieLikeInfo> LikedMovies { get; set; } = new List<MovieLikeInfo>();
 
         public IEnumerable<MovieLikeInfo> NotInterestedMovies { get; set; } = new List<MovieLikeInfo>();
-
-        public bool ExperimentDone { get; set; } = false;
+            
+        public Experiment ExperimentResult { get; set; } = null;
 
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {
@@ -24,10 +25,18 @@ namespace MovieRecommender.Models
             var userIdentity = await manager.CreateIdentityAsync(this, DefaultAuthenticationTypes.ApplicationCookie);
 
             // Add custom user claims here
-            userIdentity.AddClaim(new Claim("ExperimentDone", ExperimentDone ? "True" : "False"));
+            userIdentity.AddClaim(new Claim("ExperimentDone", ExperimentResult != null ? "True" : "False"));
 
             return userIdentity;
         }
+    }
+
+    public class Experiment
+    {
+        public IEnumerable<string> WatchedIds { get; set; } = new List<string>();
+        public IEnumerable<string> NotWatchedIds { get; set; } = new List<string>();
+        public IEnumerable<string> WouldWatchIds { get; set; } = new List<string>();
+        public IEnumerable<string> WouldNotWatchIds { get; set; } = new List<string>();
     }
 
     public class MovieLikeInfo

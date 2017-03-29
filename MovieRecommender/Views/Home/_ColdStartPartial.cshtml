@@ -18,24 +18,9 @@
         {
             <div class="column">
 
-                @{
-                    var tooltipHTML = "<div class=\"ui card\">" +
-                                                "<div class=\"content\">" +
-                                                    $"<div class=\"header\">{@suggestion.Title}</div>" +
-                                                    $" <div class=\"meta\">Directed by: {@suggestion.Director}</div>" +
-                                                    "<div class=\"description\">" +
-                                                        $"<p>{@suggestion.Overview}</p>" +
-                                                    "</div>" +
-                                                "</div>" +
-                                            "</div>";
-                }
-
                 <div class="ui card" name="interestContainer">
                     <a class="ui image" href="@Url.Action("Details","Movie", new { imdbId = @suggestion.IMDBId })" target="_blank">
-                        <div class="movietooltip" data-html="@tooltipHTML" data-position="right center">
-                            <img src="@suggestion.ImageURI">
-                        </div>
-
+                        <img src="@suggestion.ImageURI">
                     </a>
                     <div class="content">
                         <div class="header">@suggestion.Title</div>
@@ -62,23 +47,20 @@
 
 <div class="ui one column stackable center aligned page grid">
     <div class="column">
-        <div class="ui big red animated button" id="finishButton">
-            <div class="visible content">Finish</div>
-            <div class="hidden content">
-                <i class="right arrow icon"></i>
-            </div>
+        <div class="ui big red button" id="finishButton">
+            Finish
         </div>
     </div>
 </div>
 
 <div class="ui small second coupled modal">
     <div class="header">
-        Inštrukcie (1/2)
+        Inštrukcie (1/3)
     </div>
     <div class="content">
         <div class="description">
             <h3>1. Uvidíte zoznam populárnych filmov z rôznych žánrov, označte tie filmy (zelené tlačidlo like), ktoré ste videli a páčili sa vám.</h3>
-            <h3>2. Musíte však označiť minimálne 10 filmov. </h3>
+            <h3>2. Musíte označiť minimálne 10 filmov. </h3>
             <h3>3. K druhej časti experimentu sa dostanete tlačidlom Finish na spodu stránky.</h3>
         </div>
     </div>
@@ -109,11 +91,6 @@
         likeDecorator();
 
         $('.notinterested')
-        .popup({
-            inline: true
-        });
-
-        $('.movietooltip')
         .popup({
             inline: true
         });

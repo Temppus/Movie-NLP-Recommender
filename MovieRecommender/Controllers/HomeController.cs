@@ -1,10 +1,14 @@
-﻿using MovieRecommender.Database.CollectionAPI;
+﻿using Microsoft.Owin.Security;
+using MovieRecommender.App_Start.IdentityConfiguration;
+using MovieRecommender.Database;
+using MovieRecommender.Database.CollectionAPI;
 using MovieRecommender.Database.Models;
 using MovieRecommender.Models;
 using MovieRecommender.Recommending;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 
@@ -21,13 +25,28 @@ namespace MovieRecommender.Controllers
         private readonly IMovieMentionRepository _movieMentionRepository;
         private readonly IRecommender _recommender;
 
-        public HomeController(IUserRepository userStore, IMovieMentionRepository movieMentionRepository, IMovieRepository movieStore, IReviewRepository reviewStore)
+        private readonly IRepositoryManager _repoManager;
+        private readonly IAuthenticationManager _authManager;
+        private readonly ApplicationUserManager _userManager;
+        private readonly SignInHelper _signInHelper;
+
+        public HomeController(
+            IUserRepository userStore,
+            IMovieMentionRepository movieMentionRepository,
+            IMovieRepository movieStore,
+            IReviewRepository reviewStore,
+            ApplicationUserManager userManager, IAuthenticationManager authManager, IRepositoryManager repoManager)
         {
             _userStore = userStore;
             _movieMentionRepository = movieMentionRepository;
             _movieStore = movieStore;
             _reviewStore = reviewStore;
 
+            _repoManager = repoManager;
+            _userManager = userManager;
+            _authManager = authManager;
+
+            _signInHelper = new SignInHelper(userManager, authManager, repoManager);
             _recommender = new ContentBasedRecommender(_userStore, _movieStore);
         }
 
@@ -140,16 +159,22 @@ namespace MovieRecommender.Controllers
 
             return Json(new { Ok = true, Message = string.Empty }, JsonRequestBehavior.AllowGet);
         }
-       
+
         [HttpPost]
-        public JsonResult ExperimentHandler(ExperimentResultModel model)
+        public async Task<JsonResult> ExperimentHandler(ExperimentResultModel model)
         {
             string userName = User.Identity.Name;
 
-            //_userStore.UserLikedMovies(userName, model.WatchedIds);
+            _userStore.UserLikedMovies(userName, model.WatchedIds);
+            _userStore.SetOrAddExperiment(userName, model);
+
+            // Reload identity cookie
+            var user = _userManager.FindByNameAsync(userName).Result;
+            await _signInHelper.SignInAsync(user, false, false);
 
             return Json(true);
         }
+
         [AllowAnonymous]
         public ActionResult About()
         {
