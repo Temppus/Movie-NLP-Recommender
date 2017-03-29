@@ -203,7 +203,7 @@ namespace MovieRecommender.Recommending
                 foreach (KeyValuePair<string, int> keyItem in keywordsDic.OrderByDescending(key => key.Value))
                 {
                     if (movie.KeyWords.Contains(keyItem.Key))
-                        explanation.ExplanationHolders.Add(new ExplanationHolder(sentence: keyItem.Key, score: Math.Log(keyItem.Value)));
+                        explanation.ExplanationHolders.Add(new ExplanationHolder(sentence: keyItem.Key, score: keyItem.Value));
                 }
 
                 int toAddCount = 5 - explanation.ExplanationHolders.Count;

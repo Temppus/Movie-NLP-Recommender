@@ -140,7 +140,16 @@ namespace MovieRecommender.Controllers
 
             return Json(new { Ok = true, Message = string.Empty }, JsonRequestBehavior.AllowGet);
         }
+       
+        [HttpPost]
+        public JsonResult ExperimentHandler(ExperimentResultModel model)
+        {
+            string userName = User.Identity.Name;
 
+            //_userStore.UserLikedMovies(userName, model.WatchedIds);
+
+            return Json(true);
+        }
         [AllowAnonymous]
         public ActionResult About()
         {

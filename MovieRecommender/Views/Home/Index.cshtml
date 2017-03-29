@@ -31,7 +31,7 @@
         {
             currentId++;
 
-            <div class="row">
+            <div class="row" name="filmHolder">
                 <!-- Image column -->
                 <div class="four wide column">
                     <div class="row">
@@ -97,18 +97,35 @@
 
                         <!-- Buttons -->
                         <div class="sixteen wide column">
-                            <div class="row">
+                            <div class="ui two columne equal width padded grid">
+                                <div class="column">
+                                    <div class="row">
+                                        <h4> Have you seen this movie ? </h4>
+                                    </div>
 
-                                <!-- Saw button -->
-                                <div class="ui grey button" movieId="@moviePreview.IMDBId" name="sawButton">
-                                    I already saw this film
+                                    <!-- Seen buttons -->
+                                    <div class="row">
+                                        <div class="ui buttons">
+                                            <button class="ui grey experiment yes button">Yes I have</button>
+                                            <div class="or" choiceValue="none" type="saw" movieId="@moviePreview.IMDBId"></div>
+                                            <button class="ui grey experiment no button">No I haven't</button>
+                                        </div>
+                                    </div>
                                 </div>
+                                <div class="column">
+                                    <div class="row">
+                                        <h4> Would you watch this movie ? </h4>
+                                    </div>
 
-                                <!-- Would watch button -->
-                                <div class="ui green button" movieId="@moviePreview.IMDBId" name="wouldWatchButton">
-                                    I would watch this film
+                                    <!-- Would watch button -->
+                                    <div class="row">
+                                        <div class="ui buttons">
+                                            <button class="ui green experiment yes button">Yes I would</button>
+                                            <div class="or" choiceValue="none" type="would" movieId="@moviePreview.IMDBId"></div>
+                                            <button class="ui red experiment no button">No I wouldn't</button>
+                                        </div>
+                                    </div>
                                 </div>
-
                             </div>
                         </div>
 
@@ -150,17 +167,15 @@
         }
     </div>
 
-    <div class="ui two column centered grid">
+    <div class="ui one column stackable center aligned page grid">
         <div class="column">
-            <div class="ui green button"></div>
-        </div>
-        <div class="column">
-            <div class="ui green button"></div>
+            <div class="ui big violet button" id="finish-button">
+                <div class="content">Finish</div>
+            </div>
         </div>
     </div>
 
-
-    <div class="ui small second coupled modal">
+    <div class="ui small modal second coupled" id="instructions">
         <div class="header">
             Inštrukcie (2/2)
         </div>
@@ -175,6 +190,25 @@
             <div class="ui approve button">
                 <i class="checkmark icon"></i>
                 OK
+            </div>
+        </div>
+    </div>
+
+    <div class="ui small test modal" id="finishModal">
+        <div class="header">
+            Ďakujem za účasť na experimente.
+        </div>
+        <div class="content">
+            <p>Dotazník ...</p>
+        </div>
+
+        <div class="actions">
+            <div class="ui negative right labeled icon button">
+                Skončiť
+                <i class="checkmark icon"></i>
+            </div>
+            <div class="ui positive button">
+                Pokračovať znova
             </div>
         </div>
     </div>
@@ -235,47 +269,107 @@ else
 @Scripts.Render("~/bundles/movielike")
 
 <script>
+
+    $('.ui.button.experiment').click(function () {
+
+        var isOK = true;
+        var prevFilmHolder = $(this).parents("div[name='filmHolder']").prev();
+
+        if (prevFilmHolder.length)
+        {
+            prevFilmHolder.find("div[choiceValue='none']").each(function () {
+                alert("You did not answer all informations from previous movie");
+                isOK = false;
+                return false; // break
+            });
+        }
+
+        if (isOK == true)
+        {
+            $(this).siblings('.ui.button.experiment').css("border", "none");
+            $(this).css("border", "3px solid black");
+
+            if ($(this).hasClass('yes') == true)
+            {
+                $(this).siblings("div[class='or']").attr('choiceValue', true);
+            }
+            else
+            {
+                $(this).siblings("div[class='or']").attr('choiceValue', false);
+            }
+        }
+    });
+
+    $("#finish-button").click(function () {
+
+        if ($('body').find("div[choiceValue='none']").length > 0)
+        {
+            //alert('Experiment noy finished yet. Some information still needed !');
+            //return;
+        }
+
+        var likedMovieIds = [];
+
+        var experimentModel = {
+            'WatchedIds': [],
+            'NotWatchedIds': [],
+            'WouldWatchIds': [],
+            'WouldNotWatchIds': [],
+        };
+
+        $('body').find("div[choiceValue]").each(function () {
+
+            var movieid = $(this).attr('movieId');
+
+            if ($(this).attr('type') == 'saw')
+            {
+                if ($(this).attr('choiceValue') === 'true')
+                {
+                    experimentModel.WatchedIds.push(movieid);
+                }
+                else if ($(this).attr('choiceValue') === 'false')
+                {
+                    experimentModel.NotWatchedIds.push(movieid);
+                }
+            }
+            else if ($(this).attr('type') == 'would')
+            {
+                if ($(this).attr('choiceValue') === 'true')
+                {
+                    experimentModel.WouldWatchIds.push(movieid);
+                }
+                else if ($(this).attr('choiceValue') === 'false')
+                {
+                    experimentModel.WouldNotWatchIds.push(movieid);
+                }
+            }
+        });
+
+        var postModel = JSON.stringify({ model: experimentModel });
+
+        $.ajax({
+            type: 'POST',
+            url: '/Home/ExperimentHandler',
+            data: postModel,
+            contentType: 'application/json',
+            error: function (err) {
+                alert("Error while processing final experiment data.");
+            },
+            success: function (data) {
+                $('#finishModal').modal('show');
+            }
+        });
+    });
+
     $('.rating').rating({
         initialRating: 5,
         maxRating: 10,
         interactive: false
-    });
-
-
-    $('.finishbutton').click(function () {
-
-        //todo liked movies
-
-        var likedMovieIds = [];
-
-        var likeObject = {
-            'IsLike': true,
-            'IMDbId': likedMovieIds
-        };
-
-        likeObject = JSON.stringify({ model: likeObject });
-
-        $.ajax({
-            type: 'POST',
-            url: '/Movie/LikeHandler',
-            data: likeObject,
-            contentType: 'application/json',
-            error: function (err) {
-                alert("Error, cannot like movie.");
-            },
-            success: function (data) {
-
-            }
-        });
-
-    });
+    });    
 
     $(document).ready(function () {
 
-        $('.small.modal').modal('show');
-
-        likeDecorator();
-        notInterestedDecorator();
+        //$('#instructions').modal('show');
 
         $(".treemapDiv").each(function (index, element) {
 
@@ -331,13 +425,6 @@ else
                 .labels({ "resize": false, "font": { "size": 20 } })
                 .legend({ "value": false })
                 .draw();             // finally, draw the visualization!*/
-
-            modalDiv.modal({
-
-                onHidden: function () {
-                    $("#viz").html(''); // why the fuck is this hack needed ?
-                }
-            }).modal('show');
         });
 
 

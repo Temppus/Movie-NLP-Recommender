@@ -274,11 +274,12 @@
     </Compile>
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ColdStartModel.cs" />
+    <Compile Include="Models\ExperimentResultModel.cs" />
     <Compile Include="Models\ForceLayoutModel.cs" />
     <Compile Include="Models\HomeRecommendationModel.cs" />
     <Compile Include="Models\HomeViewModel.cs" />
     <Compile Include="Models\IdentityModels.cs" />
-    <Compile Include="Models\LikeModel.cs" />
+    <Compile Include="Models\SingleLikeModel.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\MovieDetailModel.cs" />
     <Compile Include="Models\MoviePreviewModel.cs" />
@@ -527,7 +528,6 @@
     <Content Include="Views\Movie\_SearchMoviePartial.cshtml" />
     <Content Include="Views\Movie\Detail.cshtml" />
     <Content Include="Views\Home\_ColdStartPartial.cshtml" />
-    <Content Include="Views\Home\_ForcePartialView.cshtml" />
     <Content Include="Views\Home\ColdStart.cshtml" />
     <Content Include="Views\Home\_SearchMoviePartial.cshtml" />
     <Content Include="Views\Home\IndexReal.cshtml" />

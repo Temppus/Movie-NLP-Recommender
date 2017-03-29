@@ -184,7 +184,7 @@ namespace MovieRecommender.Controllers
         }
 
         [HttpPost]
-        public JsonResult LikeHandler(LikeModel model)
+        public JsonResult LikeHandler(SingleLikeModel model)
         {
             string userName = User.Identity.Name;
 

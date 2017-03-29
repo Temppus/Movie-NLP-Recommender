@@ -14,8 +14,9 @@ namespace MovieRecommender.Database.CollectionAPI
         bool CheckIfUserLikedMovie(string userName, string imdbId);
         IDictionary<string, bool> GetUserLikedMovieMappings(string userName, IEnumerable<string> imdbIds);
         void UserLikedMovie(string userName, string imdbId);
+        void UserLikedMovies(string username, IEnumerable<string> imdbIds);
         void UserUnlikedMovie(string userName, string imdbId);
-
+        void UserUnlikedMovies(string username, IEnumerable<string> imdbIds);
         IEnumerable<string> GetNotInterestedMovieIdsForUser(string userName);
         bool CheckIfUserHasMovieInNotInterested(string userName, string imdbId);
         void AddMovieToNotInterested(string userName, string imdbId);

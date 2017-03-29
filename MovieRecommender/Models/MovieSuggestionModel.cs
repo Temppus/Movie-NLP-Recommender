@@ -42,17 +42,12 @@ namespace MovieRecommender.Models
         /// </summary>
         public string Sentence { get; set; }
 
-        public int Score { get; set; }
+        public double Score { get; set; }
 
-
-        /// <summary>
-        /// </summary>
-        /// <param name="sentence"></param>
-        /// <param name="score">Score will be multiplied by 100 and converted to int</param>
         public ExplanationHolder(string sentence, double score)
         {
             Sentence = sentence;
-            Score = (int)(score * 100.0d);
+            Score = score;
         }
     }
 }

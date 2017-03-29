@@ -87,6 +87,25 @@ namespace MovieRecommender.Database.CollectionAPI
             _collection.UpdateOne(filter, updateDefinition);
         }
 
+        public void UserLikedMovies(string userName, IEnumerable<string> imdbIds)
+        {
+            userName.ThrowIfNull(nameof(userName));
+            imdbIds.ThrowIfNull(nameof(imdbIds));
+
+            foreach(var imdbId in imdbIds)
+            {
+                if (CheckIfUserLikedMovie(userName, imdbId))
+                    throw new UserPreferenceException($"Can not like movie {imdbId} for user {userName}. User already liked movie.");
+            }
+
+            var movieLikeInfos = imdbIds.Select(imdbId => new MovieLikeInfo() { IMDBId = imdbId });
+
+            var updateDefinition = Builders<ApplicationUser>.Update.AddToSetEach(u => u.LikedMovies, movieLikeInfos);
+            var filter = Builders<ApplicationUser>.Filter.Where(u => u.UserName == userName);
+
+            _collection.UpdateOne(filter, updateDefinition);
+        }
+
         public void UserUnlikedMovie(string userName, string imdbId)
         {
             userName.ThrowIfNull(nameof(userName));
@@ -101,6 +120,25 @@ namespace MovieRecommender.Database.CollectionAPI
             _collection.UpdateOne(filter, updateDefinition);
         }
 
+        public void UserUnlikedMovies(string userName, IEnumerable<string> imdbIds)
+        {
+            userName.ThrowIfNull(nameof(userName));
+            imdbIds.ThrowIfNull(nameof(imdbIds));
+
+            foreach (var imdbId in imdbIds)
+            {
+                if (!CheckIfUserLikedMovie(userName, imdbId))
+                    throw new UserPreferenceException($"Can not unlike movie {imdbId} for user {userName}. User did not liked this movie.");
+            }
+
+            var movieLikeInfos = imdbIds.Select(imdbId => new MovieLikeInfo() { IMDBId = imdbId });
+
+            var updateDefinition = Builders<ApplicationUser>.Update.PullAll(u => u.LikedMovies, movieLikeInfos);
+            var filter = Builders<ApplicationUser>.Filter.Where(u => u.UserName == userName);
+
+            _collection.UpdateOne(filter, updateDefinition);
+        }
+
         public void AddMovieToNotInterested(string userName, string imdbId)
         {
             userName.ThrowIfNull(nameof(userName));
@@ -108,7 +146,7 @@ namespace MovieRecommender.Database.CollectionAPI
 
             if (CheckIfUserHasMovieInNotInterested(userName, imdbId))
                 throw new UserPreferenceException($"Can not add movie {imdbId} to not interested set for user {userName}. User already has this movie in not interested.");
-
+            
             var updateDefinition = Builders<ApplicationUser>.Update.AddToSet(u => u.NotInterestedMovies, new MovieLikeInfo() { IMDBId = imdbId });
             var filter = Builders<ApplicationUser>.Filter.Where(u => u.UserName == userName);
 

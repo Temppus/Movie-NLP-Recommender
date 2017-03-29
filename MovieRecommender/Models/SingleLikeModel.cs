@@ -5,10 +5,16 @@ using System.Web;
 
 namespace MovieRecommender.Models
 {
-    public class LikeModel
+    public class SingleLikeModel
     {
         public bool IsLike { get; set; }
         public string IMDbId { get; set; }
+    }
+
+    public class MultiLikeModel
+    {
+        public bool IsLike { get; set; }
+        public IEnumerable<string> IMDbIds { get; set; }
     }
 
     public class InterestModel
