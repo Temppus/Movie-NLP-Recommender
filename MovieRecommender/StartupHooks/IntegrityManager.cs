@@ -24,14 +24,61 @@ namespace MovieRecommender.StartupHooks
 
         public void Start()
         {
-            CheckAndFixUpUserCollectionIntegrity();
-            UpdatePosters();
+            //CheckAndFixUpUserCollectionIntegrity();
+            //UpdatePosters();
+            //RemoveExperimentData();
+            //AlterOverview();
+            //FlushUsers -> CAREFULL();
+        }
+
+        #region deprecated
+
+        private void FlushUsers()
+        {
+            _users.DeleteMany(Builders<ApplicationUser>.Filter.Empty);
         }
 
         private void CheckAndFixUpUserCollectionIntegrity()
         {
             // remove null values from liked movies, I fucked up once :)
             var updateDefinition = Builders<ApplicationUser>.Update.Pull(u => u.LikedMovies, null);
+            var emptyFilter = Builders<ApplicationUser>.Filter.Empty;
+
+            _users.UpdateMany(emptyFilter, updateDefinition);
+        }
+
+        private void AlterOverview()
+        {
+            var filter = Builders<Movie>.Filter.Empty;
+            var options = new FindOptions<Movie>
+            {
+                BatchSize = 5000
+            };
+
+            using (var cursor = _movies.FindAsync(filter, options).Result)
+            {
+                // Move to the next batch of docs
+                while (cursor.MoveNextAsync().Result)
+                {
+                    var batch = cursor.Current;
+                    foreach (var doc in batch)
+                    {
+                        string overView = doc.Overview;
+                        var splitted = overView.Split(new string[] { "Written by" }, StringSplitOptions.None);
+                        string newOverview = splitted[0].Trim();
+
+                        var idFilter = Builders<Movie>.Filter.Where(m => m.IMDBId == doc.IMDBId);
+                        var updateDefinition = Builders<Movie>.Update.Set(u => u.Overview, newOverview);
+
+                        _movies.UpdateOne(idFilter, updateDefinition);
+                    }
+                }
+            }
+        }
+
+        private void RemoveExperimentData()
+        {
+            var updateDefinition = Builders<ApplicationUser>.Update.Unset(u => u.ExperimentResult);
             var emptyFilter = Builders<ApplicationUser>.Filter.Empty;
 
             _users.UpdateMany(emptyFilter, updateDefinition);
@@ -49,5 +96,6 @@ namespace MovieRecommender.StartupHooks
             _movies.UpdateOne(filter1, update1);
             _movies.UpdateOne(filter2, update2);
         }
+        #endregion
     }
 }

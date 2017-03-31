@@ -47,19 +47,22 @@
                 Movie Recommender
             </a>
 
-            <div class="item">
-                <div class="ui left aligned search">
-                    <div class="ui icon input">
-                        <input class="prompt" type="text" placeholder="Search movie...">
-                        <i class="search icon"></i>
-                    </div>
-                    <div class="results"></div>
-                </div>
-            </div>
-
             @{
                 string experimentClaimDone = User?.Identity?.IsExperimentDone();
                 bool isExperimentDone = string.IsNullOrEmpty(experimentClaimDone) || experimentClaimDone == "False" ? false : true;
+            }
+
+            @if (isExperimentDone)
+            {
+                <div class="item">
+                    <div class="ui left aligned search">
+                        <div class="ui icon input">
+                            <input class="prompt" type="text" placeholder="Search movie...">
+                            <i class="search icon"></i>
+                        </div>
+                        <div class="results"></div>
+                    </div>
+                </div>
             }
 
             @Html.ActionLink("Home", "Index", "Home", null, htmlAttributes: new { @class = "item" })

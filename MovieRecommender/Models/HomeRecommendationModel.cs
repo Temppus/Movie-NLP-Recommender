@@ -31,6 +31,9 @@ namespace MovieRecommender.Models
             SelectedGenres = new List<string>();
         }
 
+        public int MoviesRemainingCount { get; set; } = 15;
+        public int RatedMoviesCount { get; set; } = 0;
+
         public bool ColdStartDone { get; set; } = false;
 
         public IList<MovieSuggestionModel> RecommendedMovies { get; set; } = new List<MovieSuggestionModel>();

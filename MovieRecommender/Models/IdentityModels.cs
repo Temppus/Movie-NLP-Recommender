@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using MongoDB.Bson.Serialization.Attributes;
 using System;
 using MongoDB.Bson;
+using System.Linq;
 
 namespace MovieRecommender.Models
 {
@@ -25,7 +26,15 @@ namespace MovieRecommender.Models
             var userIdentity = await manager.CreateIdentityAsync(this, DefaultAuthenticationTypes.ApplicationCookie);
 
             // Add custom user claims here
-            userIdentity.AddClaim(new Claim("ExperimentDone", ExperimentResult != null ? "True" : "False"));
+            int experimentRatedCount = 0;
+
+            if (ExperimentResult != null)
+            {
+                experimentRatedCount = ExperimentResult.WouldWatchIds().Count() + ExperimentResult.WouldNotWatchIds().Count();
+            }
+
+            userIdentity.AddClaim(new Claim("ExperimentDone", experimentRatedCount >= 15 ? "True" : "False"));
+            userIdentity.AddClaim(new Claim("ExperimentProgress", experimentRatedCount > 0 ? "True" : "False"));
 
             return userIdentity;
         }
@@ -33,10 +42,24 @@ namespace MovieRecommender.Models
 
     public class Experiment
     {
-        public IEnumerable<string> WatchedIds { get; set; } = new List<string>();
-        public IEnumerable<string> NotWatchedIds { get; set; } = new List<string>();
-        public IEnumerable<string> WouldWatchIds { get; set; } = new List<string>();
-        public IEnumerable<string> WouldNotWatchIds { get; set; } = new List<string>();
+        public IEnumerable<MovieChoice> WatchedChoice { get; set; } = new List<MovieChoice>();
+        public IEnumerable<MovieChoice> WouldWatchChoice { get; set; } = new List<MovieChoice>();
+        public IEnumerable<MovieChoice> WouldNotWatchChoice { get; set; } = new List<MovieChoice>();
+
+        public IEnumerable<string> WatchedIds()
+        {
+            return WatchedChoice.Select(x => x.IMDBID);
+        }
+
+        public IEnumerable<string> WouldWatchIds()
+        {
+            return WouldWatchChoice.Select(x => x.IMDBID);
+        }
+
+        public IEnumerable<string> WouldNotWatchIds()
+        {
+            return WouldNotWatchChoice.Select(x => x.IMDBID);
+        }
     }
 
     public class MovieLikeInfo

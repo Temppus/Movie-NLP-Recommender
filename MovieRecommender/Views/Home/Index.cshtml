@@ -14,6 +14,10 @@
         .ui.grid.explanation {
             min-height: 90%;
         }
+
+        #finish-button {
+            visibility: hidden;
+        }
     </style>
 }
 
@@ -25,16 +29,43 @@
 
 @if (Request.IsAuthenticated)
 {
-    <h4 class="ui horizontal divider header">
-        <i class="tag icon"></i>
-        Movies recommended for you
-    </h4>
+    <div class="ui one column stackable center aligned page grid">
+        <div class="column">
+            <div class="ui horizontal green statistic">
+                <div class="value">
+
+                    @{ 
+                        string progressMessage;
+                        int progressCount;
+
+                        if (Model.MoviesRemainingCount > 0)
+                        {
+                            progressMessage = "ratings remaining";
+                            progressCount = Model.MoviesRemainingCount;
+                        }
+                        else
+                        {
+                            progressMessage = "movies rated";
+                            progressCount = Model.RatedMoviesCount;
+                        }
+                    }
+
+                    @progressCount
+                </div>
+                <div class="label">
+                    @progressMessage
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 
     <div class="ui celled relaxed grid" id="resultGrid">
 
         @{ int currentId = 0;}
 
-        @foreach (var moviePreview in Model.RecommendedMovies.Take(2))
+        @foreach (var moviePreview in Model.RecommendedMovies.Take(10))
         {
             currentId++;
 
@@ -42,9 +73,13 @@
                 <!-- Image column -->
                 <div class="four wide column">
                     <div class="row">
-                        <a href="@Url.Action("Details", "Movie", new { imdbId = @moviePreview.IMDBId })" name="movieDetailLink" target="_blank">>
-                            <img alt="Film poster" src="@Url.Content(moviePreview.ImageURI)" name="posterURI" class="ui centered medium image" />
-                        </a>
+                        <img alt="Film poster" src="@Url.Content(moviePreview.ImageURI)" name="posterURI" class="ui centered medium image" />
+                        
+                        @*
+                            <a href="@Url.Action("Details", "Movie", new { imdbId = @moviePreview.IMDBId })" name="movieDetailLink" target="_blank">>
+                            </a>
+                        *@
+
                     </div>
                 </div>
 
@@ -104,38 +139,17 @@
 
                         <!-- Buttons -->
                         <div class="sixteen wide column">
-                            <div class="ui two columne equal width padded grid">
-                                <div class="column">
-                                    <div class="row">
-                                        <h4> Have you seen this movie ? </h4>
-                                    </div>
 
-                                    <!-- Seen buttons -->
-                                    <div class="row">
-                                        <div class="ui buttons">
-                                            <button class="ui grey experiment yes button">Yes I have</button>
-                                            <div class="or" choiceValue="none" type="saw" movieId="@moviePreview.IMDBId"></div>
-                                            <button class="ui grey experiment no button">No I haven't</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="column">
-                                    <div class="row">
-                                        <h4> Would you watch this movie ? </h4>
-                                    </div>
+                            @{ string isSentimentalStr = @moviePreview.Explanation.IsSentimental == true ? "True" : "False"; }
 
-                                    <!-- Would watch button -->
-                                    <div class="row">
-                                        <div class="ui buttons">
-                                            <button class="ui green experiment yes button">Yes I would</button>
-                                            <div class="or" choiceValue="none" type="would" movieId="@moviePreview.IMDBId"></div>
-                                            <button class="ui red experiment no button">No I wouldn't</button>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="ui buttons" choiceResult="none" isSentimental="@isSentimentalStr" movieId="@moviePreview.IMDBId">
+                                <button class="ui violet experiment yes button" choiceValue="saw">I saw this movie</button>
+                                <div class="or"></div>
+                                <button class="ui green experiment yes button" choiceValue="wouldWatch">I would watch it</button>
+                                <div class="or"></div>
+                                <button class="ui red experiment no button" choiceValue="wouldNotWatch">I wouldn't watch it</button>
                             </div>
                         </div>
-
                     </div>
                 </div>
                 <div class="six wide column">
@@ -145,11 +159,11 @@
                                 <div class="row">
                                     @if (moviePreview.Explanation.IsSentimental)
                                     {
-                                        <div class="ui small header">What others are saying about this film :</div>
+                                        <div class="ui medium header">What others are saying about this film :</div>
                                     }
                                     else
                                     {
-                                        <div class="ui small header">Main keywords :</div>
+                                        <div class="ui medium header">Main keywords :</div>
                                     }
 
                                 </div>
@@ -176,8 +190,11 @@
 
     <div class="ui one column stackable center aligned page grid">
         <div class="column">
-            <div class="ui big violet button" id="finish-button">
+            <div class="ui big blue button" id="finish-button">
                 <div class="content">Finish</div>
+            </div>
+            <div class="ui big blue button" id="next-button">
+                <div class="content">Next</div>
             </div>
         </div>
     </div>
@@ -188,9 +205,13 @@
         </div>
         <div class="content">
             <div class="description">
-                <h3>1. Uvidíte zoznam @Model.RecommendedMovies.Count filmov, ktoré boli pre vás odporučené. </h3>
-                <h3>2. Pre každý odporučený film určite, či ste ho už videli alebo nie.</h3>
-                <h3>3. Taktiež pre každý film označte, či by ste si ho pozreli podľa zobrazených informácií o ňom !</h3>
+                <h3>1. Uvidíte zoznam pre vás odporučených filmov.</h3>
+                <h3>2. Pre každý film vyberte jednu z týchto možností :</h3>
+                <h3>- film ste uz videli</h3>
+                <h3>- film vyzerá zaujímavo a pozreli by ste si ho</h3>
+                <h3>- film nevyzerá zaujímavo a nepozreli by ste si ho</h3>
+                <h3>3. Ďalšie filmy sa zobrazia po stlačení tlačidla NEXT na spodu stránky.</h3>
+                <h3>4. V prípade, že ste ohodnotili dostatočný počet filmov sa na spodu objaví tlačidlo FINISH, ktorým ukončíte túto časť experimentu.</h3>
             </div>
         </div>
         <div class="actions">
@@ -207,12 +228,12 @@
         </div>
         <div class="content">
             <p>V prípade, že chcete skončiť kliknite na tlačidlo finish.</p>
-            <p>Ak máte čas a chuť, môžete pokračovať ďalej a ohodnotiť ďalších 15 filmov. Budem veľmi vďačný.</p>
+            <p>Ak máte čas a chuť, môžete pokračovať ďalej a ohodnotiť ďalšie filmy. Budem veľmi vďačný.</p>
         </div>
 
         <div class="actions">
             <div class="ui positive button">Finish</div>
-            <div class="ui cancel violet button">Next 15 movies</div>
+            <div class="ui cancel violet button">Next movies</div>
         </div>
     </div>
 
@@ -226,7 +247,7 @@
                 string userNameEncoded = HttpUtility.UrlEncode(User.Identity.Name); 
                 string url = "https://docs.google.com/forms/d/e/1FAIpQLSeCYn--3o2_ypE5r94f3SnVluXrVvxHOtDJORo0_hW8DBo6eQ/viewform?entry.1042920984=" + userNameEncoded;
             }
-            <a href="@url" target="_blank">@url</a>
+            <a href="@url" id="google-form-anchor" clicked="False" target="_blank">@url</a>
         </div>
 
         <div class="actions">
@@ -291,78 +312,36 @@ else
 
 <script>
 
-    $('.ui.button.experiment').click(function () {
-
-        var isOK = true;
-        var prevFilmHolder = $(this).parents("div[name='filmHolder']").prev();
-
-        if (prevFilmHolder.length)
-        {
-            prevFilmHolder.find("div[choiceValue='none']").each(function () {
-                alert("You did not answer all informations from previous movie");
-                isOK = false;
-                return false; // break
-            });
-        }
-
-        if (isOK == true)
-        {
-            $(this).siblings('.ui.button.experiment').css("border", "none");
-            $(this).css("border", "3px solid black");
-
-            if ($(this).hasClass('yes') == true)
-            {
-                $(this).siblings("div[class='or']").attr('choiceValue', true);
-            }
-            else
-            {
-                $(this).siblings("div[class='or']").attr('choiceValue', false);
-            }
-        }
-    });
-
-    $("#finish-button").click(function () {
-
-        if ($('body').find("div[choiceValue='none']").length > 0)
-        {
-            alert('Experiment not finished yet. You must finish experiment first!');
-            return;
-        }
-
-        var likedMovieIds = [];
+    var sendRatedMovies = function(isFinish) {
 
         var experimentModel = {
-            'WatchedIds': [],
-            'NotWatchedIds': [],
-            'WouldWatchIds': [],
-            'WouldNotWatchIds': [],
+            'WatchedChoice': [],
+            'WouldWatchChoice': [],
+            'WouldNotWatchChoice': [],
         };
 
-        $('body').find("div[choiceValue]").each(function () {
+        $('body').find("div[choiceResult]").each(function () {
 
             var movieid = $(this).attr('movieId');
+            var choiceResult = $(this).attr('choiceResult');
+            var isSentimental = $(this).attr('isSentimental') === 'True' ? true : false;
 
-            if ($(this).attr('type') == 'saw')
+            var choiceObj = {
+                                IMDBID: movieid,
+                                IsSentiment: isSentimental,
+                            };
+
+            if (choiceResult === 'saw')
             {
-                if ($(this).attr('choiceValue') === 'true')
-                {
-                    experimentModel.WatchedIds.push(movieid);
-                }
-                else if ($(this).attr('choiceValue') === 'false')
-                {
-                    experimentModel.NotWatchedIds.push(movieid);
-                }
+                experimentModel.WatchedChoice.push(choiceObj);
             }
-            else if ($(this).attr('type') == 'would')
+            else if (choiceResult === 'wouldWatch')
             {
-                if ($(this).attr('choiceValue') === 'true')
-                {
-                    experimentModel.WouldWatchIds.push(movieid);
-                }
-                else if ($(this).attr('choiceValue') === 'false')
-                {
-                    experimentModel.WouldNotWatchIds.push(movieid);
-                }
+                experimentModel.WouldWatchChoice.push(choiceObj);
+            }
+            else if (choiceResult === 'wouldNotWatch')
+            {
+                experimentModel.WouldNotWatchChoice.push(choiceObj);
             }
         });
 
@@ -374,43 +353,125 @@ else
             data: postModel,
             contentType: 'application/json',
             error: function (err) {
-                alert("Error while processing final experiment data.");
+                alert("Error while processing experiment data.");
             },
             success: function (data) {
 
-                $('#almostFinish').modal({
-                    closable: false,
-                    onApprove: function () { // finish
+                if (isFinish == true)
+                {
+                    $('#almostFinish').modal({
+                        closable: false,
+                        onApprove: function () { // finish
 
-                        $('#finishModal').modal({
-                            closable: false,
-                            onApprove: function () {
-                                window.location.href = "/Movie/Browse";
-                            }
-                        }).modal('show');
-                    },
-                    onDeny: function () { // next 15
-                        window.location.href = "/Home/Index";
-                    }
-                }).modal('show');
+                            $('#finishModal').modal({
+                                closable: false,
+                                onApprove: function () {
 
+                                    if ($("#google-form-anchor").attr('clicked') !== 'True')
+                                    {
+                                        alert('You must click on google form link first !');
+                                        return false;
+                                    }
+
+                                    window.location.href = "/Movie/Browse";
+                                }
+                            }).modal('show');
+                        },
+                        onDeny: function () { // next movies
+                            window.location.href = "/Home/Index";
+                        }
+                    }).modal('show');
+                }
+                else
+                {
+                    window.location.href = "/Home/Index";
+                }
             }
         });
+    };
+
+    $('.ui.button.experiment').click(function () {
+
+        var ratedCount = $('body').find("div[choiceResult='wouldWatch']").length - $('body').find("div[choiceResult='wouldNotWatch']").length;
+
+        if ($(this).attr('choiceResult') !== 'saw')
+            ratedCount++;
+
+        var moviesRemainingToRate =  @Model.MoviesRemainingCount;
+
+        if (ratedCount >= moviesRemainingToRate)
+        {
+            document.getElementById("finish-button").style.visibility = 'visible';
+        }
+
+        var prevFilmHolder = $(this).parents("div[name='filmHolder']").prev();
+
+        if (prevFilmHolder.length > 0)
+        {
+            if (prevFilmHolder.find("div[choiceResult='none']").length > 0)
+            {
+                alert("You didn't select any choice from previous movie");
+                return;
+            }
+        }
+
+        // Add border to selected button
+        $(this).siblings('.ui.button.experiment').css("border", "none");
+        $(this).css("border", "3px solid black");
+
+        var choiceVal = $(this).attr('choiceValue');
+        var parentEle = $(this).parent("div[choiceResult]");
+
+        parentEle.attr('choiceResult', choiceVal);
     });
+
+    $("#finish-button").click(function () {
+
+        var notRatedFormMoviesCount = $('body').find("div[choiceResult='none']").length;
+
+        // user must rate all movies in form to finish
+        if (notRatedFormMoviesCount > 0)
+        {
+            alert('Not all movies rated yet !');
+            return;
+        }
+
+        sendRatedMovies(true);
+    });
+
+    $("#next-button").click(function () {
+
+        var notRatedFormMoviesCount = $('body').find("div[choiceResult='none']").length;
+
+        // user must rate all movies in form to finish
+        if (notRatedFormMoviesCount > 0)
+        {
+            alert('Not all movies rated yet !');
+            return;
+        }
+
+        sendRatedMovies(false);
+    });
+
+    $("#google-form-anchor").click(function () {
+        $(this).attr('clicked', 'True');
+    });
+
 
     $('.rating').rating({
         initialRating: 5,
         maxRating: 10,
         interactive: false
-    });    
+    });
 
     $(document).ready(function () {
 
         var isExperimentDone = "@User.Identity.IsExperimentDone()";
+        var isExperimentInProgress = "@User.Identity.IsExperimentInPogress()";
 
-        if (isExperimentDone !== "True")
+        if (isExperimentDone !== "True" && isExperimentInProgress !== "True")
         {
-            $('#instructions').modal('show');
+            $('#instructions').modal({closable: false}).modal('show');
         }
 
         $(".treemapDiv").each(function (index, element) {

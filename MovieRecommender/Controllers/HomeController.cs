@@ -18,6 +18,7 @@ namespace MovieRecommender.Controllers
     public class HomeController : Controller
     {
         private const int _minLikedMovies = 10;
+        private const int _minExperimentMovies = 15;
 
         private readonly IUserRepository _userStore;
         private readonly IMovieRepository _movieStore;
@@ -60,6 +61,20 @@ namespace MovieRecommender.Controllers
                 return View(model);
             }
 
+            ISet<string> exceptIds = new HashSet<string>();
+
+            var expData = _userStore.GetExperimentDataForUser(User.Identity.Name);
+            int experimentMoviesCount = 0;
+
+            if (expData != null)
+            {
+                exceptIds.UnionWith(expData.WouldWatchIds());
+                exceptIds.UnionWith(expData.WouldNotWatchIds());
+
+                experimentMoviesCount = expData.WouldWatchIds().Count() + expData.WouldNotWatchIds().Count();
+                model.RatedMoviesCount = experimentMoviesCount;
+            }
+
             var likedMovieIds = _userStore.FindLikedMovieIds(User.Identity.Name);
 
             if (likedMovieIds.Count() < _minLikedMovies)
@@ -70,7 +85,7 @@ namespace MovieRecommender.Controllers
             var likedMovies = _movieStore.FindMoviesByIMDbIds(likedMovieIds);
 
             int minYear = likedMovies.Select(m => m.PublicationYear).Min() - 5;
-            int maxYear = likedMovies.Select(m => m.PublicationYear).Max() + 5;
+            int maxYear = _movieStore.DistinctYearsDesc().Max();
             double minRating = likedMovies.Select(m => m.Rating).Min();
             var genres = likedMovies.Select(m => m.Genres);
 
@@ -85,9 +100,25 @@ namespace MovieRecommender.Controllers
                                                                     fromYear: minYear,
                                                                     toYear: maxYear,
                                                                     genres: genreSet,
-                                                                    limit: 15,
-                                                                    userName: User.Identity.Name)
+                                                                    limit: _minExperimentMovies,
+                                                                    userName: User.Identity.Name,
+                                                                    exceptIds: exceptIds)
                                                                     .ToList();
+
+            int cutoffCount = _minExperimentMovies - experimentMoviesCount;
+
+            // We did not rate enough movies
+            if (cutoffCount > 0)
+            {
+                model.MoviesRemainingCount = cutoffCount;
+                model.RecommendedMovies = model.RecommendedMovies.Take(10).ToList();
+            }
+            // We rated enough movies
+            else
+            {
+                model.MoviesRemainingCount = 0;
+            }
+
             return View(model);
         }
 
@@ -165,7 +196,7 @@ namespace MovieRecommender.Controllers
         {
             string userName = User.Identity.Name;
 
-            _userStore.UserLikedMovies(userName, model.WatchedIds);
+            _userStore.UserLikedMovies(userName, model.WatchedIds());
             _userStore.SetOrAddExperiment(userName, model);
 
             // Reload identity cookie

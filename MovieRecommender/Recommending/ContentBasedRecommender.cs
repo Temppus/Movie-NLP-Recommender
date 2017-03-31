@@ -66,7 +66,7 @@ namespace MovieRecommender.Recommending
             return suggestedMovies.Select(s => BsonSerializer.Deserialize<MovieSuggestionModel>(s));
         }
 
-        public IEnumerable<MovieSuggestionModel> RecommendForUser(string userName, IEnumerable<string> genres, int fromYear, int toYear, double minRating, int limit)
+        public IEnumerable<MovieSuggestionModel> RecommendForUser(string userName, IEnumerable<string> genres, int fromYear, int toYear, double minRating, int limit, IEnumerable<string> exceptIds)
         {
             var likedMovieIds = _userStore.FindLikedMovieIds(userName);
             var likedMovies = _movieStore.FindMoviesByIMDbIds(likedMovieIds);
@@ -86,7 +86,7 @@ namespace MovieRecommender.Recommending
                     weightedKeywords.Add(keyword);
             }
 
-            var exceptMovieIds = likedMovieIds.Concat(_userStore.GetNotInterestedMovieIdsForUser(userName));
+            var exceptMovieIds = likedMovieIds.Concat(_userStore.GetNotInterestedMovieIdsForUser(userName)).Concat(exceptIds);
 
             var suggestedMovies = _movieStore.FindSimilarMovies(genres, weightedKeywords, exceptMovieIds,
                                                                 limit, fromYear, toYear, 50000, minRating);
@@ -128,6 +128,11 @@ namespace MovieRecommender.Recommending
             }
 
             return suggestions;
+        }
+
+        public IEnumerable<MovieSuggestionModel> RecommendForUser(string userName, IEnumerable<string> genres, int fromYear, int toYear, double minRating, int limit)
+        {
+            return RecommendForUser(userName, genres, fromYear, toYear, minRating, limit, new List<string>());
         }
 
         public IEnumerable<MovieSuggestionModel> RecommendForUserByMovie(string userName, string movieId)

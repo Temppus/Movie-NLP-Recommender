@@ -13,6 +13,7 @@ namespace MovieRecommender.Recommending
         IEnumerable<MovieSuggestionModel> RecommendForUser(string userName);
         IEnumerable<MovieSuggestionModel> RecommendForUserByMovie(string userName, string movieId);
         IEnumerable<MovieSuggestionModel> RecommendForUser(string userName, IEnumerable<string> genres, int fromYear, int toYear, double minRating, int limit);
+        IEnumerable<MovieSuggestionModel> RecommendForUser(string userName, IEnumerable<string> genres, int fromYear, int toYear, double minRating, int limit, IEnumerable<string> exceptIds);
     }
 
 }

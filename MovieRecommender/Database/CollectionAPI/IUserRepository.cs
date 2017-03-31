@@ -11,6 +11,7 @@ namespace MovieRecommender.Database.CollectionAPI
     {
         void SetOrAddExperiment(string userName, ExperimentResultModel experimentModel);
         bool IsExperimentDone(string userName);
+        Experiment GetExperimentDataForUser(string userName);
         IEnumerable<MovieLikeInfo> FindLikedMoviesInfo(string userName);
         IEnumerable<string> FindLikedMovieIds(string userName);
         bool CheckIfUserLikedMovie(string userName, string imdbId);

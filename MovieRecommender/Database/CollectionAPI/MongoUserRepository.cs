@@ -30,21 +30,19 @@ namespace MovieRecommender.Database.CollectionAPI
 
             if (exists)
             {
-                var up1 = Builders<ApplicationUser>.Update.AddToSetEach(u => u.ExperimentResult.WatchedIds, experimentModel.WatchedIds);
-                var up2 = Builders<ApplicationUser>.Update.AddToSetEach(u => u.ExperimentResult.NotWatchedIds, experimentModel.NotWatchedIds);
-                var up3 = Builders<ApplicationUser>.Update.AddToSetEach(u => u.ExperimentResult.WouldWatchIds, experimentModel.WouldWatchIds);
-                var up4 = Builders<ApplicationUser>.Update.AddToSetEach(u => u.ExperimentResult.WouldNotWatchIds, experimentModel.WouldNotWatchIds);
-                var combineUpdate = Builders<ApplicationUser>.Update.Combine(up1, up2, up3, up4);
+                var up1 = Builders<ApplicationUser>.Update.AddToSetEach(u => u.ExperimentResult.WatchedChoice, experimentModel.WatchedChoice);
+                var up2 = Builders<ApplicationUser>.Update.AddToSetEach(u => u.ExperimentResult.WouldWatchChoice, experimentModel.WouldWatchChoice);
+                var up3 = Builders<ApplicationUser>.Update.AddToSetEach(u => u.ExperimentResult.WouldNotWatchChoice, experimentModel.WouldNotWatchChoice);
+                var combineUpdate = Builders<ApplicationUser>.Update.Combine(up1, up2, up3);
                 _collection.UpdateOne(userFilter, combineUpdate);
             }
             else
             {
                 Experiment experiment = new Experiment()
                 {
-                    WatchedIds = experimentModel.WatchedIds,
-                    NotWatchedIds = experimentModel.NotWatchedIds,
-                    WouldWatchIds = experimentModel.WouldWatchIds,
-                    WouldNotWatchIds = experimentModel.WouldNotWatchIds,
+                    WatchedChoice = experimentModel.WatchedChoice,
+                    WouldWatchChoice = experimentModel.WouldWatchChoice,
+                    WouldNotWatchChoice = experimentModel.WouldNotWatchChoice,
                 };
 
                 var updateDefinition = Builders<ApplicationUser>.Update.Set(u => u.ExperimentResult, experiment);
@@ -57,7 +55,24 @@ namespace MovieRecommender.Database.CollectionAPI
             userName.ThrowIfNull(nameof(userName));
 
             var filter = Builders<ApplicationUser>.Filter.Where(u => u.UserName == userName && u.ExperimentResult != null);
-            return _collection.Find(filter).ToList().Count > 0;
+            var expData = _collection.Find(filter).FirstOrDefault()?.ExperimentResult;
+
+            if (expData == null)
+                return false;
+
+            return expData.WouldWatchIds().Count() + expData.WouldNotWatchIds().Count() >= 15;
+        }
+
+        public Experiment GetExperimentDataForUser(string userName)
+        {
+            userName.ThrowIfNull(nameof(userName));
+
+            var userFilter = Builders<ApplicationUser>.Filter.Where(u => u.UserName == userName);
+            var existsFilter = Builders<ApplicationUser>.Filter.Exists(u => u.ExperimentResult, true);
+            var notNullFilter = Builders<ApplicationUser>.Filter.Where(u => u.ExperimentResult != null);
+            var andFilter = Builders<ApplicationUser>.Filter.And(userFilter, existsFilter, notNullFilter);
+
+            return _collection.Find(andFilter).FirstOrDefault()?.ExperimentResult;
         }
 
         public bool CheckIfUserLikedMovie(string userName, string imdbId)

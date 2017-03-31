@@ -47,7 +47,7 @@
 
 <div class="ui one column stackable center aligned page grid">
     <div class="column">
-        <div class="ui big red button" id="finishButton">
+        <div class="ui big violet button" id="finishButton">
             Finish
         </div>
     </div>
@@ -86,7 +86,7 @@
     $(document).ready(function () {
 
 
-        $('.small.modal').modal('show');
+        $('.small.modal').modal({ closable: false }).modal('show');
 
         likeDecorator();
 

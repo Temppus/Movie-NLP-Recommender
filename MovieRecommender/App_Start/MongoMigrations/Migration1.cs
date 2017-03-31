@@ -13,7 +13,7 @@ namespace MovieRecommender.App_Start.MongoMigrations
     {
         private static IEnumerable<IdentityRole> _roles = new List<IdentityRole>()
         {
-            new IdentityRole() {  Name = "admin" },
+            new IdentityRole() { Name = "admin" },
             new IdentityRole() { Name = "user" }
         };
 
