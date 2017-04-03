@@ -180,13 +180,30 @@ namespace MovieRecommender.Recommending
 
             foreach (var movie in movies)
             {
-                var reviews = reviewStore.FindReviewsByReviewId(movie.ReviewId).OrderByDescending(r => r.Rating).Take(5);
-
+                var review = reviewStore.FindMovieReviewById(movie.ReviewId);
                 var explanation = new Explanation() { IsSentimental = true };
 
-                foreach (var review in reviews)
+                // Should not happen
+                if (review == null)
                 {
-                    explanation.ExplanationHolders.Add(new ExplanationHolder(sentence: review.Title, score: review.GetUsefullnessVotes()));
+                    explanations.Add(new ExplanationTuple(movie.IMDBId, explanation));
+                    continue;
+                }
+
+                IEnumerable<ReviewStructure> topReviews = new List<ReviewStructure>();
+
+                if (review.SentimentExtracted)
+                {
+                    topReviews = review.Reviews.OrderByDescending(r => r.SentimentScore).Take(5);
+                }
+                else
+                {
+                    topReviews = review.Reviews.OrderByDescending(r => r.Rating).Take(5);
+                }
+
+                foreach (var reviewInfo in topReviews)
+                {
+                    explanation.ExplanationHolders.Add(new ExplanationHolder(sentence: reviewInfo.Title, score: reviewInfo.GetUsefullnessVotes()));
                 }
 
                 explanations.Add(new ExplanationTuple(movie.IMDBId, explanation));

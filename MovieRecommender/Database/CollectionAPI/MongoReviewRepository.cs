@@ -14,7 +14,12 @@ namespace MovieRecommender.Database.CollectionAPI
 
         public MongoReviewRepository(MongoDbConnectionPool dbPool)
         {
-            _collection = dbPool.Database.GetCollection<MovieReview>("reviews");
+            _collection = dbPool.Database.GetCollection<MovieReview>("sentiment_reviews");
+        }
+
+        public MovieReview FindMovieReviewById(ObjectId reviewId)
+        {
+            return _collection.Find(r => r._id == reviewId).FirstOrDefault();
         }
 
         public IEnumerable<ReviewStructure> FindReviewsByReviewId(ObjectId reviewId)

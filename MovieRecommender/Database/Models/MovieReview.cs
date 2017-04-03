@@ -7,16 +7,17 @@ using System.Web;
 
 namespace MovieRecommender.Database.Models
 {
+    [BsonIgnoreExtraElements]
     public class MovieReview
     {
         [BsonId]
         public ObjectId _id { get; set; }
-
+        public bool SentimentExtracted { get; set; }
         public string ImdbId { get; set; }
-
-        public List<ReviewStructure> Reviews { get; set; }
+        public List<ReviewStructure> Reviews { get; set; } = new List<ReviewStructure>();
     }
 
+    [BsonIgnoreExtraElements]
     public class ReviewStructure
     {
         public string UsefullnessDescription { get; set; }
@@ -28,6 +29,9 @@ namespace MovieRecommender.Database.Models
         public string ReviewDate { get; set; }
         public bool IsSpoilerReview { get; set; }
         public int Rating { get; set; }
+
+        public float SentimentScore { get; set; }
+        public float SentimentMagnitude { get; set; }
 
         public int GetUsefullnessVotes()
         {

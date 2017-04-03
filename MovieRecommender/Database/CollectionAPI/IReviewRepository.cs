@@ -10,6 +10,7 @@ namespace MovieRecommender.Database.CollectionAPI
 {
     public interface IReviewRepository
     {
-        IEnumerable<ReviewStructure> FindReviewsByReviewId(ObjectId id);
+        MovieReview FindMovieReviewById(ObjectId reviewId);
+        IEnumerable<ReviewStructure> FindReviewsByReviewId(ObjectId reviewId);
     }
 }
