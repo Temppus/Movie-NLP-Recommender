@@ -5,6 +5,7 @@ using MovieRecommender.Database.CollectionAPI;
 using MovieRecommender.Database.Models;
 using MovieRecommender.Models;
 using MovieRecommender.Recommending;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +21,7 @@ namespace MovieRecommender.Controllers
         private const int _minLikedMovies = 10;
         private const int _minExperimentMovies = 15;
 
+        private readonly IUserExperimentRepository _userExperimentRepository;
         private readonly IUserRepository _userStore;
         private readonly IMovieRepository _movieStore;
         private readonly IReviewRepository _reviewStore;
@@ -36,8 +38,11 @@ namespace MovieRecommender.Controllers
             IMovieMentionRepository movieMentionRepository,
             IMovieRepository movieStore,
             IReviewRepository reviewStore,
+            IUserExperimentRepository userExperimentRepository,
             ApplicationUserManager userManager, IAuthenticationManager authManager, IRepositoryManager repoManager)
         {
+            _userExperimentRepository = userExperimentRepository;
+
             _userStore = userStore;
             _movieMentionRepository = movieMentionRepository;
             _movieStore = movieStore;
@@ -202,6 +207,19 @@ namespace MovieRecommender.Controllers
             // Reload identity cookie
             var user = _userManager.FindByNameAsync(userName).Result;
             await _signInHelper.SignInAsync(user, false, false);
+
+            return Json(true);
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> LogUserProgress(UserProgressModel model)
+        {
+            var experimentProgress = new UserExperimentProgress() { UserName = model.UserName, ChoiceValue = model.ChoiceValue, TimeStamp = DateTime.Now };
+
+            await Task.Run(() => 
+            {
+                _userExperimentRepository.LogUserProgress(experimentProgress);
+            });
 
             return Json(true);
         }

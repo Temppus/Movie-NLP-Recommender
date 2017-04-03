@@ -32,4 +32,10 @@ namespace MovieRecommender.Models
         public string IMDBID { get; set; }
         public bool IsSentiment { get; set; }
     }
+
+    public class UserProgressModel
+    {
+        public string UserName { get; set; }
+        public string ChoiceValue { get; set; }
+    }
 }

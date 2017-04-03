@@ -61,10 +61,13 @@ namespace MovieRecommender.App_Start
             container.RegisterInstance(mongoPool);
             container.RegisterInstance(logger);
 
+            container.RegisterType<ILogger, Logger>();
+
             container.RegisterType<IMovieRepository, MongoMovieRepository>(new InjectionConstructor(container.Resolve<MongoDbConnectionPool>()));
             container.RegisterType<IMovieMentionRepository, MongoMovieMentionRepository>(new InjectionConstructor(container.Resolve<MongoDbConnectionPool>()));
             container.RegisterType<IReviewRepository, MongoReviewRepository>(new InjectionConstructor(container.Resolve<MongoDbConnectionPool>()));
             container.RegisterType<IUserRepository, MongoUserRepository>(new InjectionConstructor(container.Resolve<MongoDbConnectionPool>()));
+            container.RegisterType<IUserExperimentRepository, MongoUserExperimentRepository>(new InjectionConstructor(container.Resolve<MongoDbConnectionPool>()));
 
             container.RegisterType<ApplicationIdentityContext>(new InjectionConstructor(container.Resolve<MongoDbConnectionPool>()));
             container.RegisterType<IRepositoryManager, RepositoryManager>(new InjectionConstructor(container.Resolve<MongoDbConnectionPool>()));

@@ -533,3 +533,29 @@ else
 
     });
 </script>
+
+<script>
+
+    $('.ui.button.experiment').click(function () {
+
+        var logObject = { };
+
+        logObject.UserName = "@User.Identity.Name";
+        logObject.ChoiceValue = $(this).attr('choiceValue');
+
+        var logModel = JSON.stringify({ model: logObject });
+
+        $.ajax({
+            type: 'POST',
+            url: '/Home/LogUserProgress',
+            data: logModel,
+            contentType: 'application/json',
+            error: function (err) {
+                alert("Error while logging progress data.");
+            },
+            success: function (data) {
+            }
+        });
+    });
+
+</script>
