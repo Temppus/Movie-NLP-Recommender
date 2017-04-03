@@ -16,7 +16,7 @@ namespace MovieRecommender.App_Start.MongoMigrations
         public Migration3()
             : base("0.0.3", "movies")
         {
-            Description = "Add indexes to PublicationYear property.";
+            Description = "Add indexes to PublicationYear and IMDBId property.";
         }
 
         public override void BeforeMigration(IMongoCollection<BsonDocument> collection)
@@ -26,6 +26,7 @@ namespace MovieRecommender.App_Start.MongoMigrations
 
             movieCollection.Indexes.CreateOne(Builders<Movie>.IndexKeys.Descending(x => x.PublicationYear));
             movieCollection.Indexes.CreateOne(Builders<Movie>.IndexKeys.Ascending(x => x.PublicationYear));
+            movieCollection.Indexes.CreateOne(Builders<Movie>.IndexKeys.Descending(x => x.IMDBId));
         }
     }
 }

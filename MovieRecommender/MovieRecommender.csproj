@@ -242,7 +242,6 @@
     <Compile Include="App_Start\MongoMigrations\Migration2.cs" />
     <Compile Include="App_Start\MongoMigrations\Migration1.cs" />
     <Compile Include="App_Start\MongoMigrations\Migration3.cs" />
-    <Compile Include="App_Start\MongoMigrations\Migration4.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="App_Start\UnityConfig.cs" />
