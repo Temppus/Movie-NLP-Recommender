@@ -1,0 +1,279 @@
+﻿@model MovieRecommender.Models.ExperimentResultViewModel
+@using MovieRecommender.Models
+
+@{
+    ViewBag.Title = "Results";
+}
+
+@section styles {
+    <style>
+        .vizDiv {
+            min-height: 350px;
+        }
+
+        .ndgc {
+            width: 350px;
+        }
+    </style>
+}
+
+<div class="ui one column stackable center aligned page grid">
+    <div class="column">
+        <h3>Summary results</h3>
+    </div>
+</div>
+
+<div id="vizSummary" class="vizDiv"></div>
+
+<div class="ui one column stackable center aligned page grid">
+    <div class="column">
+        <h3>Explanation methods results (normalized would watch clicks)</h3>
+    </div>
+</div>
+
+<div id="vizExplanationMethods" class="vizDiv"></div>
+
+<div class="ui one column stackable center aligned page grid">
+    <div class="column">
+        <h3>Would watch clicks by time</h3>
+    </div>
+</div>
+
+<div id="vizWouldWatchByTime" class="vizDiv"></div>
+
+
+<div class="ui one column stackable center aligned page grid">
+    <div class="column">
+        <h3>Mean average precision at K (would watch movies)</h3>
+    </div>
+</div>
+
+<div id="vizPrecisionAtK" class="vizDiv"></div>
+
+<div class="ui one column stackable center aligned page grid">
+    <div class="column">
+        <h3>Mean average precision at K (saw movies)</h3>
+    </div>
+</div>
+
+<div id="vizSawPrecisionAtK" class="vizDiv"></div>
+
+
+<div class="ui one column stackable center aligned page grid">
+    <div class="column">
+        <h3>Would watch NDCG</h3>
+    </div>
+</div>
+
+<div id="vizSingleNDCG" class="vizDiv ndgc"></div>
+
+
+<div class="ui one column stackable center aligned page grid">
+    <div class="column">
+        <h3>Would watch + saw NDCG</h3>
+    </div>
+</div>
+
+<div id="vizAllNDCG" class="vizDiv ndgc"></div>
+
+
+@section Scripts {
+    <script src="//d3plus.org/js/d3.js"></script>
+    <script src="//d3plus.org/js/d3plus.js"></script>
+
+    <script>
+
+@{
+    int watchedClicks = Model.Users.Select(x => x.ExperimentResult).SelectMany(x => x.WatchedChoice).Count();
+    int wouldWatchClicks = Model.Users.Select(x => x.ExperimentResult).SelectMany(x => x.WouldWatchChoice).Count();
+    int wouldNotWatchClicks = Model.Users.Select(x => x.ExperimentResult).SelectMany(x => x.WouldNotWatchChoice).Count();
+}
+
+        /* **************************************** SUMMARY **************************************************  */
+        var summaryData =
+        [
+          {"value": @watchedClicks, "name": "Saw"},
+          {"value": @wouldWatchClicks, "name": "Would watch"},
+          {"value": @wouldNotWatchClicks, "name": "Wouldn't watch"},
+        ];
+
+        var attributes = 
+        [
+            {"name": summaryData[0].name, "hex": "#515A5A"},
+            {"name": summaryData[1].name, "hex": "#1D8348"},
+            {"name": summaryData[2].name, "hex": "#CB4335"}
+        ];
+
+        d3plus.viz()
+          .container("#vizSummary")
+          .data(summaryData)
+          .type("pie")
+          .id("name")
+          .size("value")
+          .attrs(attributes)
+          .color("hex")
+          .draw();
+
+        /* **************************************** WOULD WATCH SENTIMENT / KEYWORDS NORMALIZED CLICKS **************************************************  */
+
+        @{
+
+            var expDatas = Model.Users.Select(x => x.ExperimentResult);
+
+            int sentimentWouldWatch = 0;
+            int keywordsWouldWatch = 0;
+
+            foreach (var exp in expDatas)
+            {
+                int wouldCount = exp.WouldWatchChoice.Count();
+
+                int wouldSentimentCount = exp.WouldWatchChoice.Where(x => x.IsSentiment).Count();
+                int wouldKeyWordCount = exp.WouldWatchChoice.Where(x => !x.IsSentiment).Count();
+
+                int wouldTogether = wouldSentimentCount + wouldKeyWordCount;
+
+                sentimentWouldWatch += wouldSentimentCount * 100 / wouldTogether;
+                keywordsWouldWatch += wouldKeyWordCount * 100 / wouldTogether;
+            }
+        }
+
+        var explanationData =
+        [
+            {"value": @sentimentWouldWatch, "name": "Sentiment"},
+            {"value": @keywordsWouldWatch, "name": "Keywords"},
+        ];
+
+        var attributes = 
+        [
+            {"name": explanationData[0].name, "hex": "#1D8348"},
+            {"name": explanationData[1].name, "hex": "#154360"},
+        ];
+
+        d3plus.viz()
+          .container("#vizExplanationMethods")
+          .data(explanationData)
+          .type("pie")
+          .id("name")
+          .size("value")
+          .attrs(attributes)
+          .color("hex")
+          .draw();
+
+
+        /* **************************************** WOULD WATCH CLICKS BY TIME **************************************************  */
+
+        var wouldWatchArray = new Array();
+
+        @{
+            for (int i = 0; i < Model.SentimentWouldWatchList.Count; i++)
+            {
+                @:var obj = { "click" : @i, "name" : "sentiment", "value" : @Model.SentimentWouldWatchList[i]};
+                        @:wouldWatchArray.push(obj);
+                    }
+
+            for (int i = 0; i < Model.KeyWordsWouldWatchList.Count; i++)
+            {
+                @:var obj = { "click" : @i, "name" : "keyword", "value" : @Model.KeyWordsWouldWatchList[i]};
+                        @:wouldWatchArray.push(obj);
+                    }
+        }
+
+
+          d3plus.viz()
+          .container("#vizWouldWatchByTime")
+          .data(wouldWatchArray)
+          .type("line")
+          .id("name")
+          .text("name")
+          .y("value")
+          .x("click")
+          .draw();
+
+
+        /* ***************************************** WOULD WATCCH PRECISON AT K *********************************************  */
+        var precisionAtKArray = new Array();
+
+        @{
+            for (int i = 0; i < Model.SentimentPrecisionAt.Count; i++)
+            {
+                @:var obj = { "click" : @i, "name" : "sentiment", "value" : @Model.SentimentPrecisionAt[i]};
+                @:precisionAtKArray.push(obj);
+            }
+
+            for (int i = 0; i < Model.KeywordPrecisionAt.Count; i++)
+            {
+                @:var obj = { "click" : @i, "name" : "keyword", "value" : @Model.KeywordPrecisionAt[i]};
+                @:precisionAtKArray.push(obj);
+            }
+        }
+
+        d3plus.viz()
+        .container("#vizPrecisionAtK")
+        .data(precisionAtKArray)
+        .type("line")
+        .id("name")
+        .text("name")
+        .y("value")
+        .x("click")
+        .draw();
+
+        /* ***************************************** WOULD WATCCH PRECISON AT K *********************************************  */
+        var sawPrecisionAtKArray = new Array();
+
+        @{
+            for (int i = 0; i < Model.SawPrecisionAt.Count; i++)
+            {
+                @:var obj = { "k" : @i + 1, "name" : "saw", "precision" : @Model.SawPrecisionAt[i]};
+                @:sawPrecisionAtKArray.push(obj);
+            }
+        }
+
+        d3plus.viz()
+        .container("#vizSawPrecisionAtK")
+        .data(sawPrecisionAtKArray)
+        .type("line")
+        .id("name")
+        .text("name")
+        .y("precision")
+        .x("k")
+        .draw();
+
+        /* ***************************************** NDCG SINGLE *********************************************  */
+        var ndcgSingleArray = new Array();
+
+        @{
+            @:ndcgSingleArray.push({"NDCG Values": 1, "name":"Sentiment", "value": @Model.SentimentSingleNDCG});
+            @:ndcgSingleArray.push({"NDCG Values": 2, "name":"Keywords", "value": @Model.KeywordSingleNDCG});
+            @:ndcgSingleArray.push({"NDCG Values": 3, "name":"Saw", "value": @Model.SawNDCG});
+        }
+
+        d3plus.viz()
+            .container("#vizSingleNDCG")
+            .data(ndcgSingleArray)
+            .type("bar")
+            .id("name")
+            .x("NDCG Values")
+            .y("value")
+            .draw();
+
+        /* ***************************************** NDCG ALL *********************************************  */
+        var ndcgAllArray = new Array();
+
+        @{
+            @:ndcgAllArray.push({"NDCG Values": 3, "name":"Sentiment", "value": @Model.SentimentNDCGAll});
+            @:ndcgAllArray.push({"NDCG Values": 4, "name":"Keywords", "value": @Model.KeywordNDCGAll});
+        }
+
+        d3plus.viz()
+            .container("#vizAllNDCG")
+            .data(ndcgAllArray)
+            .type("bar")
+            .id("name")
+            .x("NDCG Values")
+            .y("value")
+            .draw();
+
+     </script>
+}
+
+

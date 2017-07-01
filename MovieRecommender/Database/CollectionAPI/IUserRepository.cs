@@ -9,6 +9,7 @@ namespace MovieRecommender.Database.CollectionAPI
 {
     public interface IUserRepository
     {
+        ExperimentResultViewModel FillExperimentData();
         void SetOrAddExperiment(string userName, ExperimentResultModel experimentModel);
         bool IsExperimentDone(string userName);
         Experiment GetExperimentDataForUser(string userName);

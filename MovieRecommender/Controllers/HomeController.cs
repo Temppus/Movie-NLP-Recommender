@@ -53,7 +53,7 @@ namespace MovieRecommender.Controllers
             _authManager = authManager;
 
             _signInHelper = new SignInHelper(userManager, authManager, repoManager);
-            _recommender = new ContentBasedRecommender(_userStore, _movieStore);
+            _recommender = new ContentBasedRecommender(_userStore, _movieStore, _reviewStore);
         }
 
         [AllowAnonymous]

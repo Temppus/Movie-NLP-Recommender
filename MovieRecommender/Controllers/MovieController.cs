@@ -45,7 +45,7 @@ namespace MovieRecommender.Controllers
             _movieMentionRepository = movieMentionRepository;
 
             //_recommender = new NlpRecommender(_userStore, _movieMentionRepository);
-            _recommender = new ContentBasedRecommender(_userStore, _movieStore);
+            _recommender = new ContentBasedRecommender(_userStore, _movieStore, _reviewStore);
         }
 
         // GET: Movie

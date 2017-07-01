@@ -206,8 +206,8 @@
         <div class="content">
             <div class="description">
                 <h3>1. Uvidíte zoznam pre vás odporučených filmov.</h3>
-                <h3>2. Pre každý film vyberte jednu z týchto možností :</h3>
-                <h3>- film ste uz videli</h3>
+                <h3>2. Pre každý film pozorne vyberte jednu z týchto možností :</h3>
+                <h3>- film ste už videli</h3>
                 <h3>- film vyzerá zaujímavo a pozreli by ste si ho</h3>
                 <h3>- film nevyzerá zaujímavo a nepozreli by ste si ho</h3>
                 <h3>3. Ďalšie filmy sa zobrazia po stlačení tlačidla NEXT na spodu stránky.</h3>
@@ -242,7 +242,9 @@
             (3/3) Vyplnenie krátkeho dotazníka :)
         </div>
         <div class="content">
-            <p>Ako poslednú vec vás poprosím vyplniť jednoduchý dotazník s pár otázkami. Kliknite na link nižšie :</p>
+            <p>Ako poslednú vec vás poprosím vyplniť jednoduchý dotazník s pár otázkami.</p>
+            <p>Po vyplnení budete môcť využívať širšiu funkcionalitu webu.</p>
+            <p>Kliknite na link nižšie :</p>
             @{
                 string userNameEncoded = HttpUtility.UrlEncode(User.Identity.Name); 
                 string url = "https://docs.google.com/forms/d/e/1FAIpQLSeCYn--3o2_ypE5r94f3SnVluXrVvxHOtDJORo0_hW8DBo6eQ/viewform?entry.1042920984=" + userNameEncoded;
@@ -251,7 +253,7 @@
         </div>
 
         <div class="actions">
-            <div class="ui positive button">OK</div>
+            <div class="ui positive button">Ďakujem za účasť na experimente</div>
         </div>
     </div>
 }
@@ -369,7 +371,7 @@ else
 
                                     if ($("#google-form-anchor").attr('clicked') !== 'True')
                                     {
-                                        alert('You must click on google form link first !');
+                                        alert('Click on google form link first please !');
                                         return false;
                                     }
 

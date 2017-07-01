@@ -323,6 +323,7 @@ namespace MovieRecommender.Controllers
                 return View("Error");
             }
             var result = await _userManager.ConfirmEmailAsync(userId, code);
+
             if (result.Succeeded)
             {
                 return View("ConfirmEmail");

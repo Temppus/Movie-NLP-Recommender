@@ -13,6 +13,8 @@ namespace MovieRecommender.Database.CollectionAPI
     {
         private IMongoCollection<ApplicationUser> _collection;
 
+        public static IList<string> ExceptUsers = new List<string>() { "matko", "Nivazarafikom", "marty", "superstela", "Lazik", "Nasus255", "user01", "Charlie", "test17" };
+
         public MongoUserRepository(MongoDbConnectionPool dbPool)
         {
             _collection = dbPool.Database.GetCollection<ApplicationUser>("users");
@@ -245,6 +247,18 @@ namespace MovieRecommender.Database.CollectionAPI
             var user = _collection.Find(userNameFilter).Single();
 
             return user.NotInterestedMovies.Select(x => x.IMDBId);
+        }
+
+        public ExperimentResultViewModel FillExperimentData()
+        {
+            var experiementFilter = Builders<ApplicationUser>.Filter.Where(u => u.ExperimentResult != null);
+            var exceptUsers = Builders<ApplicationUser>.Filter.Nin(u => u.UserName, ExceptUsers);
+            var users = _collection.Find(Builders<ApplicationUser>.Filter.And(experiementFilter, exceptUsers)).ToList();
+
+            return new ExperimentResultViewModel()
+            {
+                Users = users
+            };
         }
     }
 }

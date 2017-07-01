@@ -17,14 +17,16 @@ namespace MovieRecommender.Recommending
     {
         private readonly IUserRepository _userStore;
         private readonly IMovieRepository _movieStore;
+        private readonly IReviewRepository _reviewStore;
 
         private static double _minRating = 5.5d;
         private static int _minYear = 1990;
 
-        public ContentBasedRecommender(IUserRepository userStore, IMovieRepository movieStore)
+        public ContentBasedRecommender(IUserRepository userStore, IMovieRepository movieStore, IReviewRepository reviewStore)
         {
             _userStore = userStore;
             _movieStore = movieStore;
+            _reviewStore = reviewStore;
         }
 
         public IEnumerable<MovieSuggestionModel> RecommendForUser(string userName)
@@ -89,9 +91,12 @@ namespace MovieRecommender.Recommending
             var exceptMovieIds = likedMovieIds.Concat(_userStore.GetNotInterestedMovieIdsForUser(userName)).Concat(exceptIds);
 
             var suggestedMovies = _movieStore.FindSimilarMovies(genres, weightedKeywords, exceptMovieIds,
-                                                                limit, fromYear, toYear, 50000, minRating);
+                                                                limit * 2, fromYear, toYear, 50000, minRating);
 
             var suggestions = suggestedMovies.Select(s => BsonSerializer.Deserialize<MovieSuggestionModel>(s)).ToList();
+
+            // Remove movies with empty reviews
+            suggestions = suggestions.Where(s => _reviewStore.FindReviewsByReviewId(s.ReviewId).Count() > 0).Take(limit).ToList();
 
             // Explain by random method
             Random rnd = new Random();

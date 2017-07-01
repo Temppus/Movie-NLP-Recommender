@@ -75,6 +75,7 @@
             @if (Request.IsAuthenticated && isExperimentDone)
             {
                 @Html.ActionLink("Profile", "Index", "Manage", null, htmlAttributes: new { @class = "item" })
+                @Html.ActionLink("Results", "Index", "Experiment", null, htmlAttributes: new { @class = "item" })
             }
 
             @Html.Partial("_LoginPartial")
